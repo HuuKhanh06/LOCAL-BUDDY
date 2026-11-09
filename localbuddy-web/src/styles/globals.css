@@ -1,33 +1,54 @@
-@import './tokens.css';
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "./tokens.css";
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --color-burgundy: #1A0A0F;
+  --color-burgundy-light: #2E131C;
+  --color-blush: #F6E6EA;
+  --color-blush-light: #FBF4F6;
+  --color-blush-border: #E4C3CC;
+  --color-navy: #1C1C28;
+  --color-navy-light: #2B2B3D;
+  --color-navy-muted: #52526B;
+  --color-cyan: #1EC1CB;
+  --color-cyan-hover: #18A7B0;
+  --color-cyan-soft: #E5F8F9;
+
+  --color-success: #0F6E4B;
+  --color-success-bg: #E3F7EF;
+  --color-warning: #8C4A08;
+  --color-warning-bg: #FEF1DC;
+  --color-error: #A61B2B;
+  --color-error-bg: #FCE8EB;
+}
 
 @layer base {
   html {
-    font-family: 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
     background-color: var(--color-bg);
     color: var(--color-text);
+    scroll-behavior: smooth;
   }
 
   body {
     min-height: 100vh;
     background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  h1, h2, h3, h4, .heading-burgundy {
+    color: var(--color-burgundy);
   }
 
   * {
     box-sizing: border-box;
   }
 
-  /* Accessible focus ring */
   :focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--color-cyan);
     outline-offset: 2px;
-  }
-
-  /* Minimum tap target 44px */
-  button, a, [role="button"] {
-    min-height: 44px;
   }
 }
 
@@ -35,12 +56,4 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
-}
-
-/* CHẾ ĐỘ FIGMA: Tắt animation & transition khi tham số URL chứa ?figma=1 để html.to.design chụp chuẩn xác */
-body.figma-mode *,
-.figma-mode * {
-  animation: none !important;
-  transition: none !important;
-  transform: none !important;
 }

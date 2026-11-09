@@ -1,12 +1,18 @@
-// pages/tourist/BookingFormPage.tsx (S-08)
+// pages/tourist/BookingFormPage.tsx (UC.12: Đặt lịch Hướng dẫn viên theo giờ)
+// Tuân thủ chốt Câu hỏi 2 & 3:
+// - Bắt buộc nhập cả Địa điểm hẹn (diaDiemHen) và Ghi chú yêu cầu (ghiChuYeuCau) + có chip gợi ý điểm đón Đà Nẵng (NB-05).
+// - Khi gửi yêu cầu (PENDING), khung giờ VẪN GIỮ LÀ AVAILABLE (BR-04), chỉ khóa HOLD khi HDV bấm Chấp nhận (UC.13).
+
 import React, { useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useBookingContext } from '../../context/BookingContext';
 import { Button } from '../../components/ui/Button';
 import { Input, Textarea } from '../../components/ui/Input';
 import { PaymentSummary } from '../../components/common/PaymentSummary';
+import { ErrorState } from '../../components/common/GuideCard';
 import { useToast } from '../../components/ui/Toast';
-import { formatDate, calcDeltaHours } from '../../utils/time';
+import { formatDate } from '../../utils/time';
+import { DANANG_MEETING_SPOTS } from '../../data/mockData';
 
 export const BookingFormPage: React.FC = () => {
   const { guideId } = useParams<{ guideId: string }>();
@@ -16,30 +22,37 @@ export const BookingFormPage: React.FC = () => {
   const { showToast } = useToast();
 
   const guideItem = getGuideById(guideId || '');
-  const date = searchParams.get('date') || '2026-11-05';
-  const startTime = searchParams.get('start') || '09:00';
-  const endTime = searchParams.get('end') || '12:00';
+  const date = searchParams.get('date') || '2026-11-12';
+  const startTime = searchParams.get('start') || '08:00';
+  const endTime = searchParams.get('end') || '11:00';
+  const slotId = searchParams.get('slotId') || '';
 
-  // Form states
+  const startHour = parseInt(startTime.split(':')[0], 10) || 8;
+  const endHour = parseInt(endTime.split(':')[0], 10) || 11;
+  const defaultHours = Math.max(1, endHour - startHour);
+
+  const [hours, setHours] = useState<number>(defaultHours);
   const [guestCount, setGuestCount] = useState<number>(2);
-  const [location, setLocation] = useState('Bãi biển Mỹ Khê, Đà Nẵng');
-  const [specialRequests, setSpecialRequests] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [meetingLocation, setMeetingLocation] = useState<string>(
+    DANANG_MEETING_SPOTS[0]
+  );
+  const [specialRequests, setSpecialRequests] = useState<string>(
+    'Nhóm mình muốn khám phá ẩm thực địa phương và chụp ảnh tại các điểm nổi bật ở Đà Nẵng.'
+  );
+  const [errorMsg, setErrorMsg] = useState<string>('');
 
   if (!guideItem) {
     return (
-      <div className="py-12 text-center">
-        <h2 className="text-xl font-bold">Không tìm thấy thông tin Guide</h2>
-        <Button variant="primary" onClick={() => navigate('/guides')} className="mt-4">
-          Quay lại tìm kiếm
-        </Button>
+      <div className="py-10 max-w-xl mx-auto">
+        <ErrorState
+          message="Không tìm thấy thông tin Hướng dẫn viên để đặt lịch."
+          onRetry={() => navigate('/guides')}
+        />
       </div>
     );
   }
 
   const { user, profile } = guideItem;
-  const hours = 3; // Ví dụ 09:00 - 12:00 = 3h
   const totalAmount = profile.hourlyRate * hours;
   const depositAmount = Math.round(totalAmount * 0.3);
   const remainingAmount = totalAmount - depositAmount;
@@ -48,139 +61,211 @@ export const BookingFormPage: React.FC = () => {
     e.preventDefault();
     setErrorMsg('');
 
-    if (!guestCount || guestCount < 1) {
-      setErrorMsg('Vui lòng nhập số lượng khách hợp lệ (tối thiểu 1 khách).');
+    if (!guestCount || guestCount < 1 || guestCount > 20) {
+      setErrorMsg('Số lượng khách tham gia phải từ 1 đến 20 người.');
       return;
     }
 
-    // Kiểm tra giờ bắt đầu phải cách thời điểm đặt ít nhất 24 giờ [S]
-    const delta = calcDeltaHours(date, startTime);
-    if (delta < 24) {
-      setErrorMsg('Theo quy định, giờ bắt đầu ca phải cách thời điểm đặt ít nhất 24 giờ để Guide kịp chuẩn bị.');
+    if (!meetingLocation.trim()) {
+      setErrorMsg(
+        'Theo quy định FR 4.1 (UC.12), vui lòng nhập hoặc chọn Địa điểm hẹn đón khách tại Đà Nẵng.'
+      );
       return;
     }
 
-    // Atomic Lock check: kiểm tra xem khung giờ này có vừa bị ai đặt không
-    const currentSlot = slots.find(
-      (s) => s.guideId === user.id && s.date === date && s.startTime === startTime
+    if (!specialRequests.trim()) {
+      setErrorMsg(
+        'Theo quy định FR 4.1 (UC.12), vui lòng nhập Ghi chú yêu cầu / Lịch trình mong muốn để HDV chuẩn bị.'
+      );
+      return;
+    }
+
+    // Kiểm tra xem khung giờ có đang bị HOLD hoặc BUSY không
+    const matchedSlot = slots.find(
+      (s) =>
+        s.guideId === user.id &&
+        s.date === date &&
+        s.startTime === startTime
     );
 
-    if (currentSlot && currentSlot.status === 'BUSY') {
-      setErrorMsg('Khung giờ này vừa được đặt, vui lòng chọn khung khác.');
+    if (matchedSlot && matchedSlot.status !== 'AVAILABLE') {
+      setErrorMsg(
+        `Khung giờ ${startTime} – ${endTime} ngày ${formatDate(
+          date
+        )} hiện đang ở trạng thái ${matchedSlot.status}, vui lòng chọn khung giờ khác.`
+      );
       return;
     }
 
-    setIsSubmitting(true);
+    const newBooking = createBooking({
+      guideId: user.id,
+      date,
+      startTime,
+      endTime,
+      hours,
+      guestCount,
+      meetingLocation,
+      specialRequests,
+      slotIds: slotId ? [slotId] : undefined,
+    });
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-
-      const newBooking = createBooking({
-        guideId: user.id,
-        date,
-        startTime,
-        endTime,
-        hours,
-        guestCount,
-        meetingLocation: location,
-        specialRequests,
-      });
-
-      showToast('Đã gửi yêu cầu đặt lịch, chờ Guide xác nhận trong 24 giờ!', 'success');
-      navigate(`/don/${newBooking.id}`);
-    }, 600);
+    showToast(
+      `Đã tạo yêu cầu đặt lịch ${newBooking.id}! Hướng dẫn viên có 24 giờ để phản hồi (BR-03).`,
+      'success'
+    );
+    navigate(`/don/${newBooking.id}`);
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
-      <div className="border-b border-[#D6E2D9] pb-4">
-        <h1 className="text-[24px] font-bold text-[#14231A]">Xác nhận đặt lịch hướng dẫn viên</h1>
-        <p className="text-[14px] text-[#4B5B50] mt-1">
-          Điền thông tin chuyến đi để gửi yêu cầu đến Guide {user.fullName}
-        </p>
+    <div className="max-w-3xl mx-auto py-4 space-y-6">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <span className="text-[12px] font-bold uppercase tracking-wider text-[#1A0A0F] bg-[#F6E6EA] px-3 py-1 rounded-full">
+            UC.12 • Gửi yêu cầu đặt lịch theo giờ
+          </span>
+          <h1 className="text-[26px] font-extrabold text-[#1A0A0F] mt-2">
+            Xác nhận thông tin chuyến đi tại Đà Nẵng
+          </h1>
+        </div>
+        <Button variant="ghost" onClick={() => navigate(`/guides/${user.id}`)}>
+          ← Đổi khung giờ khác
+        </Button>
       </div>
 
-      {/* Tóm tắt ca làm việc đã chọn */}
-      <div className="bg-white border border-[#D6E2D9] rounded-[12px] p-4 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-[#DCFCE7] text-[#15803D] font-bold flex items-center justify-center text-lg">
-            {user.fullName.charAt(0)}
-          </div>
+      {/* Thẻ tóm tắt HDV & Ca đã chọn */}
+      <div className="bg-[#1C1C28] text-white rounded-[16px] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md">
+        <div className="flex items-center gap-4">
+          <img
+            src={profile.avatarUrl}
+            alt={user.fullName}
+            className="w-16 h-16 rounded-full object-cover border-2 border-[#1EC1CB]"
+          />
           <div>
-            <h3 className="font-bold text-[16px] text-[#14231A]">{user.fullName}</h3>
-            <span className="text-[13px] text-[#4B5B50]">
-              📅 {formatDate(date)} • ⏰ {startTime} – {endTime} ({hours} giờ)
+            <span className="text-[11px] font-bold text-[#1EC1CB] uppercase tracking-wider">
+              Hướng dẫn viên đồng hành
             </span>
+            <h3 className="text-[19px] font-extrabold text-white">{user.fullName}</h3>
+            <p className="text-[13px] text-[#F6E6EA]/90 mt-0.5">
+              📅 Ngày {formatDate(date)} • ⏰ Khung giờ {startTime} – {endTime} ({hours} giờ)
+            </p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => navigate(`/guides/${user.id}`)}
-          className="text-[13px] text-[#15803D] font-semibold hover:underline"
-        >
-          Đổi ca khác
-        </button>
+        <div className="sm:text-right bg-white/10 px-4 py-2.5 rounded-[12px]">
+          <span className="text-[11px] text-[#F6E6EA]/80 block">Đơn giá áp dụng</span>
+          <span className="text-[18px] font-black text-[#1EC1CB] tabular-nums">
+            {profile.hourlyRate.toLocaleString('vi-VN')} ₫ / giờ
+          </span>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white border border-[#D6E2D9] rounded-[16px] p-6 shadow-sm space-y-5">
-        <Input
-          label="Số lượng khách tham gia * (Bắt buộc)"
-          type="number"
-          min={1}
-          max={20}
-          value={guestCount}
-          onChange={(e) => setGuestCount(Number(e.target.value))}
-          hint="Bao gồm cả người lớn và trẻ em"
-        />
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white border border-[#E4C3CC] rounded-[16px] p-6 sm:p-8 shadow-xs space-y-6"
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Số lượng khách tham gia * (1 – 20 người)"
+            type="number"
+            min={1}
+            max={20}
+            value={guestCount}
+            onChange={(e) => setGuestCount(Number(e.target.value))}
+            hint="Giá thuê tính theo giờ của HDV, không phụ thu theo đầu người"
+          />
 
-        <Input
-          label="Địa điểm gặp mặt đón khách (Tùy chọn)"
-          placeholder="Ví dụ: Khách sạn Mường Thanh, bãi biển Mỹ Khê..."
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-        />
+          <Input
+            label="Số giờ thuê trong ca *"
+            type="number"
+            min={1}
+            max={10}
+            value={hours}
+            onChange={(e) => setHours(Math.max(1, Math.min(10, Number(e.target.value))))}
+            hint={`Khung giờ gốc: ${startTime} – ${endTime}`}
+          />
+        </div>
 
+        {/* Địa điểm hẹn bắt buộc + Chip chọn nhanh địa danh Đà Nẵng (NB-05) */}
+        <div className="space-y-2">
+          <Input
+            label="Địa điểm hẹn đón khách tại Đà Nẵng * (Bắt buộc - FR 4.1)"
+            placeholder="Nhập địa chỉ khách sạn hoặc điểm hẹn tại Đà Nẵng..."
+            value={meetingLocation}
+            onChange={(e) => setMeetingLocation(e.target.value)}
+          />
+          <div>
+            <span className="text-[12px] font-semibold text-[#52526B] block mb-1.5">
+              📍 Chọn nhanh điểm hẹn phổ biến tại Đà Nẵng:
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {DANANG_MEETING_SPOTS.map((spot) => (
+                <button
+                  key={spot}
+                  type="button"
+                  onClick={() => setMeetingLocation(spot)}
+                  className={`px-3 py-1 rounded-full text-[12px] font-semibold border transition-colors cursor-pointer ${
+                    meetingLocation === spot
+                      ? 'bg-[#1EC1CB] text-[#1C1C28] border-[#1C1C28]'
+                      : 'bg-[#FBF4F6] text-[#1C1C28] border-[#E4C3CC] hover:border-[#1EC1CB]'
+                  }`}
+                >
+                  {spot}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Ghi chú yêu cầu bắt buộc (FR 4.1, UC.12) */}
         <Textarea
-          label="Yêu cầu riêng / Lưu ý đặc biệt (Tùy chọn)"
-          placeholder="Ví dụ: Cần tour nhiều điểm chụp ảnh, có người lớn tuổi..."
+          label="Ghi chú yêu cầu & Lịch trình mong muốn * (Bắt buộc - FR 4.1, UC.12)"
+          placeholder="Ví dụ: Muốn đi Chùa Linh Ứng Sơn Trà, ăn hải sản Bé Mặn và nhờ HDV chụp ảnh gia đình..."
           value={specialRequests}
           onChange={(e) => setSpecialRequests(e.target.value)}
+          rows={4}
+          hint="Thông tin này giúp Hướng dẫn viên chuẩn bị lộ trình phù hợp nhất cho bạn"
         />
 
-        {/* Tóm tắt thanh toán (Chế độ Tourist: TUYỆT ĐỐI KHÔNG HIỂN THỊ PHÍ SÀN theo Q13) */}
-        <div>
-          <PaymentSummary
-            total={totalAmount}
-            deposit={depositAmount}
-            remaining={remainingAmount}
-            mode="tourist"
-          />
-          <p className="text-[12px] text-[#4B5B50] mt-2 italic">
-            * Bạn chưa cần thanh toán ngay. Sau khi Guide chấp nhận đơn, bạn sẽ có 15 phút để thanh toán cọc 30%.
+        {/* Tóm tắt thanh toán (Mode tourist: Tuyệt đối ẩn phí sàn) */}
+        <PaymentSummary
+          hourlyRate={profile.hourlyRate}
+          hours={hours}
+          total={totalAmount}
+          deposit={depositAmount}
+          remaining={remainingAmount}
+          mode="tourist"
+        />
+
+        <div className="p-4 rounded-[12px] bg-[#E5F8F9] border border-[#1EC1CB] text-[13px] text-[#1C1C28] space-y-1">
+          <p className="font-bold">
+            ℹ️ Cơ chế giữ lịch nguyên tử của LocalBuddy (BR-03, BR-04, BR-05):
+          </p>
+          <p>
+            1. Khi bạn bấm <strong>Gửi yêu cầu đặt lịch</strong>, đơn sẽ ở trạng thái <strong>Chờ HDV phản hồi (PENDING)</strong>. Bạn chưa phải thanh toán ngay.
+          </p>
+          <p>
+            2. Ngay khi HDV <strong>{user.fullName}</strong> bấm Chấp nhận (trong vòng 24 giờ), hệ thống sẽ khóa nguyên tử khung giờ (<strong>HOLD</strong>) trong <strong>15 phút</strong> để bạn thanh toán cọc 30%.
           </p>
         </div>
 
         {errorMsg && (
-          <div className="p-3 bg-[#FEE2E2] text-[#B91C1C] rounded-[8px] text-[13px]">
-            {errorMsg}
+          <div className="p-3.5 bg-[#FCE8EB] border border-[#F5B2BA] text-[#A61B2B] rounded-[12px] text-[13px] font-semibold">
+            ⚠️ {errorMsg}
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-4 border-t border-[#D6E2D9]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#E4C3CC] flex-wrap gap-3">
           <Button
             type="button"
-            variant="ghost"
+            variant="secondary"
             onClick={() => navigate(`/guides/${user.id}`)}
           >
-            ← Quay lại
+            ← Quay lại hồ sơ HDV
           </Button>
-
-          <Button type="submit" variant="primary" isLoading={isSubmitting} className="px-6">
-            Gửi yêu cầu đặt lịch
+          <Button type="submit" variant="primary" size="lg">
+            Gửi yêu cầu đặt lịch ngay →
           </Button>
         </div>
       </form>
     </div>
   );
 };
-

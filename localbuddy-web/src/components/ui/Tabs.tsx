@@ -1,5 +1,5 @@
 // components/ui/Tabs.tsx
-import React, { useState } from 'react';
+import React from 'react';
 import { clsx } from 'clsx';
 
 export interface TabItem {
@@ -17,7 +17,7 @@ interface TabsProps {
 
 export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange, className }) => {
   return (
-    <div className={clsx('flex border-b border-[#D6E2D9] overflow-x-auto gap-2', className)}>
+    <div className={clsx('flex border-b border-[#E4C3CC] overflow-x-auto gap-1', className)}>
       {tabs.map((tab) => {
         const isActive = tab.id === activeTab;
         return (
@@ -26,18 +26,22 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange, className
             type="button"
             onClick={() => onChange(tab.id)}
             className={clsx(
-              'px-4 py-2.5 text-[14px] font-semibold whitespace-nowrap border-b-2 transition-colors flex items-center gap-1.5',
+              'px-4 py-3 text-[14px] font-bold whitespace-nowrap border-b-2 transition-all flex items-center gap-2 cursor-pointer',
               isActive
-                ? 'border-[#15803D] text-[#15803D]'
-                : 'border-transparent text-[#4B5B50] hover:text-[#14231A]'
+                ? 'border-[#1EC1CB] text-[#1A0A0F] bg-[#F6E6EA]/50 rounded-t-[10px]'
+                : 'border-transparent text-[#52526B] hover:text-[#1A0A0F] hover:bg-[#F6E6EA]/25 rounded-t-[10px]'
             )}
           >
-            {tab.label}
+            <span>{tab.label}</span>
             {tab.badge !== undefined && (
-              <span className={clsx(
-                'text-[12px] px-1.5 py-0.5 rounded-full font-medium',
-                isActive ? 'bg-[#DCFCE7] text-[#15803D]' : 'bg-[#E5E7EB] text-[#374151]'
-              )}>
+              <span
+                className={clsx(
+                  'text-[12px] px-2 py-0.5 rounded-full font-bold tabular-nums',
+                  isActive
+                    ? 'bg-[#1EC1CB] text-[#1C1C28]' // Chữ navy trên nền cyan!
+                    : 'bg-[#F6E6EA] text-[#1A0A0F]'
+                )}
+              >
                 {tab.badge}
               </span>
             )}
@@ -47,4 +51,3 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange, className
     </div>
   );
 };
-

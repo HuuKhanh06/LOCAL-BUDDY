@@ -1,218 +1,335 @@
-// pages/tourist/BalancePaymentPage.tsx (S-13: Thanh toán 70% và quyết toán)
-import React, { useState } from 'react';
+// pages/tourist/BalancePaymentPage.tsx (UC.20: Tất toán 70% còn lại sau khi hoàn thành tour)
+// Tích hợp lớp PaymentProvider (SANDBOX) hỗ trợ 2 nhánh chuẩn BR-13 + Khôi phục đóng tab + Chống thanh toán trùng:
+// 1. ONLINE (VNPay / MoMo / Thẻ): Thành công -> PaymentStatus = PAID, Ví HDV cộng +(G - F).
+// 2. CASH (Tiền mặt trực tiếp): PaymentStatus = WAITING_RECONCILE (Chờ HDV bấm xác nhận đã nhận đủ 70% tiền mặt ở UC.21).
+
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBookingContext } from '../../context/BookingContext';
 import { Button } from '../../components/ui/Button';
 import { PaymentSummary } from '../../components/common/PaymentSummary';
+import { ErrorState } from '../../components/common/GuideCard';
 import { useToast } from '../../components/ui/Toast';
 import { formatMoney } from '../../utils/money';
+import { formatDate, formatTimeRange } from '../../utils/time';
+import {
+  paymentProvider,
+  PaymentGatewayId,
+  SandboxOutcome,
+} from '../../services/paymentProvider';
 
 export const BalancePaymentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getBookingById, payFinal } = useBookingContext();
+  const { getBookingById, getGuideById, payFinal } = useBookingContext();
   const { showToast } = useToast();
 
   const booking = getBookingById(id || '');
+  const guideItem = booking ? getGuideById(booking.guideId) : undefined;
 
-  // Lựa chọn phương thức: Online hoặc Tiền mặt (Cash)
   const [method, setMethod] = useState<'ONLINE' | 'CASH'>('ONLINE');
+  const [gateway, setGateway] = useState<PaymentGatewayId>(() => {
+    if (!booking) return 'VNPAY';
+    const interrupted = paymentProvider.getInterruptedSession(booking.id, 'BALANCE_70');
+    return interrupted ? interrupted.gateway : 'VNPAY';
+  });
+  const [recoveredBanner, setRecoveredBanner] = useState<string>(() => {
+    if (!booking) return '';
+    const interrupted = paymentProvider.getInterruptedSession(booking.id, 'BALANCE_70');
+    return interrupted
+      ? `Phát hiện phiên thanh toán 70% qua ${interrupted.gateway} trước đó bị gián đoạn (đóng tab hoặc hủy giữa chừng). Hệ thống chưa trừ tiền — bạn có thể hoàn tất thanh toán hoặc chọn trả Tiền mặt cho HDV.`
+      : '';
+  });
+  const [onlineError, setOnlineError] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [onlineFailed, setOnlineFailed] = useState(false);
-  const [cashWaiting, setCashWaiting] = useState(false);
+
+  useEffect(() => {
+    if (!booking || booking.paymentStatus === 'PAID') return;
+
+    paymentProvider.startCheckoutSession({
+      bookingId: booking.id,
+      phase: 'BALANCE_70',
+      amount: booking.remainingAmount,
+      gateway,
+    });
+
+    const handleBeforeUnload = () => {
+      paymentProvider.markSessionInterrupted(booking.id, 'BALANCE_70');
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [booking, gateway]);
 
   if (!booking) {
     return (
-      <div className="py-12 text-center">
-        <h2 className="text-xl font-bold">Không tìm thấy đơn đặt lịch</h2>
-        <Button variant="primary" onClick={() => navigate('/don-cua-toi')} className="mt-4">
-          Về danh sách đơn
-        </Button>
+      <div className="py-10 max-w-xl mx-auto">
+        <ErrorState
+          message="Không tìm thấy đơn đặt lịch cần tất toán 70%."
+          onRetry={() => navigate('/don-cua-toi')}
+        />
       </div>
     );
   }
 
-  const handleOnlinePay = (simulateSuccess: boolean) => {
+  const handleOnlineSandbox = async (outcome: SandboxOutcome) => {
+    if (isProcessing) return;
     setIsProcessing(true);
-    setOnlineFailed(false);
+    setOnlineError('');
 
-    setTimeout(() => {
-      setIsProcessing(false);
-      if (simulateSuccess) {
-        payFinal(booking.id, 'ONLINE', true);
-        showToast('Thanh toán 70% thành công! Chuyến đi đã quyết toán xong.', 'success');
+    try {
+      const gwResult = await paymentProvider.processPayment({
+        bookingId: booking.id,
+        phase: 'BALANCE_70',
+        amount: booking.remainingAmount,
+        gateway,
+        sandboxOutcome: outcome,
+      });
+
+      if (gwResult.status === 'DUPLICATE_BLOCKED') {
+        setOnlineError(gwResult.messageVi);
+        showToast(gwResult.messageVi, 'warning');
+        return;
+      }
+
+      if (outcome === 'CANCELLED_MIDWAY') {
+        setRecoveredBanner(gwResult.messageVi);
+        showToast(gwResult.messageVi, 'info');
+        return;
+      }
+
+      const res = payFinal(booking.id, 'ONLINE', gwResult.ok, gateway);
+      if (res.ok) {
+        showToast(`${res.message} (${gwResult.transactionRef})`, 'success');
         navigate(`/don/${booking.id}`);
       } else {
-        setOnlineFailed(true);
-        showToast('Giao dịch trực tuyến không thành công. Bạn có thể thử lại hoặc đổi sang trả tiền mặt.', 'error');
+        setOnlineError(gwResult.messageVi || res.message);
+        showToast(gwResult.messageVi || res.message, 'error');
       }
-    }, 600);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleCashConfirm = () => {
-    payFinal(booking.id, 'CASH', true);
-    setCashWaiting(true);
-    showToast('Đã chọn thanh toán tiền mặt. Vui lòng thanh toán trực tiếp cho Guide.', 'info');
+    paymentProvider.clearCheckoutSession(booking.id, 'BALANCE_70');
+    const res = payFinal(booking.id, 'CASH', true, 'CASH_DIRECT');
+    if (res.ok) {
+      showToast(res.message, 'info');
+      navigate(`/don/${booking.id}`);
+    }
   };
 
   return (
-    <div className="max-w-xl mx-auto py-8 px-4 space-y-6">
-      <div className="border-b border-[#D6E2D9] pb-4">
-        <span className="text-[12px] font-bold text-[#15803D] uppercase tracking-wider">
-          Quyết toán chuyến đi • {booking.id}
+    <div className="max-w-2xl mx-auto py-4 space-y-6">
+      <div className="bg-[#1C1C28] text-white rounded-[16px] p-6">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-[#1EC1CB]">
+          UC.20 • Quyết toán chuyến đi đã hoàn thành (BR-13) • {paymentProvider.mode}
         </span>
-        <h1 className="text-[24px] font-bold text-[#14231A] mt-0.5">Thanh toán 70% còn lại</h1>
-        <p className="text-[14px] text-[#4B5B50] mt-1">
-          Chuyến đi đã hoàn thành. Vui lòng thanh toán khoản tiền còn lại cho hướng dẫn viên.
+        <h1 className="text-[24px] font-extrabold text-white mt-1">
+          Tất toán 70% còn lại • Đơn {booking.id}
+        </h1>
+        <p className="text-[14px] text-[#F6E6EA]/85 mt-1">
+          Hướng dẫn viên: <strong>{guideItem?.user.fullName || 'Nguyễn Hữu Khanh'}</strong> • Ngày{' '}
+          {formatDate(booking.date)} ({formatTimeRange(booking.startTime, booking.endTime)})
         </p>
       </div>
 
-      <div className="bg-white border border-[#D6E2D9] rounded-[16px] p-6 shadow-sm space-y-6">
-        <PaymentSummary
-          total={booking.totalAmount}
-          deposit={booking.depositAmount}
-          remaining={booking.remainingAmount}
-          mode="tourist"
-        />
-
-        <div className="p-4 bg-[#DCFCE7] rounded-[12px] border border-[#86EFAC] text-center">
-          <span className="text-[13px] text-[#166534] block">Số tiền còn lại cần thanh toán (B = 70%):</span>
-          <span className="text-[28px] font-bold text-[#15803D] tabular-nums">
-            {formatMoney(booking.remainingAmount)}
-          </span>
+      {booking.paymentStatus === 'PAID' ? (
+        <div className="bg-[#E3F7EF] border border-[#9FE0C6] rounded-[16px] p-8 text-center space-y-4">
+          <span className="text-4xl block">✅</span>
+          <h2 className="text-[22px] font-extrabold text-[#0F6E4B]">
+            Đơn {booking.id} đã tất toán đầy đủ 100%
+          </h2>
+          <p className="text-[14px] text-[#1C1C28] max-w-md mx-auto">
+            Hệ thống đã ghi nhận đầy đủ khoản thanh toán 70% cuối cùng và khóa chống thu tiền trùng lặp.
+          </p>
+          <Button variant="primary" onClick={() => navigate(`/don/${booking.id}`)}>
+            Quay về chi tiết đơn & Đánh giá HDV →
+          </Button>
         </div>
-
-        {cashWaiting ? (
-          <div className="p-4 bg-[#FEF3C7] border border-[#FDE68A] rounded-[12px] space-y-3 text-center">
-            <span className="text-3xl">💵</span>
-            <h3 className="font-bold text-[16px] text-[#92400E]">Đang chờ Guide xác nhận đã nhận tiền mặt</h3>
-            <p className="text-[13px] text-[#4B5B50]">
-              Bạn đã chọn phương thức thanh toán tiền mặt trực tiếp. Khi Guide xác nhận đã nhận đủ số tiền tại màn hình của Guide, đơn sẽ chuyển sang <strong>Đã thanh toán đủ (PAID)</strong>.
-            </p>
-            <Button variant="primary" onClick={() => navigate(`/don/${booking.id}`)} className="mt-2">
-              Quay lại chi tiết đơn
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <h3 className="text-[14px] font-semibold text-[#14231A]">Chọn phương thức thanh toán:</h3>
-
-            <div className="grid grid-cols-2 gap-3">
-              <label
-                className={`flex items-center gap-2.5 p-3 rounded-[10px] border cursor-pointer transition-all ${
-                  method === 'ONLINE'
-                    ? 'border-[#15803D] bg-[#F6FAF6] font-semibold text-[#15803D]'
-                    : 'border-[#D6E2D9] text-[#14231A]'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="payMethod"
-                  checked={method === 'ONLINE'}
-                  onChange={() => {
-                    setMethod('ONLINE');
-                    setOnlineFailed(false);
-                  }}
-                  className="accent-[#15803D]"
-                />
-                <span>💳 Thanh toán Online</span>
-              </label>
-
-              <label
-                className={`flex items-center gap-2.5 p-3 rounded-[10px] border cursor-pointer transition-all ${
-                  method === 'CASH'
-                    ? 'border-[#15803D] bg-[#F6FAF6] font-semibold text-[#15803D]'
-                    : 'border-[#D6E2D9] text-[#14231A]'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="payMethod"
-                  checked={method === 'CASH'}
-                  onChange={() => {
-                    setMethod('CASH');
-                    setOnlineFailed(false);
-                  }}
-                  className="accent-[#15803D]"
-                />
-                <span>💵 Tiền mặt trực tiếp</span>
-              </label>
-            </div>
-
-            {/* Khối xử lý cho Online */}
-            {method === 'ONLINE' && (
-              <div className="border border-[#D6E2D9] rounded-[12px] p-4 bg-white space-y-3">
-                <div className="flex items-center justify-between border-b border-[#D6E2D9] pb-2">
-                  <span className="text-[13px] font-semibold text-[#14231A]">Cổng thanh toán giả lập</span>
-                  <span className="text-[11px] bg-[#FEF3C7] text-[#92400E] px-2 py-0.5 rounded font-medium">Demo</span>
-                </div>
-
-                {onlineFailed ? (
-                  <div className="space-y-3">
-                    <div className="p-3 bg-[#FEE2E2] text-[#B91C1C] rounded-[8px] text-[13px]">
-                      ✕ Thanh toán trực tuyến không thành công. Vui lòng thử lại hoặc chuyển sang trả tiền mặt.
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="primary"
-                        isLoading={isProcessing}
-                        onClick={() => handleOnlinePay(true)}
-                        className="flex-1"
-                      >
-                        Thử lại Online
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        onClick={() => setMethod('CASH')}
-                        className="flex-1"
-                      >
-                        Chọn tiền mặt
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <p className="text-[13px] text-[#4B5B50]">
-                      Mô phỏng cổng thanh toán trực tuyến:
-                    </p>
-                    <div className="grid grid-cols-2 gap-3 pt-1">
-                      <Button
-                        variant="primary"
-                        isLoading={isProcessing}
-                        onClick={() => handleOnlinePay(true)}
-                        className="w-full"
-                      >
-                        ✓ Trả thành công
-                      </Button>
-                      <Button
-                        variant="danger"
-                        isLoading={isProcessing}
-                        onClick={() => handleOnlinePay(false)}
-                        className="w-full"
-                      >
-                        ✕ Giả lập lỗi
-                      </Button>
-                    </div>
-                  </div>
-                )}
+      ) : (
+        <div className="bg-white border border-[#E4C3CC] rounded-[16px] p-6 sm:p-8 shadow-xs space-y-6">
+          {recoveredBanner && (
+            <div className="p-4 rounded-[12px] bg-[#E5F8F9] border border-[#1EC1CB] text-[13px] text-[#1C1C28] flex items-start justify-between gap-3">
+              <div>
+                <strong className="block text-[#1A0A0F] mb-0.5">
+                  🔄 Khôi phục phiên tất toán an toàn
+                </strong>
+                <span>{recoveredBanner}</span>
               </div>
-            )}
+              <button
+                type="button"
+                aria-label="Đóng thông báo khôi phục"
+                onClick={() => setRecoveredBanner('')}
+                className="text-[#52526B] hover:text-[#1A0A0F] font-bold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+          )}
 
-            {/* Khối xử lý cho Tiền mặt */}
-            {method === 'CASH' && (
-              <div className="border border-[#D6E2D9] rounded-[12px] p-4 bg-[#F6FAF6] space-y-3">
-                <p className="text-[13px] text-[#14231A]">
-                  Bạn sẽ đưa <strong>{formatMoney(booking.remainingAmount)}</strong> trực tiếp cho Guide sau khi chuyến đi kết thúc. Guide sẽ xác nhận nhận tiền trên hệ thống.
-                </p>
-                <Button variant="primary" onClick={handleCashConfirm} className="w-full">
-                  Xác nhận chọn trả tiền mặt
+          <PaymentSummary
+            hourlyRate={booking.hourlyRateSnapshot}
+            hours={booking.hours}
+            total={booking.totalAmount}
+            deposit={booking.depositAmount}
+            remaining={booking.remainingAmount}
+            mode="tourist"
+          />
+
+          <div className="p-5 bg-[#F6E6EA] rounded-[14px] border border-[#E4C3CC] flex items-center justify-between">
+            <div>
+              <span className="text-[12px] font-bold uppercase tracking-wider text-[#1A0A0F] block">
+                Khoản tiền 70% còn lại cần tất toán (B = 70% G)
+              </span>
+              <span className="text-[12px] text-[#52526B]">
+                Đã trừ khoản đặt cọc 30% ({formatMoney(booking.depositAmount)})
+              </span>
+            </div>
+            <span className="text-[28px] font-black text-[#1A0A0F] tabular-nums">
+              {formatMoney(booking.remainingAmount)}
+            </span>
+          </div>
+
+          {/* Chọn phương thức: ONLINE hoặc CASH */}
+          <div className="space-y-3">
+            <h3 className="text-[15px] font-bold text-[#1A0A0F]">
+              Chọn phương thức thanh toán 70% cuối:
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setMethod('ONLINE');
+                  setOnlineError('');
+                }}
+                className={`p-4 rounded-[12px] border text-left transition-all cursor-pointer ${
+                  method === 'ONLINE'
+                    ? 'bg-[#1EC1CB] text-[#1C1C28] border-[#1C1C28] font-bold shadow-xs'
+                    : 'bg-white text-[#1C1C28] border-[#E4C3CC] hover:border-[#1EC1CB]'
+                }`}
+              >
+                <span className="text-[15px] font-extrabold block">
+                  💳 Thanh toán Online qua Cổng
+                </span>
+                <span className="text-[12px] opacity-85">
+                  Đơn chuyển sang Đã thanh toán đủ (PAID) ngay lập tức
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMethod('CASH');
+                  setOnlineError('');
+                }}
+                className={`p-4 rounded-[12px] border text-left transition-all cursor-pointer ${
+                  method === 'CASH'
+                    ? 'bg-[#1EC1CB] text-[#1C1C28] border-[#1C1C28] font-bold shadow-xs'
+                    : 'bg-white text-[#1C1C28] border-[#E4C3CC] hover:border-[#1EC1CB]'
+                }`}
+              >
+                <span className="text-[15px] font-extrabold block">
+                  💵 Trả Tiền mặt trực tiếp cho HDV
+                </span>
+                <span className="text-[12px] opacity-85">
+                  HDV sẽ bấm xác nhận đã nhận đủ 70% tiền mặt trên ứng dụng (UC.21)
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {method === 'ONLINE' ? (
+            <div className="border-2 border-dashed border-[#E4C3CC] rounded-[14px] p-5 bg-[#FBF4F6] space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <span className="text-[14px] font-bold text-[#1A0A0F]">
+                  Chọn cổng thanh toán Online ({paymentProvider.mode}):
+                </span>
+                <div className="flex gap-2">
+                  {(['VNPAY', 'MOMO', 'BANK_CARD'] as const).map((gw) => (
+                    <button
+                      key={gw}
+                      type="button"
+                      onClick={() => setGateway(gw)}
+                      className={`px-3 py-1 rounded-full text-[12px] font-bold border cursor-pointer ${
+                        gateway === gw
+                          ? 'bg-[#1C1C28] text-[#1EC1CB] border-[#1C1C28]'
+                          : 'bg-white text-[#1C1C28] border-[#E4C3CC]'
+                      }`}
+                    >
+                      {gw}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {onlineError && (
+                <div className="p-3.5 bg-[#FCE8EB] border border-[#F5B2BA] text-[#A61B2B] rounded-[12px] text-[13px] font-semibold">
+                  ⚠️ {onlineError}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <Button
+                  type="button"
+                  variant="primary"
+                  disabled={isProcessing}
+                  onClick={() => handleOnlineSandbox('SUCCESS')}
+                  className="w-full"
+                >
+                  ✓ Tất toán {formatMoney(booking.remainingAmount)}
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={isProcessing}
+                  onClick={() => handleOnlineSandbox('CANCELLED_MIDWAY')}
+                  className="w-full"
+                >
+                  ⏸ Hủy giữa chừng
+                </Button>
+                <Button
+                  type="button"
+                  variant="danger"
+                  disabled={isProcessing}
+                  onClick={() => handleOnlineSandbox('FAILED_RETRYABLE')}
+                  className="w-full"
+                >
+                  ✕ Giả lập Lỗi cổng
                 </Button>
               </div>
-            )}
+            </div>
+          ) : (
+            <div className="border border-[#F8CA84] rounded-[14px] p-5 bg-[#FEF1DC]/50 space-y-4">
+              <h4 className="text-[15px] font-bold text-[#8C4A08]">
+                💵 Hướng dẫn thanh toán Tiền mặt trực tiếp (UC.20 → UC.21):
+              </h4>
+              <p className="text-[14px] text-[#1C1C28] leading-relaxed">
+                Bạn sẽ trao trực tiếp số tiền <strong>{formatMoney(booking.remainingAmount)}</strong> cho Hướng dẫn viên{' '}
+                <strong>{guideItem?.user.fullName}</strong>. Sau khi bạn bấm nút xác nhận bên dưới, trạng thái thanh toán sẽ chuyển sang{' '}
+                <strong>Chờ HDV xác nhận tiền mặt (WAITING_RECONCILE)</strong> cho đến khi HDV bấm xác nhận đã nhận đủ tiền.
+              </p>
+              <Button
+                type="button"
+                variant="primary"
+                size="lg"
+                onClick={handleCashConfirm}
+                className="w-full"
+              >
+                Xác nhận trả Tiền mặt {formatMoney(booking.remainingAmount)} cho HDV →
+              </Button>
+            </div>
+          )}
+
+          <div className="pt-2">
+            <Button variant="ghost" onClick={() => navigate(`/don/${booking.id}`)}>
+              ← Quay lại chi tiết đơn
+            </Button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
-

@@ -1,70 +1,67 @@
-/* LOCALBUDDY Design Tokens */
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+/* ============================================================
+   LOCALBUDDY ĐÀ NẴNG – DESIGN TOKENS & BRAND PALETTE
+   4 màu chủ đạo bắt buộc:
+   - burgundy: #1A0A0F (tiêu đề đậm, footer, nhấn sang trọng)
+   - blush:    #F6E6EA (nền sáng của trang, vùng nhấn nhẹ)
+   - navy:     #1C1C28 (nền tối hero/sidebar dashboard, chữ chính)
+   - cyan:     #1EC1CB (CTA, link, focus ring, trạng thái đang chọn)
+   Quy tắc: Chữ trên nền cyan (#1EC1CB) LUÔN dùng navy (#1C1C28), KHÔNG dùng trắng.
+   ============================================================ */
 
 :root {
-  /* Primary */
-  --color-primary: #15803D;
-  --color-primary-dark: #14532D;
-  --color-primary-soft: #DCFCE7;
-  --color-secondary: #86EFAC;
+  /* 4 Brand Core Colors */
+  --color-burgundy: #1A0A0F;
+  --color-burgundy-light: #2E131C;
+  --color-burgundy-soft: #4A202E;
 
-  /* Background & Surface */
-  --color-bg: #F6FAF6;
+  --color-blush: #F6E6EA;
+  --color-blush-light: #FBF4F6;
+  --color-blush-medium: #EDD2D9;
+  --color-blush-border: #E4C3CC;
+
+  --color-navy: #1C1C28;
+  --color-navy-light: #2B2B3D;
+  --color-navy-muted: #52526B;
+  --color-navy-subtle: #787891;
+
+  --color-cyan: #1EC1CB;
+  --color-cyan-hover: #18A7B0;
+  --color-cyan-active: #138E96;
+  --color-cyan-soft: #E5F8F9;
+  --color-cyan-border: #8CE2E7;
+
+  /* Surface & Layout Aliases */
+  --color-bg: #FBF4F6;
+  --color-bg-blush: #F6E6EA;
   --color-surface: #FFFFFF;
+  --color-text: #1C1C28;
+  --color-text-heading: #1A0A0F;
+  --color-text-muted: #52526B;
+  --color-border: #E4C3CC;
 
-  /* Text */
-  --color-text: #14231A;
-  --color-text-muted: #4B5B50;
+  /* 3 Semantic Status Colors (Harmonized with Burgundy/Blush/Navy/Cyan) */
+  /* 1. Thành công (Success - Emerald/Teal Green) */
+  --color-success: #0F6E4B;
+  --color-success-bg: #E3F7EF;
+  --color-success-border: #99E2C4;
 
-  /* Border */
-  --color-border: #D6E2D9;
+  /* 2. Chờ / Giữ chỗ (Warning / Hold - Warm Amber) */
+  --color-warning: #8C4A08;
+  --color-warning-bg: #FEF1DC;
+  --color-warning-border: #F8CA84;
 
-  /* Semantic */
-  --color-success: #166534;
-  --color-success-bg: #DCFCE7;
-  --color-warning: #92400E;
-  --color-warning-bg: #FEF3C7;
-  --color-error: #B91C1C;
-  --color-error-bg: #FEE2E2;
-  --color-info: #1E40AF;
-  --color-info-bg: #DBEAFE;
-  --color-neutral: #374151;
-  --color-neutral-bg: #E5E7EB;
+  /* 3. Lỗi / Hủy / Tranh chấp (Danger / Error - Deep Crimson) */
+  --color-error: #A61B2B;
+  --color-error-bg: #FCE8EB;
+  --color-error-border: #F5B2BA;
 
-  /* BookingStatus badges */
-  --bs-pending-text: #92400E;
-  --bs-pending-bg: #FEF3C7;
-  --bs-waiting-text: #9A3412;
-  --bs-waiting-bg: #FFEDD5;
-  --bs-confirmed-text: #1E40AF;
-  --bs-confirmed-bg: #DBEAFE;
-  --bs-completed-text: #166534;
-  --bs-completed-bg: #DCFCE7;
-  --bs-disputed-text: #B91C1C;
-  --bs-disputed-bg: #FEE2E2;
-  --bs-cancelled-text: #374151;
-  --bs-cancelled-bg: #E5E7EB;
-
-  /* Spacing (multiples of 4px) */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-12: 48px;
-
-  /* Border radius */
-  --radius-btn: 8px;
+  /* Radii & Shadows */
   --radius-card: 12px;
+  --radius-btn: 12px;
   --radius-modal: 16px;
-  --radius-badge: 999px;
+  --radius-badge: 9999px;
 
-  /* Shadows */
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-modal: 0 8px 24px rgba(0,0,0,0.12);
-
-  /* Sidebar width (Admin) */
-  --sidebar-width: 240px;
+  --shadow-card: 0 2px 10px rgba(26, 10, 15, 0.05), 0 1px 3px rgba(28, 28, 40, 0.04);
+  --shadow-card-hover: 0 10px 24px rgba(26, 10, 15, 0.09), 0 4px 8px rgba(28, 28, 40, 0.05);
+  --shadow-modal: 0 20px 40px rgba(26, 10, 15, 0.22);
 }
-

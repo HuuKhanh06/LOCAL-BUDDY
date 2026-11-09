@@ -1,4 +1,6 @@
-// pages/tourist/MyBookingsPage.tsx (S-10)
+// pages/tourist/MyBookingsPage.tsx
+// Danh sách đơn đặt lịch của Du khách (Đủ 4 trạng thái: Đang tải, Rỗng, Lỗi, Thành công)
+
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBookingContext } from '../../context/BookingContext';
@@ -6,32 +8,28 @@ import { BookingCard } from '../../components/common/BookingCard';
 import { Tabs } from '../../components/ui/Tabs';
 import { EmptyState, LoadingState, ErrorState } from '../../components/common/GuideCard';
 import { Button } from '../../components/ui/Button';
-import { BookingStatus } from '../../types';
 
 export const MyBookingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { bookings, getGuideById } = useBookingContext();
   const [activeTab, setActiveTab] = useState<string>('all');
-
-  // Giả lập trạng thái tải / lỗi demo
-  const [simulateLoading, setSimulateLoading] = useState(false);
-  const [simulateError, setSimulateError] = useState(false);
+  const [viewStatus, setViewStatus] = useState<'ready' | 'loading' | 'error'>('ready');
 
   const tabs = [
     { id: 'all', label: 'Tất cả đơn', badge: bookings.length },
     {
       id: 'PENDING',
-      label: 'Chờ xác nhận',
+      label: 'Chờ HDV phản hồi',
       badge: bookings.filter((b) => b.bookingStatus === 'PENDING').length || undefined,
     },
     {
       id: 'WAITING_PAYMENT',
-      label: 'Chờ đặt cọc',
+      label: 'Chờ đặt cọc 30%',
       badge: bookings.filter((b) => b.bookingStatus === 'WAITING_PAYMENT').length || undefined,
     },
     {
       id: 'CONFIRMED',
-      label: 'Đã xác nhận',
+      label: 'Đã xác nhận lịch',
       badge: bookings.filter((b) => b.bookingStatus === 'CONFIRMED').length || undefined,
     },
     {
@@ -41,8 +39,11 @@ export const MyBookingsPage: React.FC = () => {
     },
     {
       id: 'CANCELLED_DISPUTED',
-      label: 'Hủy / Tranh chấp',
-      badge: bookings.filter((b) => b.bookingStatus === 'CANCELLED' || b.bookingStatus === 'DISPUTED').length || undefined,
+      label: 'Đã hủy / Khiếu nại',
+      badge:
+        bookings.filter(
+          (b) => b.bookingStatus === 'CANCELLED' || b.bookingStatus === 'DISPUTED'
+        ).length || undefined,
     },
   ];
 
@@ -57,74 +58,115 @@ export const MyBookingsPage: React.FC = () => {
   }, [bookings, activeTab]);
 
   return (
-    <div className="py-6 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#D6E2D9] pb-4">
+    <div className="space-y-6 py-2">
+      <div className="bg-[#1C1C28] text-white rounded-[16px] p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-[26px] font-bold text-[#14231A]">Đơn đặt lịch của tôi</h1>
-          <p className="text-[14px] text-[#4B5B50] mt-1">
-            Theo dõi tiến độ, thanh toán cọc và quản lý các chuyến đi của bạn tại Đà Nẵng
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#1EC1CB]">
+            Quản lý hành trình Đà Nẵng
+          </span>
+          <h1 className="text-[26px] sm:text-[30px] font-extrabold text-white mt-1">
+            Đơn đặt lịch của tôi
+          </h1>
+          <p className="text-[14px] text-[#F6E6EA]/85 mt-1">
+            Theo dõi thời hạn giữ chỗ 15 phút, thanh toán cọc 30%, xác nhận hoàn thành và tất toán 70%
           </p>
         </div>
 
-        {/* Demo switches */}
-        <div className="flex items-center gap-2 self-start sm:self-auto bg-white p-1.5 rounded-[8px] border border-[#D6E2D9] text-[12px]">
-          <span className="text-[#4B5B50] font-semibold">Demo:</span>
-          <button
-            onClick={() => setSimulateLoading(!simulateLoading)}
-            className={`px-2 py-1 rounded ${simulateLoading ? 'bg-[#15803D] text-white' : 'bg-gray-100 text-[#14231A]'}`}
-          >
-            {simulateLoading ? 'Tắt Loading' : 'Giả lập Loading'}
-          </button>
-          <button
-            onClick={() => setSimulateError(!simulateError)}
-            className={`px-2 py-1 rounded ${simulateError ? 'bg-[#B91C1C] text-white' : 'bg-gray-100 text-[#14231A]'}`}
-          >
-            {simulateError ? 'Tắt Error' : 'Giả lập Lỗi'}
-          </button>
+        <div className="flex items-center gap-1.5 bg-white/10 p-1.5 rounded-[12px] text-[12px] self-start">
+          <span className="px-2 text-[#F6E6EA]/80 font-semibold">Trạng thái UI:</span>
+          {(['ready', 'loading', 'error'] as const).map((st) => (
+            <button
+              key={st}
+              type="button"
+              onClick={() => setViewStatus(st)}
+              className={`px-2.5 py-1 rounded-[8px] font-bold cursor-pointer ${
+                viewStatus === st
+                  ? 'bg-[#1EC1CB] text-[#1C1C28]'
+                  : 'text-white hover:bg-white/10'
+              }`}
+            >
+              {st === 'ready' ? 'Thành công' : st === 'loading' ? 'Đang tải' : 'Lỗi'}
+            </button>
+          ))}
         </div>
       </div>
 
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-      {simulateError ? (
+      {viewStatus === 'error' ? (
         <ErrorState
-          message="Lỗi mô phỏng: Không thể nạp danh sách đơn của bạn từ bộ nhớ."
-          onRetry={() => setSimulateError(false)}
+          message="Không thể tải danh sách đơn đặt lịch từ máy chủ."
+          onRetry={() => setViewStatus('ready')}
         />
-      ) : simulateLoading ? (
-        <LoadingState message="Đang tải danh sách đơn đặt lịch..." />
+      ) : viewStatus === 'loading' ? (
+        <LoadingState message="Đang đồng bộ danh sách đơn đặt lịch của bạn..." />
       ) : filteredBookings.length === 0 ? (
         <EmptyState
-          title="Không có đơn nào trong mục này"
-          description="Bạn chưa có chuyến đi nào ở trạng thái này. Hãy tìm kiếm và đặt lịch với một Local Guide ngay!"
-          actionText="Tìm Local Guide"
+          title="Chưa có đơn đặt lịch nào trong mục này"
+          description="Hãy khám phá các Hướng dẫn viên bản địa tại Đà Nẵng và chọn một khung giờ phù hợp với lịch trình của bạn!"
+          actionText="Khám phá HDV Đà Nẵng ngay →"
           onAction={() => navigate('/guides')}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {filteredBookings.map((b) => {
             const guide = getGuideById(b.guideId);
 
-            // Nút thanh toán cọc nhanh nếu là WAITING_PAYMENT
-            const quickAction =
-              b.bookingStatus === 'WAITING_PAYMENT' ? (
+            let quickAction: React.ReactNode = undefined;
+            if (b.bookingStatus === 'WAITING_PAYMENT') {
+              quickAction = (
                 <Button
                   variant="primary"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/don/${b.id}/dat-coc`);
-                  }}
-                  className="text-[13px] h-9 px-3"
+                  size="sm"
+                  onClick={() => navigate(`/don/${b.id}/dat-coc`)}
                 >
-                  💳 Cọc ngay 30%
+                  💳 Đặt cọc 30% ngay
                 </Button>
-              ) : undefined;
+              );
+            } else if (
+              b.bookingStatus === 'CONFIRMED' &&
+              b.guideRequestedCompletion
+            ) {
+              quickAction = (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => navigate(`/don/${b.id}`)}
+                >
+                  ✓ Xác nhận hoàn thành / Khiếu nại
+                </Button>
+              );
+            } else if (
+              b.bookingStatus === 'COMPLETED' &&
+              b.paymentStatus === 'WAITING_FINAL'
+            ) {
+              quickAction = (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => navigate(`/don/${b.id}/thanh-toan-70`)}
+                >
+                  💳 Tất toán 70% còn lại
+                </Button>
+              );
+            } else {
+              quickAction = (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => navigate(`/don/${b.id}`)}
+                >
+                  Xem chi tiết →
+                </Button>
+              );
+            }
 
             return (
               <BookingCard
                 key={b.id}
                 booking={b}
                 guideName={guide?.user.fullName}
+                guideAvatar={guide?.profile.avatarUrl}
                 onClick={() => navigate(`/don/${b.id}`)}
                 actionButton={quickAction}
               />
@@ -135,4 +177,3 @@ export const MyBookingsPage: React.FC = () => {
     </div>
   );
 };
-

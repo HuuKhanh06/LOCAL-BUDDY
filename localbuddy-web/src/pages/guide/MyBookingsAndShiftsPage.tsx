@@ -1,248 +1,443 @@
-// pages/guide/MyBookingsAndShiftsPage.tsx (S-21: Đơn và ca của tôi)
+// pages/guide/MyBookingsAndShiftsPage.tsx
+// Quản lý toàn bộ Đơn & Ca dẫn khách của Hướng dẫn viên:
+// - Bấm "Yêu cầu xác nhận hoàn thành" (UC.17) -> mở cửa sổ 24 giờ cho khách xác nhận (UC.18) hoặc khiếu nại (UC.19)
+// - Trong cửa sổ 24 giờ, HDV cũng có quyền gửi khiếu nại nếu khách vi phạm (UC.19)
+// - Bấm "Xác nhận đã thu đủ 70% tiền mặt" (UC.21) khi đơn ở COMPLETED + WAITING_RECONCILE -> cộng +(D - F) vào ví
+// - Bấm "Hủy nhận dẫn khách" (UC.25, BR-06) -> hoàn 100% cọc cho khách và cộng +1 vào soLanViPham của HDV
+
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useBookingContext } from '../../context/BookingContext';
 import { StatusBadge, PaymentBadge } from '../../components/common/StatusBadge';
 import { PaymentSummary } from '../../components/common/PaymentSummary';
 import { Tabs } from '../../components/ui/Tabs';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
-import { EmptyState } from '../../components/common/GuideCard';
+import { Textarea } from '../../components/ui/Input';
+import { EmptyState, Countdown } from '../../components/common/GuideCard';
 import { useToast } from '../../components/ui/Toast';
-import { formatDate, formatTimeRange, calcDeltaHours } from '../../utils/time';
+import {
+  formatDate,
+  formatTimeRange,
+  getSecondsUntil,
+} from '../../utils/time';
 import { formatMoney } from '../../utils/money';
 
 export const MyBookingsAndShiftsPage: React.FC = () => {
+  const navigate = useNavigate();
   const {
     bookings,
+    currentUser,
+    getUserById,
+    getReviewByBookingId,
     requestCompletion,
+    autoConfirmCompletionTimeout,
     confirmCashPayment,
     guideCancelBooking,
+    submitDispute,
+    replyToReview,
   } = useBookingContext();
   const { showToast } = useToast();
 
   const [activeTab, setActiveTab] = useState<string>('all');
-  const [selectedBookingForCancel, setSelectedBookingForCancel] = useState<string | null>(null);
+  const [cancelBookingId, setCancelBookingId] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState<string>(
+    'Hướng dẫn viên gặp sự cố sức khỏe đột xuất không thể dẫn đoàn.'
+  );
 
-  // Toggle demo ca đã kết thúc để kiểm thử nút Yêu cầu hoàn thành
-  const [demoShiftEnded, setDemoShiftEnded] = useState(false);
+  // Modal khiếu nại / No-show từ phía HDV (UC.19)
+  const [disputeBookingId, setDisputeBookingId] = useState<string | null>(null);
+  const [disputeReason, setDisputeReason] = useState<string>(
+    'Du khách tự ý hủy ngang giữa chừng và có hành vi không đúng mực trong chuyến đi.'
+  );
 
-  // Lọc đơn thuộc về Guide hiện tại (Lê Hoàng Nam)
-  const guideBookings = bookings.filter((b) => b.guideId === 'u-guide-1');
+  // Modal Đánh giá hai chiều từ HDV -> Du khách
+  const [replyBookingId, setReplyBookingId] = useState<string | null>(null);
+  const [touristStars, setTouristStars] = useState<number>(5);
+  const [replyComment, setReplyComment] = useState<string>(
+    'Cảm ơn bạn đã đồng hành tại Đà Nẵng! Du khách rất thân thiện, đúng giờ và tôn trọng văn hóa bản địa.'
+  );
+
+  const activeGuideId =
+    currentUser?.role === 'guide' ? currentUser.id : 'u-guide-1';
+
+  const guideBookings = bookings.filter((b) => b.guideId === activeGuideId);
 
   const tabs = [
     { id: 'all', label: 'Tất cả đơn & ca', badge: guideBookings.length },
     {
       id: 'CONFIRMED',
-      label: 'Sắp diễn ra',
-      badge: guideBookings.filter((b) => b.bookingStatus === 'CONFIRMED').length || undefined,
+      label: 'Đã xác nhận / Đang đi',
+      badge:
+        guideBookings.filter((b) => b.bookingStatus === 'CONFIRMED').length ||
+        undefined,
+    },
+    {
+      id: 'WAITING_RECONCILE',
+      label: 'Chờ xác nhận tiền mặt 70%',
+      badge:
+        guideBookings.filter((b) => b.paymentStatus === 'WAITING_RECONCILE')
+          .length || undefined,
     },
     {
       id: 'COMPLETED',
       label: 'Đã hoàn thành',
-      badge: guideBookings.filter((b) => b.bookingStatus === 'COMPLETED').length || undefined,
+      badge:
+        guideBookings.filter((b) => b.bookingStatus === 'COMPLETED').length ||
+        undefined,
     },
     {
       id: 'PENDING_WAITING',
-      label: 'Đang xử lý',
-      badge: guideBookings.filter((b) => b.bookingStatus === 'PENDING' || b.bookingStatus === 'WAITING_PAYMENT').length || undefined,
+      label: 'Chờ duyệt / Chờ cọc',
+      badge:
+        guideBookings.filter(
+          (b) =>
+            b.bookingStatus === 'PENDING' ||
+            b.bookingStatus === 'WAITING_PAYMENT'
+        ).length || undefined,
     },
     {
       id: 'CANCELLED_DISPUTED',
-      label: 'Hủy / Tranh chấp',
-      badge: guideBookings.filter((b) => b.bookingStatus === 'CANCELLED' || b.bookingStatus === 'DISPUTED').length || undefined,
+      label: 'Đã hủy / Tranh chấp',
+      badge:
+        guideBookings.filter(
+          (b) =>
+            b.bookingStatus === 'CANCELLED' || b.bookingStatus === 'DISPUTED'
+        ).length || undefined,
     },
   ];
 
   const filtered = useMemo(() => {
     if (activeTab === 'all') return guideBookings;
+    if (activeTab === 'WAITING_RECONCILE') {
+      return guideBookings.filter((b) => b.paymentStatus === 'WAITING_RECONCILE');
+    }
     if (activeTab === 'PENDING_WAITING') {
       return guideBookings.filter(
-        (b) => b.bookingStatus === 'PENDING' || b.bookingStatus === 'WAITING_PAYMENT'
+        (b) =>
+          b.bookingStatus === 'PENDING' || b.bookingStatus === 'WAITING_PAYMENT'
       );
     }
     if (activeTab === 'CANCELLED_DISPUTED') {
       return guideBookings.filter(
-        (b) => b.bookingStatus === 'CANCELLED' || b.bookingStatus === 'DISPUTED'
+        (b) =>
+          b.bookingStatus === 'CANCELLED' || b.bookingStatus === 'DISPUTED'
       );
     }
     return guideBookings.filter((b) => b.bookingStatus === activeTab);
   }, [guideBookings, activeTab]);
 
   const handleRequestComplete = (bookingId: string) => {
-    requestCompletion(bookingId);
-    showToast(
-      `Đã gửi yêu cầu hoàn thành đơn ${bookingId}! Khách du lịch có 24 giờ để phản hồi.`,
-      'success'
-    );
+    const res = requestCompletion(bookingId);
+    showToast(res.message, 'success');
   };
 
   const handleConfirmCash = (bookingId: string) => {
-    confirmCashPayment(bookingId);
-    showToast(
-      `Đã xác nhận nhận 70% tiền mặt đơn ${bookingId}. Đơn đã chuyển sang PAID và cập nhật ví!`,
-      'success'
-    );
+    const res = confirmCashPayment(bookingId);
+    showToast(res.message, 'success');
   };
 
-  const handleGuideCancel = () => {
-    if (!selectedBookingForCancel) return;
-    guideCancelBooking(selectedBookingForCancel);
-    showToast(
-      `Đã hủy đơn ${selectedBookingForCancel}. Hệ thống đã hoàn trả 100% tiền cọc cho khách và ghi nhận vi phạm của Guide.`,
-      'error'
+  const handleConfirmGuideCancel = () => {
+    if (!cancelBookingId) return;
+    if (!cancelReason.trim()) {
+      showToast('Vui lòng nhập lý do hủy đơn.', 'error');
+      return;
+    }
+    const res = guideCancelBooking(cancelBookingId, cancelReason);
+    showToast(res.message, 'error');
+    setCancelBookingId(null);
+  };
+
+  const handleConfirmGuideDispute = () => {
+    if (!disputeBookingId) return;
+    const res = submitDispute(
+      disputeBookingId,
+      'Khiếu nại / No-show từ phía Hướng dẫn viên',
+      disputeReason
     );
-    setSelectedBookingForCancel(null);
+    showToast(res.message, 'warning');
+    setDisputeBookingId(null);
+  };
+
+  const handleConfirmReplyReview = () => {
+    if (!replyBookingId) return;
+    const res = replyToReview(replyBookingId, touristStars, replyComment);
+    if (res.ok) {
+      showToast(res.message, 'success');
+      setReplyBookingId(null);
+    } else {
+      showToast(res.message, 'error');
+    }
   };
 
   return (
-    <div className="py-6 space-y-6 max-w-4xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#D6E2D9] pb-4">
+    <div className="space-y-6 py-2">
+      <div className="bg-[#1C1C28] text-white rounded-[16px] p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-[26px] font-bold text-[#14231A]">Đơn và ca làm việc của tôi (S-21)</h1>
-          <p className="text-[14px] text-[#4B5B50] mt-1">
-            Quản lý các chuyến đi đã chốt, gửi yêu cầu hoàn thành và xác nhận nhận tiền mặt
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#1EC1CB]">
+            UC.17, UC.21, UC.25 • Quản lý ca dẫn khách & Đối soát
+          </span>
+          <h1 className="text-[26px] sm:text-[30px] font-extrabold text-white mt-1">
+            Đơn & Ca dẫn khách của tôi
+          </h1>
+          <p className="text-[14px] text-[#F6E6EA]/85 mt-1">
+            Gửi yêu cầu xác nhận hoàn thành tour (UC.17), xác nhận thu 70% tiền mặt (UC.21) và đối soát doanh thu
           </p>
         </div>
 
-        {/* Nút giả lập ca kết thúc cho demo */}
-        <div className="flex items-center gap-2 self-start sm:self-auto bg-white p-2 rounded-[8px] border border-[#D6E2D9] text-[12px]">
-          <span className="text-[#4B5B50] font-semibold">Demo:</span>
-          <button
-            type="button"
-            onClick={() => setDemoShiftEnded(!demoShiftEnded)}
-            className={`px-2.5 py-1 rounded font-semibold ${
-              demoShiftEnded ? 'bg-[#15803D] text-white' : 'bg-gray-100 text-[#14231A]'
-            }`}
-          >
-            {demoShiftEnded ? '✓ Giả lập: Ca đã kết thúc' : 'Mô phỏng: Ca đã kết thúc'}
-          </button>
-        </div>
+        <Button variant="primary" size="sm" onClick={() => navigate('/guide/vi')}>
+          💰 Xem Ví & Lịch sử đối soát →
+        </Button>
       </div>
 
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
       {filtered.length === 0 ? (
         <EmptyState
-          title="Không có đơn nào trong mục này"
-          description="Hiện tại không có đơn nào ở trạng thái bạn vừa chọn."
+          title="Chưa có đơn đặt lịch nào trong phân mục này"
+          description="Bạn có thể chuyển sang tab khác hoặc kiểm tra mục Yêu cầu đặt lịch đến."
+          actionText="Xem tất cả đơn của tôi"
+          onAction={() => setActiveTab('all')}
         />
       ) : (
         <div className="space-y-6">
           {filtered.map((b) => {
+            const tourist = getUserById(b.touristId);
             const platformFee = Math.round(b.totalAmount * b.feeRate);
             const guideReceives = b.totalAmount - platformFee;
-            const delta = b.deltaHours ?? Math.max(0, calcDeltaHours(b.date, b.startTime));
-
-            // Điều kiện nút Yêu cầu hoàn thành: chỉ sau khi ca kết thúc (hoặc bật demo)
-            const canRequestComplete =
-              b.bookingStatus === 'CONFIRMED' && (delta <= 0 || demoShiftEnded);
-
-            // Điều kiện nút Xác nhận tiền mặt: COMPLETED nhánh tiền mặt chưa PAID
-            const canConfirmCash =
-              b.bookingStatus === 'COMPLETED' &&
-              b.paymentMethod === 'CASH' &&
-              b.paymentStatus !== 'PAID';
+            const cashReconcileDelta = b.depositAmount - platformFee;
 
             return (
               <div
                 key={b.id}
-                className="bg-white border border-[#D6E2D9] rounded-[16px] p-6 shadow-sm space-y-4"
+                className="bg-white border border-[#E4C3CC] rounded-[16px] p-6 sm:p-8 shadow-sm space-y-5"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#D6E2D9] pb-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-[#14231A] text-lg">{b.id}</span>
-                      <StatusBadge status={b.bookingStatus} />
-                      {b.bookingStatus !== 'CANCELLED' && b.bookingStatus !== 'DISPUTED' && (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E4C3CC] pb-4">
+                  <div className="flex items-center gap-3.5">
+                    {tourist?.avatarUrl && (
+                      <img
+                        src={tourist.avatarUrl}
+                        alt={tourist.fullName}
+                        className="w-12 h-12 rounded-full object-cover border-2 border-[#1EC1CB]"
+                      />
+                    )}
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="px-2.5 py-0.5 rounded bg-[#1A0A0F] text-[#F6E6EA] text-[12px] font-black">
+                          {b.id}
+                        </span>
+                        <StatusBadge status={b.bookingStatus} />
                         <PaymentBadge status={b.paymentStatus} />
-                      )}
+                      </div>
+                      <h3 className="text-[18px] font-extrabold text-[#1A0A0F] mt-1">
+                        Du khách: {tourist?.fullName || 'Dương Đăng Huân'} ({tourist?.phone || '0905123456'})
+                      </h3>
                     </div>
-                    <span className="text-[13px] text-[#4B5B50] mt-1 block">
-                      Khách du lịch: <strong>Trần Minh Anh</strong> (0900 000 001)
+                  </div>
+
+                  <div className="sm:text-right">
+                    <span className="text-[12px] text-[#52526B] block">
+                      Thu nhập thực nhận của bạn (G − F):
+                    </span>
+                    <span className="text-[22px] font-black text-[#0F6E4B] tabular-nums">
+                      {formatMoney(guideReceives)}
                     </span>
                   </div>
+                </div>
 
-                  <div className="text-right">
-                    <span className="text-[12px] text-[#4B5B50]">Thu nhập ước tính:</span>
-                    <div className="text-[18px] font-bold text-[#15803D] tabular-nums">
-                      {formatMoney(guideReceives)}
+                {/* Banner trạng thái cửa sổ 24h chờ khách xác nhận hoàn thành (UC.17 → UC.18) */}
+                {b.bookingStatus === 'CONFIRMED' && b.guideRequestedCompletion && (
+                  <div className="p-4 rounded-[12px] bg-[#E5F8F9] border border-[#1EC1CB] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="text-[13px] text-[#1C1C28]">
+                      <strong className="block text-[14px] text-[#1A0A0F]">
+                        ⏳ Đã gửi yêu cầu xác nhận hoàn thành (UC.17) — Đang chờ khách xác nhận trong 24 giờ
+                      </strong>
+                      <span>
+                        Nếu sau 24 giờ khách không phản hồi và không có khiếu nại, hệ thống sẽ tự động chuyển đơn sang Đã hoàn thành (COMPLETED).
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Countdown
+                        seconds={getSecondsUntil(b.completionAutoConfirmAt, 79200)}
+                        onExpire={() => autoConfirmCompletionTimeout(b.id)}
+                        label="Cửa sổ 24h"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          autoConfirmCompletionTimeout(b.id);
+                          showToast(
+                            `Đã giả lập hết 24h -> Đơn ${b.id} tự động chuyển sang COMPLETED + WAITING_FINAL!`,
+                            'success'
+                          );
+                        }}
+                        className="px-2.5 py-1.5 rounded-[8px] bg-[#1C1C28] text-[#1EC1CB] text-[11px] font-bold cursor-pointer"
+                      >
+                        ⚡ Tua hết 24h
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Banner đối soát tiền mặt 70% (UC.21, BR-13) */}
+                {b.bookingStatus === 'COMPLETED' &&
+                  b.paymentStatus === 'WAITING_RECONCILE' && (
+                    <div className="p-4 rounded-[12px] bg-[#FEF1DC] border-2 border-[#F8CA84] space-y-2 text-[13px] text-[#8C4A08]">
+                      <strong className="text-[14px] block">
+                        💵 Khách đã chọn trả Tiền mặt 70% ({formatMoney(b.remainingAmount)}) trực tiếp cho bạn (UC.21)
+                      </strong>
+                      <p className="text-[#1C1C28]">
+                        Sau khi nhận đủ <strong>{formatMoney(b.remainingAmount)}</strong> tiền mặt từ khách, hãy bấm nút <strong>“Xác nhận đã thu đủ 70% tiền mặt”</strong> bên dưới. Hệ thống sẽ khấu trừ phí sàn ({formatMoney(platformFee)}) vào khoản cọc 30% ({formatMoney(b.depositAmount)}) đang giữ và cộng thêm phần dư <strong>+{formatMoney(cashReconcileDelta)}</strong> vào ví khả dụng của bạn (BR-13).
+                      </p>
+                    </div>
+                  )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#FBF4F6] p-4 rounded-[12px] border border-[#E4C3CC] text-[14px]">
+                  <div className="space-y-1.5">
+                    <div>
+                      <span className="text-[#52526B]">📅 Ngày dẫn khách: </span>
+                      <strong className="text-[#1A0A0F]">{formatDate(b.date)}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[#52526B]">⏰ Khung giờ: </span>
+                      <strong className="text-[#1A0A0F]">
+                        {formatTimeRange(b.startTime, b.endTime)} ({b.hours} giờ)
+                      </strong>
+                    </div>
+                    <div>
+                      <span className="text-[#52526B]">👥 Số lượng khách: </span>
+                      <strong className="text-[#1A0A0F]">{b.guestCount} khách</strong>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div>
+                      <span className="text-[#52526B]">📍 Điểm đón tại Đà Nẵng: </span>
+                      <strong className="text-[#1A0A0F]">{b.meetingLocation}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[#52526B]">📝 Ghi chú lịch trình: </span>
+                      <p className="text-[#1C1C28] italic mt-0.5">“{b.specialRequests}”</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[14px]">
-                  <div className="space-y-1">
-                    <div className="text-[#4B5B50]">
-                      📅 Ngày: <strong className="text-[#14231A]">{formatDate(b.date)}</strong>
-                    </div>
-                    <div className="text-[#4B5B50]">
-                      ⏰ Khung giờ: <strong className="text-[#14231A]">{formatTimeRange(b.startTime, b.endTime)} ({b.hours}h)</strong>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-[#4B5B50]">
-                      📍 Điểm hẹn: <strong className="text-[#14231A]">{b.meetingLocation || 'Theo thỏa thuận'}</strong>
-                    </div>
-                    <div className="text-[#4B5B50]">
-                      👥 Số khách: <strong className="text-[#14231A]">{b.guestCount} người</strong>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Guide nhìn thấy chi tiết tiền và phí */}
                 <PaymentSummary
+                  hourlyRate={b.hourlyRateSnapshot}
+                  hours={b.hours}
                   total={b.totalAmount}
                   deposit={b.depositAmount}
                   remaining={b.remainingAmount}
+                  feeRate={b.feeRate}
                   platformFee={platformFee}
                   guideReceives={guideReceives}
+                  paymentMethod={b.paymentMethod}
                   mode="guide"
                 />
 
-                {/* Các nút hành động của Guide */}
-                <div className="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-[#D6E2D9]">
-                  {/* Hủy đơn khi CONFIRMED: cảnh báo hoàn 100% & ghi vi phạm */}
-                  {b.bookingStatus === 'CONFIRMED' && (
-                    <Button
-                      variant="danger"
-                      onClick={() => setSelectedBookingForCancel(b.id)}
-                      className="text-[13px] h-9 px-3"
-                    >
-                      Hủy đơn ca này
-                    </Button>
-                  )}
+                {/* Thanh hành động của HDV */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#E4C3CC]">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() =>
+                      navigate(`/guide/tin-nhan?partner=${b.touristId}&bookingId=${b.id}`)
+                    }
+                  >
+                    💬 Nhắn tin với khách
+                  </Button>
 
-                  {/* Nút Yêu cầu hoàn thành: chỉ bật sau ca kết thúc */}
-                  {b.bookingStatus === 'CONFIRMED' && (
-                    <Button
-                      variant="primary"
-                      disabled={!canRequestComplete}
-                      onClick={() => handleRequestComplete(b.id)}
-                      className="text-[13px] h-9 px-4 font-semibold"
-                    >
-                      {canRequestComplete
-                        ? '✓ Gửi yêu cầu hoàn thành'
-                        : '🔒 Yêu cầu hoàn tất (Chỉ sau ca)'}
-                    </Button>
-                  )}
+                  <div className="flex flex-wrap items-center gap-3">
+                    {b.bookingStatus === 'PENDING' && (
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => navigate('/guide/don-den')}
+                      >
+                        Đi tới duyệt yêu cầu (UC.13) →
+                      </Button>
+                    )}
 
-                  {/* Nút Xác nhận đã nhận tiền mặt */}
-                  {canConfirmCash && (
-                    <Button
-                      variant="primary"
-                      onClick={() => handleConfirmCash(b.id)}
-                      className="text-[13px] h-9 px-4 font-bold bg-[#15803D]"
-                    >
-                      💵 Xác nhận đã nhận đủ {formatMoney(b.remainingAmount)} tiền mặt
-                    </Button>
-                  )}
+                    {b.bookingStatus === 'CONFIRMED' && !b.guideRequestedCompletion && (
+                      <>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => {
+                            setDisputeReason(
+                              'Du khách vắng mặt tại điểm hẹn quá 30 phút không liên lạc được (No-show).'
+                            );
+                            setDisputeBookingId(b.id);
+                          }}
+                        >
+                          ⚠️ Báo khách vắng mặt (No-show)
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => setCancelBookingId(b.id)}
+                        >
+                          ✕ Hủy nhận dẫn khách (UC.25)
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={() => handleRequestComplete(b.id)}
+                        >
+                          ✓ Yêu cầu xác nhận hoàn thành tour (UC.17)
+                        </Button>
+                      </>
+                    )}
 
-                  {/* Đã thanh toán đủ */}
-                  {b.bookingStatus === 'COMPLETED' && b.paymentStatus === 'PAID' && (
-                    <span className="text-[13px] font-semibold text-[#166534] bg-[#DCFCE7] px-3 py-1 rounded-full">
-                      ✓ Đã hoàn tất và quyết toán xong
-                    </span>
-                  )}
+                    {b.bookingStatus === 'CONFIRMED' && b.guideRequestedCompletion && (
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => setDisputeBookingId(b.id)}
+                      >
+                        ⚠️ Gửi khiếu nại sự cố (UC.19)
+                      </Button>
+                    )}
+
+                    {b.bookingStatus === 'COMPLETED' &&
+                      b.paymentStatus === 'WAITING_RECONCILE' && (
+                        <Button
+                          variant="primary"
+                          size="lg"
+                          onClick={() => handleConfirmCash(b.id)}
+                        >
+                          💵 Xác nhận đã thu đủ {formatMoney(b.remainingAmount)} tiền mặt (UC.21)
+                        </Button>
+                      )}
+
+                    {b.bookingStatus === 'COMPLETED' && b.paymentStatus === 'PAID' && (
+                      <>
+                        {(() => {
+                          const rev = getReviewByBookingId(b.id);
+                          if (rev && !rev.guideReply) {
+                            return (
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setReplyBookingId(b.id)}
+                              >
+                                ★ Đánh giá hai chiều & Phản hồi khách
+                              </Button>
+                            );
+                          }
+                          if (rev?.guideReply) {
+                            return (
+                              <span className="px-3 py-1 rounded-full bg-[#E5F8F9] text-[#1C1C28] border border-[#1EC1CB] text-[12px] font-bold">
+                                ★ Đã đánh giá hai chiều ({rev.touristRating}★)
+                              </span>
+                            );
+                          }
+                          return null;
+                        })()}
+                        <span className="px-3.5 py-1.5 rounded-full bg-[#E3F7EF] text-[#0F6E4B] border border-[#99E2C4] text-[13px] font-extrabold">
+                          ✓✓ Đã hoàn thành & Quyết toán vào Ví
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -250,37 +445,128 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Modal Guide hủy đơn CONFIRMED (S-16: cảnh báo hoàn 100% cho Tourist và ghi vi phạm) */}
+      {/* Modal HDV hủy đơn đã CONFIRMED (UC.25, BR-06) */}
       <Modal
-        isOpen={Boolean(selectedBookingForCancel)}
-        onClose={() => setSelectedBookingForCancel(null)}
-        title="Cảnh báo hủy đơn từ phía Hướng dẫn viên (S-16)"
+        isOpen={Boolean(cancelBookingId)}
+        onClose={() => setCancelBookingId(null)}
+        title={`Cảnh báo Hủy đơn đã xác nhận ${cancelBookingId} (UC.25, BR-06)`}
         footer={
           <>
-            <Button variant="ghost" onClick={() => setSelectedBookingForCancel(null)}>
-              Đóng lại
+            <Button variant="ghost" onClick={() => setCancelBookingId(null)}>
+              Giữ lại lịch dẫn khách
             </Button>
-            <Button variant="danger" onClick={handleGuideCancel}>
-              Xác nhận hủy đơn & chấp nhận vi phạm
+            <Button variant="danger" onClick={handleConfirmGuideCancel}>
+              Xác nhận hủy & Chấp nhận +1 vi phạm
             </Button>
           </>
         }
       >
-        <div className="space-y-4 text-[14px]">
-          <div className="p-3 bg-[#FEF2F2] border border-[#FCA5A5] rounded-[8px] text-[#B91C1C]">
-            ⚠️ <strong>Cảnh báo nghiêm trọng:</strong> Theo quy tắc nền tảng (BR), nếu Guide đơn phương hủy đơn đã xác nhận (CONFIRMED):
-            <ul className="list-disc pl-5 mt-2 space-y-1">
-              <li>Du khách sẽ được <strong>hoàn tiền 100%</strong> số tiền cọc đã đóng.</li>
-              <li>Hệ thống sẽ <strong>ghi nhận 01 lần vi phạm</strong> hợp đồng của Guide vào hồ sơ quản trị.</li>
-              <li>Hành vi hủy đơn cận ngày có thể dẫn tới việc tạm khóa tài khoản hướng dẫn viên.</li>
+        <div className="space-y-4">
+          <div className="p-4 bg-[#FCE8EB] border border-[#F5B2BA] rounded-[12px] text-[13px] text-[#A61B2B] space-y-1.5">
+            <strong className="block text-[14px]">
+              ⚠️ Quy tắc chế tài khi HDV hủy đơn đã xác nhận (BR-06):
+            </strong>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>
+                Du khách được <strong>hoàn trả 100% tiền đặt cọc (30%)</strong> ngay lập tức.
+              </li>
+              <li>
+                Hướng dẫn viên nhận <strong>0 ₫</strong> và bị hệ thống tự động cộng <strong>+1 lần vi phạm (soLanViPham)</strong>.
+              </li>
+              <li>
+                Lịch sử vi phạm sẽ hiển thị cảnh báo đỏ trên trang Quản lý người dùng của Admin (UC.06).
+              </li>
             </ul>
           </div>
-          <p className="text-[#4B5B50]">
-            Bạn có chắc chắn muốn hủy đơn <strong>{selectedBookingForCancel}</strong> không?
+
+          <Textarea
+            label="Lý do hủy đơn bắt buộc (CANCELLATION_RECORD.lyDo NOT NULL) *"
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            rows={3}
+          />
+        </div>
+      </Modal>
+
+      {/* Modal HDV gửi khiếu nại trong cửa sổ 24h (UC.19) */}
+      <Modal
+        isOpen={Boolean(disputeBookingId)}
+        onClose={() => setDisputeBookingId(null)}
+        title={`Gửi khiếu nại từ phía HDV cho đơn ${disputeBookingId} (UC.19)`}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setDisputeBookingId(null)}>
+              Đóng
+            </Button>
+            <Button variant="danger" onClick={handleConfirmGuideDispute}>
+              Gửi khiếu nại tới Admin
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-[13px] text-[#52526B]">
+            Trong cửa sổ 24 giờ sau khi yêu cầu hoàn thành, nếu Du khách vi phạm thỏa thuận, bạn có thể gửi khiếu nại để Admin thẩm định và bảo vệ quyền lợi cho bạn (UC.19, UC.27).
           </p>
+          <Textarea
+            label="Nội dung sự cố / khiếu nại *"
+            value={disputeReason}
+            onChange={(e) => setDisputeReason(e.target.value)}
+            rows={4}
+          />
+        </div>
+      </Modal>
+
+      {/* Modal Đánh giá hai chiều từ HDV -> Du khách */}
+      <Modal
+        isOpen={Boolean(replyBookingId)}
+        onClose={() => setReplyBookingId(null)}
+        title={`Đánh giá hai chiều & Phản hồi đơn ${replyBookingId}`}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setReplyBookingId(null)}>
+              Đóng
+            </Button>
+            <Button variant="primary" onClick={handleConfirmReplyReview}>
+              Gửi đánh giá & Phản hồi
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="text-[13px] font-bold text-[#1A0A0F] block mb-2">
+              Chấm điểm hợp tác của Du khách (1 – 5 sao):
+            </label>
+            <div className="flex items-center gap-2">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setTouristStars(s)}
+                  className={`w-10 h-10 rounded-[10px] text-lg font-bold border cursor-pointer ${
+                    s <= touristStars
+                      ? 'bg-[#1EC1CB] text-[#1C1C28] border-[#1C1C28]'
+                      : 'bg-[#FBF4F6] text-gray-400 border-[#E4C3CC]'
+                  }`}
+                >
+                  ★
+                </button>
+              ))}
+              <span className="text-[13px] font-bold text-[#1A0A0F] ml-1">
+                {touristStars} / 5 sao
+              </span>
+            </div>
+          </div>
+
+          <Textarea
+            label="Lời cảm ơn & Phản hồi công khai trên hồ sơ của bạn *"
+            value={replyComment}
+            onChange={(e) => setReplyComment(e.target.value)}
+            rows={3}
+          />
         </div>
       </Modal>
     </div>
   );
 };
-

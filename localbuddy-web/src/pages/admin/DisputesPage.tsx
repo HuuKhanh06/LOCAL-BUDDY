@@ -1,199 +1,438 @@
-// pages/admin/DisputesPage.tsx (S-29: Xử lý tranh chấp)
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import {
+  Scale,
+  AlertTriangle,
+  CheckCircle2,
+  Eye,
+  Clock,
+  ShieldAlert,
+  UserCheck,
+  UserX,
+  FileText,
+} from 'lucide-react';
 import { useBookingContext } from '../../context/BookingContext';
-import { StatusBadge, PaymentBadge } from '../../components/common/StatusBadge';
-import { PaymentSummary } from '../../components/common/PaymentSummary';
+import { formatMoney } from '../../utils/money';
+import { formatDateTimeVN, formatDateVN } from '../../utils/time';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
-import { EmptyState } from '../../components/common/GuideCard';
 import { useToast } from '../../components/ui/Toast';
-import { formatDate, formatTimeRange } from '../../utils/time';
-import { formatMoney } from '../../utils/money';
-import { Booking } from '../../types';
+import { DisputeRecord, DisputeFaultDecision } from '../../types';
 
 export const DisputesPage: React.FC = () => {
-  const { bookings, resolveDispute } = useBookingContext();
+  const {
+    disputes,
+    getBookingById,
+    getGuideById,
+    getUserById,
+    resolveDispute,
+  } = useBookingContext();
   const { showToast } = useToast();
 
-  // Chỉ liệt kê các đơn Đang tranh chấp (DISPUTED)
-  const disputedBookings = bookings.filter((b) => b.bookingStatus === 'DISPUTED');
+  const [isLoading, setIsLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState<'ALL' | 'OPEN' | 'RESOLVED'>('ALL');
+  const [selectedDispute, setSelectedDispute] = useState<DisputeRecord | null>(null);
+  const [decision, setDecision] = useState<DisputeFaultDecision>('GUIDE_FAULT');
+  const [resolutionNote, setResolutionNote] = useState('');
+  const [noteError, setNoteError] = useState('');
 
-  const [selectedDispute, setSelectedDispute] = useState<Booking | null>(null);
-  const [adminNote, setAdminNote] = useState('Đã đối soát thông tin ca tham quan. Khách du lịch phản ánh đúng thực tế, Guide không hoàn thành đúng cam kết thời gian.');
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 200);
+    return () => clearTimeout(timer);
+  }, []);
 
-  const handleOpenResolve = (b: Booking) => {
-    setSelectedDispute(b);
-    setIsConfirmModalOpen(true);
+  const openDisputes = disputes.filter((d) => d.status !== 'RESOLVED');
+  const resolvedDisputes = disputes.filter((d) => d.status === 'RESOLVED');
+
+  const filteredDisputes = disputes.filter((d) => {
+    if (filterStatus === 'OPEN') return d.status !== 'RESOLVED';
+    if (filterStatus === 'RESOLVED') return d.status === 'RESOLVED';
+    return true;
+  });
+
+  const handleOpenRulingModal = (disp: DisputeRecord) => {
+    setSelectedDispute(disp);
+    setDecision(disp.decision || 'GUIDE_FAULT');
+    setResolutionNote(disp.resolutionNote || '');
+    setNoteError('');
   };
 
-  const handleConfirmResolve = () => {
+  const handleConfirmRuling = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!selectedDispute) return;
-    resolveDispute(selectedDispute.id, adminNote);
-    showToast(
-      `Đã chốt xử lý tranh chấp đơn ${selectedDispute.id}! Đơn đã chuyển sang Đã hủy (CANCELLED) ở tất cả các vai trò và không thu 70% còn lại.`,
-      'success'
-    );
-    setIsConfirmModalOpen(false);
-    setSelectedDispute(null);
+
+    if (!resolutionNote.trim() || resolutionNote.trim().length < 10) {
+      setNoteError(
+        'Vui lòng nhập kết luận phân xử chi tiết (tối thiểu 10 ký tự) để lưu hồ sơ đối soát (DISPUTE.ketQuaXuLy).'
+      );
+      return;
+    }
+
+    const res = resolveDispute(selectedDispute.bookingId, resolutionNote.trim(), decision);
+    if (res.ok) {
+      showToast(res.message, 'success');
+      setSelectedDispute(null);
+    } else {
+      setNoteError(res.message);
+      showToast(res.message, 'error');
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 animate-pulse">
+        <div className="h-28 bg-white rounded-[12px] border border-[#E8CED5]" />
+        <div className="h-96 bg-white rounded-[12px] border border-[#E8CED5]" />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between border-b border-[#D6E2D9] pb-4">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-[12px] font-mono font-bold text-[#B91C1C] uppercase">S-29 • ADMIN PORTAL</span>
-          <h1 className="text-[24px] font-bold text-[#14231A] mt-0.5">Xử lý khiếu nại & Tranh chấp đơn (S-29)</h1>
-          <p className="text-[14px] text-[#4B5B50] mt-1">
-            Xem xét bằng chứng từ hai bên. Quyết định của Quản trị viên là quyết định cuối cùng, không thể kháng nghị.
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#A62626] bg-[#FDECEC] px-3 py-1 rounded-full mb-2">
+            <Scale className="w-3.5 h-3.5" /> Phân xử Khiếu nại & Tranh chấp • UC.27 & BR-12
+          </span>
+          <h1 className="text-2xl font-extrabold text-[#1A0A0F]">
+            Trung tâm Xử lý Khiếu nại & Bảo vệ Giao dịch
+          </h1>
+          <p className="text-sm text-[#525266] mt-0.5">
+            Thẩm định bằng chứng từ Du khách và Hướng dẫn viên, đưa ra phán quyết hoàn cọc hoặc bồi thường ví HDV.
           </p>
         </div>
 
-        <span className="bg-[#FEE2E2] text-[#B91C1C] px-3 py-1 rounded-full text-[13px] font-bold">
-          {disputedBookings.length} vụ tranh chấp
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="px-3 py-1.5 rounded-[10px] bg-[#FDECEC] border border-[#F5B5B5] text-xs font-bold text-[#A62626]">
+            Chờ phân xử: {openDisputes.length}
+          </span>
+          <span className="px-3 py-1.5 rounded-[10px] bg-[#E6F7F0] border border-[#B2E5D0] text-xs font-bold text-[#146C43]">
+            Đã giải quyết: {resolvedDisputes.length}
+          </span>
+        </div>
       </div>
 
-      {disputedBookings.length === 0 ? (
-        <EmptyState
-          title="Không có vụ tranh chấp nào đang chờ xử lý"
-          description="Tất cả khiếu nại giữa du khách và hướng dẫn viên đã được phân xử xong."
-        />
-      ) : (
-        <div className="space-y-6">
-          {disputedBookings.map((b) => {
-            const platformFee = Math.round(b.totalAmount * b.feeRate);
-            const guideReceives = b.totalAmount - platformFee;
+      {/* Filter Tabs */}
+      <div className="flex flex-wrap gap-2">
+        {(
+          [
+            { key: 'ALL', label: `Tất cả hồ sơ (${disputes.length})` },
+            { key: 'OPEN', label: `Đang tranh chấp (${openDisputes.length})` },
+            { key: 'RESOLVED', label: `Đã kết luận (${resolvedDisputes.length})` },
+          ] as const
+        ).map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setFilterStatus(tab.key)}
+            className={`px-4 py-2 rounded-[10px] text-xs font-bold transition-all cursor-pointer ${
+              filterStatus === tab.key
+                ? 'bg-[#1EC1CB] text-[#1C1C28] shadow-xs'
+                : 'bg-white text-[#525266] hover:bg-[#F6E6EA]/60 border border-[#E8CED5]'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Disputes List */}
+      <div className="space-y-4">
+        {filteredDisputes.length === 0 ? (
+          <div className="bg-white rounded-[12px] border border-[#E8CED5] p-12 text-center">
+            <Scale className="w-10 h-10 text-[#6E7085] mx-auto mb-3" />
+            <h3 className="text-base font-bold text-[#1A0A0F]">
+              Không có hồ sơ khiếu nại nào trong mục này
+            </h3>
+            <p className="text-sm text-[#525266] mt-1">
+              Mọi giao dịch đặt lịch tại Đà Nẵng đang diễn ra ổn định.
+            </p>
+          </div>
+        ) : (
+          filteredDisputes.map((disp) => {
+            const booking = getBookingById(disp.bookingId);
+            const reporter = getUserById(disp.reporterId);
+            const tourist = booking ? getUserById(booking.touristId) : undefined;
+            const guide = booking ? getGuideById(booking.guideId) : undefined;
 
             return (
               <div
-                key={b.id}
-                className="bg-white border-2 border-[#FCA5A5] rounded-[16px] p-6 shadow-sm space-y-5"
+                key={disp.id}
+                className="bg-white rounded-[12px] border border-[#E8CED5] p-6 shadow-xs space-y-4"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#D6E2D9] pb-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-[#B91C1C] text-lg">{b.id}</span>
-                      <StatusBadge status={b.bookingStatus} />
-                      <PaymentBadge status={b.paymentStatus} />
-                    </div>
-                    <span className="text-[13px] text-[#4B5B50] mt-1 block">
-                      Khách: <strong>Trần Minh Anh</strong> (0900 000 001) • Guide: <strong>Lê Hoàng Nam</strong> (0900 000 002)
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E8CED5] pb-4">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <span className="font-mono font-extrabold text-sm px-2.5 py-1 rounded bg-[#1A0A0F] text-[#F6E6EA]">
+                      {disp.id}
                     </span>
+                    <span className="font-bold text-sm text-[#1C1C28]">
+                      Đơn đặt lịch: {disp.bookingId}
+                    </span>
+                    {disp.status !== 'RESOLVED' ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#FDECEC] text-[#A62626] border border-[#F5B5B5]">
+                        <AlertTriangle className="w-3.5 h-3.5" /> Đang đóng băng chờ phân xử
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#E6F7F0] text-[#146C43] border border-[#B2E5D0]">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Đã phán quyết:{' '}
+                        {disp.decision === 'GUIDE_FAULT' ? 'Lỗi do HDV (Hoàn cọc 100%)' : 'Lỗi do Khách (Tịch thu cọc)'}
+                      </span>
+                    )}
                   </div>
-
-                  <div className="text-right">
-                    <span className="text-[12px] text-[#4B5B50]">Tổng giá trị tranh chấp:</span>
-                    <div className="text-[20px] font-bold text-[#B91C1C] tabular-nums">
-                      {formatMoney(b.totalAmount)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Thông tin sự kiện và bằng chứng hai bên */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-[10px] p-4 space-y-2">
-                    <div className="flex items-center gap-2 text-[#B91C1C] font-bold text-[14px]">
-                      <span>👤 Khiếu nại từ Tourist:</span>
-                    </div>
-                    <p className="text-[13px] text-[#14231A] leading-relaxed">
-                      "Hướng dẫn viên đến trễ 45 phút so với giờ hẹn tại Làng chài Nam Ô, tự ý cắt bớt lịch trình tham quan không đúng như đã cam kết trong đơn đặt lịch."
-                    </p>
-                    <div className="text-[11px] text-[#4B5B50]">
-                      Bằng chứng kèm theo: 02 ảnh chụp nhật ký cuộc gọi và định vị GPS.
-                    </div>
-                  </div>
-
-                  <div className="bg-[#F6FAF6] border border-[#D6E2D9] rounded-[10px] p-4 space-y-2">
-                    <div className="flex items-center gap-2 text-[#15803D] font-bold text-[14px]">
-                      <span>🧭 Giải trình từ Guide:</span>
-                    </div>
-                    <p className="text-[13px] text-[#14231A] leading-relaxed">
-                      "Do thời tiết mưa lớn gây sạt lở cục bộ trên đường Nguyễn Tất Thành dẫn đến đến trễ. Đã thỏa thuận bù giờ thêm cho khách nhưng khách không đồng ý."
-                    </p>
-                    <div className="text-[11px] text-[#4B5B50]">
-                      Bằng chứng kèm theo: Ảnh thời tiết thực tế tại cung đường.
-                    </div>
+                  <div className="text-xs text-[#6E7085] flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" /> Gửi lúc: {formatDateTimeVN(disp.createdAt)}
                   </div>
                 </div>
 
-                {/* Thông tin tài chính vụ việc */}
-                <div className="bg-[#F9FAFB] border border-[#D6E2D9] rounded-[10px] p-4 space-y-2 text-[14px]">
-                  <h4 className="font-bold text-[#14231A]">Bảng phân bổ tài chính:</h4>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <span className="text-[#4B5B50] text-[12px] block">Tổng tiền (G):</span>
-                      <strong className="text-[#14231A]">{formatMoney(b.totalAmount)}</strong>
+                {/* Parties & Financial Info */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#FDF7F9] rounded-[10px] p-4 border border-[#E8CED5] text-xs">
+                  <div>
+                    <div className="text-[#525266] font-semibold">Người gửi khiếu nại:</div>
+                    <div className="font-extrabold text-sm text-[#1A0A0F] mt-0.5">
+                      {reporter?.fullName || disp.reporterId} (
+                      {disp.reporterRole === 'tourist' ? 'Du khách' : 'Hướng dẫn viên'})
                     </div>
-                    <div>
-                      <span className="text-[#4B5B50] text-[12px] block">Tiền cọc 30% (D):</span>
-                      <strong className="text-[#15803D]">{formatMoney(b.depositAmount)}</strong>
+                    <div className="text-[#A62626] font-bold mt-1">
+                      Nhóm lý do: {disp.reasonCategory}
                     </div>
-                    <div>
-                      <span className="text-[#4B5B50] text-[12px] block">Còn lại 70% (B):</span>
-                      <strong className="text-[#B91C1C]">{formatMoney(b.remainingAmount)} (Không thu)</strong>
+                  </div>
+
+                  <div>
+                    <div className="text-[#525266] font-semibold">Các bên trong giao dịch:</div>
+                    <div className="mt-0.5">
+                      Du khách: <strong>{tourist?.fullName || booking?.touristId}</strong>
                     </div>
+                    <div className="mt-0.5">
+                      HDV: <strong>{guide?.user.fullName || booking?.guideId}</strong>
+                    </div>
+                    {booking && (
+                      <div className="text-[#6E7085] mt-0.5">
+                        Ngày đi: {formatDateVN(booking.date)} ({booking.startTime} - {booking.endTime})
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <div className="text-[#525266] font-semibold">Giá trị đơn & Tiền cọc đang giữ:</div>
+                    {booking ? (
+                      <>
+                        <div className="mt-0.5">
+                          Tổng giá trị đơn (G): <strong>{formatMoney(booking.totalAmount)}</strong>
+                        </div>
+                        <div className="text-sm font-extrabold text-[#118B93] mt-0.5">
+                          Cọc 30% (D): {formatMoney(booking.depositAmount)} (Phí sàn{' '}
+                          {Math.round(booking.feeRate * 100)}%)
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-[#6E7085]">Không tìm thấy đơn</div>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-[#D6E2D9]">
-                  <span className="text-[13px] text-[#4B5B50]">
-                    Quy tắc chốt tranh chấp: Chuyển đơn sang <strong>Đã hủy</strong>, không thu khoản 70% còn lại.
-                  </span>
+                {/* Description & Evidence */}
+                <div className="space-y-2">
+                  <div className="text-xs font-bold uppercase tracking-wider text-[#525266]">
+                    Nội dung tường trình khiếu nại:
+                  </div>
+                  <p className="text-sm text-[#1C1C28] bg-[#F4F5F8] p-3.5 rounded-[10px] border border-[#E2E4EC] leading-relaxed">
+                    "{disp.description}"
+                  </p>
+                </div>
 
+                {disp.evidenceUrls.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="text-xs font-bold text-[#525266] flex items-center gap-1">
+                      <FileText className="w-3.5 h-3.5" /> Bằng chứng đính kèm:
+                    </span>
+                    {disp.evidenceUrls.map((url, idx) => (
+                      <a
+                        key={idx}
+                        href={url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#E6F9FA] text-[#118B93] text-xs font-bold hover:underline"
+                      >
+                        Xem ảnh bằng chứng #{idx + 1} ↗
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                {/* Resolved Outcome Box */}
+                {disp.status === 'RESOLVED' && (
+                  <div className="bg-[#E6F7F0] border border-[#B2E5D0] rounded-[10px] p-4 text-xs space-y-1">
+                    <div className="font-extrabold text-[#146C43] text-sm">
+                      Kết luận của Admin ({disp.resolvedAt ? formatDateTimeVN(disp.resolvedAt) : ''}):
+                    </div>
+                    <p className="text-[#1C1C28] font-medium">{disp.resolutionNote}</p>
+                    <div className="flex flex-wrap gap-4 pt-1 font-bold text-[#146C43]">
+                      <span>Hoàn trả khách: {formatMoney(disp.refundAmount || 0)}</span>
+                      <span>•</span>
+                      <span>Bồi thường ví HDV: {formatMoney(disp.guidePayoutAmount || 0)}</span>
+                      <span>•</span>
+                      <span>Phí sàn giữ: {formatMoney(disp.platformFeeAmount || 0)}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Button */}
+                <div className="flex justify-end pt-2">
                   <Button
-                    variant="danger"
-                    onClick={() => handleOpenResolve(b)}
-                    className="px-5 font-bold"
+                    variant={disp.status === 'RESOLVED' ? 'outline' : 'primary'}
+                    onClick={() => handleOpenRulingModal(disp)}
+                    icon={<Eye className="w-4 h-4" />}
                   >
-                    ⚖️ Chốt kết quả tranh chấp
+                    {disp.status === 'RESOLVED'
+                      ? 'Xem chi tiết hồ sơ phân xử'
+                      : 'Thẩm định & Ra phán quyết (UC.27)'}
                   </Button>
                 </div>
               </div>
             );
-          })}
-        </div>
+          })
+        )}
+      </div>
+
+      {/* Ruling Modal */}
+      {selectedDispute && (
+        <Modal
+          isOpen={!!selectedDispute}
+          onClose={() => setSelectedDispute(null)}
+          title={`Phân xử Tranh chấp ${selectedDispute.id} — Đơn ${selectedDispute.bookingId}`}
+          size="lg"
+        >
+          {(() => {
+            const booking = getBookingById(selectedDispute.bookingId);
+            const deposit = booking?.depositAmount || 0;
+            const feeRate = booking?.feeRate || 0.12;
+            const platformFeeOnForfeit = Math.round(deposit * feeRate);
+            const guideCompOnForfeit = Math.max(0, deposit - platformFeeOnForfeit);
+
+            return (
+              <form onSubmit={handleConfirmRuling} className="space-y-5">
+                <div className="bg-[#FDF7F9] border border-[#E8CED5] rounded-[10px] p-4 text-xs space-y-1.5">
+                  <div className="font-bold text-[#1A0A0F] text-sm">
+                    Tóm tắt khiếu nại ({selectedDispute.reasonCategory}):
+                  </div>
+                  <p className="text-[#1C1C28]">"{selectedDispute.description}"</p>
+                  <div className="pt-1 font-bold text-[#118B93]">
+                    Tiền cọc 30% đang đóng băng: {formatMoney(deposit)} (Không thu 70% cuối)
+                  </div>
+                </div>
+
+                {/* 2 Ruling Cards */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-extrabold uppercase tracking-wider text-[#1C1C28]">
+                    Chọn phán quyết của Admin (BR-12, UC.27) *
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Option 1: GUIDE_FAULT */}
+                    <button
+                      type="button"
+                      disabled={selectedDispute.status === 'RESOLVED'}
+                      onClick={() => setDecision('GUIDE_FAULT')}
+                      className={`text-left p-4 rounded-[12px] border-2 transition-all cursor-pointer ${
+                        decision === 'GUIDE_FAULT'
+                          ? 'border-[#1EC1CB] bg-[#E6F9FA]/50 shadow-xs'
+                          : 'border-[#E8CED5] bg-white hover:bg-[#FDF7F9]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="font-extrabold text-sm text-[#1A0A0F] flex items-center gap-1.5">
+                          <UserCheck className="w-4 h-4 text-[#146C43]" />
+                          Phương án 1: Lỗi thuộc về HDV
+                        </span>
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#E6F7F0] text-[#146C43]">
+                          GUIDE_FAULT
+                        </span>
+                      </div>
+                      <ul className="text-xs text-[#525266] space-y-1 list-disc pl-4">
+                        <li>
+                          Hoàn trả <strong>100% tiền cọc ({formatMoney(deposit)})</strong> cho Du khách
+                        </li>
+                        <li>Phí nền tảng giữ lại: <strong>0 ₫</strong></li>
+                        <li>
+                          Cộng <strong>+1 lần vi phạm</strong> (`soLanViPham`) vào hồ sơ HDV
+                        </li>
+                      </ul>
+                    </button>
+
+                    {/* Option 2: TOURIST_FAULT */}
+                    <button
+                      type="button"
+                      disabled={selectedDispute.status === 'RESOLVED'}
+                      onClick={() => setDecision('TOURIST_FAULT')}
+                      className={`text-left p-4 rounded-[12px] border-2 transition-all cursor-pointer ${
+                        decision === 'TOURIST_FAULT'
+                          ? 'border-[#1EC1CB] bg-[#E6F9FA]/50 shadow-xs'
+                          : 'border-[#E8CED5] bg-white hover:bg-[#FDF7F9]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="font-extrabold text-sm text-[#1A0A0F] flex items-center gap-1.5">
+                          <UserX className="w-4 h-4 text-[#C93B3B]" />
+                          Phương án 2: Lỗi thuộc về Du khách
+                        </span>
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#FDECEC] text-[#A62626]">
+                          TOURIST_FAULT
+                        </span>
+                      </div>
+                      <ul className="text-xs text-[#525266] space-y-1 list-disc pl-4">
+                        <li>Tịch thu 100% tiền cọc (Hoàn khách: <strong>0 ₫</strong>)</li>
+                        <li>
+                          Khấu trừ phí sàn {Math.round(feeRate * 100)}%: <strong>{formatMoney(platformFeeOnForfeit)}</strong>
+                        </li>
+                        <li>
+                          Cộng ví HDV: <strong>+{formatMoney(guideCompOnForfeit)}</strong> & Cộng +1 vi phạm khách
+                        </li>
+                      </ul>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Mandatory Resolution Note */}
+                <div>
+                  <label className="block text-xs font-bold text-[#1C1C28] mb-1.5">
+                    Biên bản kết luận phân xử (`DISPUTE.ketQuaXuLy` — Bắt buộc) *
+                  </label>
+                  <textarea
+                    rows={3}
+                    disabled={selectedDispute.status === 'RESOLVED'}
+                    value={resolutionNote}
+                    onChange={(e) => {
+                      setResolutionNote(e.target.value);
+                      if (noteError) setNoteError('');
+                    }}
+                    placeholder="Ghi rõ căn cứ bằng chứng GPS/tin nhắn và lý do đưa ra phán quyết tài chính..."
+                    className="w-full px-3.5 py-2.5 rounded-[10px] border border-[#D4C0C6] text-sm text-[#1C1C28] focus:outline-none focus:ring-2 focus:ring-[#1EC1CB] disabled:bg-[#F4F5F8]"
+                  />
+                  {noteError && (
+                    <p className="mt-1.5 text-xs font-semibold text-[#C93B3B] flex items-center gap-1">
+                      <ShieldAlert className="w-3.5 h-3.5" /> {noteError}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2 border-t border-[#E8CED5]">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setSelectedDispute(null)}
+                  >
+                    Đóng
+                  </Button>
+                  {selectedDispute.status !== 'RESOLVED' && (
+                    <Button type="submit" variant="primary" icon={<CheckCircle2 className="w-4 h-4" />}>
+                      Xác nhận Phán quyết & Thực thi Đối soát
+                    </Button>
+                  )}
+                </div>
+              </form>
+            );
+          })()}
+        </Modal>
       )}
-
-      {/* Modal xác nhận không hoàn tác (RQ-15, Q11) */}
-      <Modal
-        isOpen={isConfirmModalOpen}
-        onClose={() => setIsConfirmModalOpen(false)}
-        title="Xác nhận chốt kết quả tranh chấp (S-29)"
-        footer={
-          <>
-            <Button variant="ghost" onClick={() => setIsConfirmModalOpen(false)}>
-              Hủy bỏ
-            </Button>
-            <Button variant="danger" onClick={handleConfirmResolve}>
-              Chốt quyết định (Không hoàn tác)
-            </Button>
-          </>
-        }
-      >
-        <div className="space-y-4 text-[14px]">
-          <div className="p-3 bg-[#FEF2F2] border border-[#FCA5A5] rounded-[8px] text-[#B91C1C]">
-            ⚠️ <strong>Quy định giải quyết tranh chấp (Q11):</strong>
-            <ul className="list-disc pl-5 mt-1 space-y-1 text-[13px]">
-              <li>Đơn hàng sẽ chuyển sang trạng thái <strong>Đã hủy (CANCELLED)</strong>.</li>
-              <li>Khoản tiền 70% còn lại (420.000 đ) sẽ <strong>hoàn toàn không được thu</strong> từ du khách.</li>
-              <li>Quyết định của Admin là quyết định có hiệu lực thi hành ngay lập tức, <strong>không có kháng nghị</strong> và <strong>không thể hoàn tác</strong>.</li>
-            </ul>
-          </div>
-
-          <div>
-            <label className="text-[13px] font-bold text-[#14231A] block mb-1">
-              Ghi chú kết luận của Quản trị viên (Admin Note) *:
-            </label>
-            <textarea
-              className="w-full border border-[#D6E2D9] rounded-[8px] p-2.5 text-[14px]"
-              rows={3}
-              value={adminNote}
-              onChange={(e) => setAdminNote(e.target.value)}
-            />
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 };

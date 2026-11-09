@@ -1,115 +1,172 @@
-# LOCALBUDDY — Nền Tảng Đặt Local Guide Theo Giờ Tại Đà Nẵng
+# LocalBuddy Đà Nẵng — Nền tảng Đặt lịch Hướng dẫn viên Địa phương theo Giờ
 
-> **Đồ án học phần:** Phân tích và Thiết kế Hệ thống Nâng cao  
-> **Phiên bản triển khai:** Google Antigravity IDE (React, TypeScript, Vite, Tailwind CSS)  
-> **Màu chủ đạo:** Xanh lá thiên nhiên `#15803D` • **Font chữ:** `Be Vietnam Pro`  
-> **Lưu ý quan trọng:** Toàn bộ dữ liệu, đăng nhập và cổng thanh toán là **giả lập (mock)** phục vụ đồ án học phần; không có backend, không có cơ sở dữ liệu thật và không phát sinh giao dịch tiền tệ thật.
+> **Đồ án môn học:** Hệ thống thương mại điện tử kết nối **Du khách (`Tourist`)**, **Hướng dẫn viên bản địa (`Local Guide`)** và **Quản trị viên (`Admin`)** tại TP. Đà Nẵng.
+> **Công nghệ:** React 19 + TypeScript (Strict) + Vite + Tailwind CSS v4 + Supabase (PostgreSQL 15, Row Level Security, Edge Functions, pg_cron).
 
 ---
 
-## 1. Cài đặt và Khởi chạy trên Localhost
+## 1. THÔNG TIN 3 TÀI KHOẢN MẪU KIỂM THỬ (1-CLICK DEMO)
+
+Hệ thống tích hợp sẵn các tài khoản mẫu tại Đà Nẵng để Giảng viên và Hội đồng phản biện kiểm thử nhanh mà không cần tạo mới:
+
+| Vai trò                     | Họ tên               | Email đăng nhập             | Mật khẩu | Chức năng nổi bật                                                                                                                                                     |
+| :-------------------------- | :------------------- | :-------------------------- | :------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Du khách (`Tourist`)**    | **Dương Đăng Huân**  | `huan.duong@gmail.com`      | `123456` | Tìm HDV, đặt lịch 4 tiếng Cầu Rồng - Sơn Trà, thanh toán cọc 30%, hủy đơn xem trước phạt $\Delta T$, tất toán 70% Online/Tiền mặt, đánh giá 2 chiều.                  |
+| **HDV (`Local Guide`)**     | **Nguyễn Hữu Khanh** | `khanh.guide@localbuddy.vn` | `123456` | Đã xác minh KYC (`Verified`), đơn giá `250.000 ₫ / giờ`, quản lý ca rảnh (khóa an toàn), duyệt yêu cầu (khóa nguyên tử 15p), xác nhận nhận tiền mặt 70%, ví rút tiền. |
+| **HDV Mới (`Pending KYC`)** | **Hoàng Minh Đức**   | `minhduc.kyc@gmail.com`     | `123456` | Hồ sơ mới nộp, bị khóa mở lịch theo quy tắc `BR-01` để kiểm thử luồng thẩm định KYC.                                                                                  |
+| **Quản trị viên (`Admin`)** | **Lê Văn Hoàng**     | `admin@localbuddy.vn`       | `123456` | Duyệt/từ chối KYC có lý do, khóa/mở khóa tài khoản vi phạm, phán quyết tranh chấp (2 nhánh), duyệt rút tiền ngân hàng, đổi phí sàn 10%–15%, xuất CSV.                 |
+
+> [!TIP]
+> Bạn có thể bấm nút **"Vào ngay"** tại màn hình đăng nhập [`/dang-nhap`](http://localhost:5174/dang-nhap) hoặc dùng thanh chuyển vai trò nhanh ở đáy màn hình.
+
+---
+
+## 2. HƯỚNG DẪN CÀI ĐẶT & CHẠY DỰ ÁN TẠI LOCAL
 
 ### Yêu cầu môi trường
-* Node.js phiên bản LTS (khuyến nghị v18+)
-* Trình duyệt Chrome / Edge
+
+- Node.js $\ge 18.x$ (Khuyên dùng LTS v20.x hoặc v22.x)
+- Trình duyệt hiện đại (Chrome, Edge, Firefox, Safari)
 
 ### Các bước khởi chạy
+
 ```bash
-# 1. Điều hướng vào thư mục dự án
+# 1. Đi vào thư mục mã nguồn web
 cd localbuddy-web
 
-# 2. Cài đặt các gói phụ thuộc (Dependencies)
+# 2. Cài đặt toàn bộ dependencies (nếu chưa cài)
 npm install
 
-# 3. Khởi chạy máy chủ phát triển
-npm run dev
+# 3. Tạo tệp cấu hình biến môi trường (mẫu có sẵn không chứa khóa bí mật)
+cp .env.example .env
 
-# 4. Kiểm tra biên dịch TypeScript & Vite Build
+# 4. Khởi chạy máy chủ phát triển Vite
+npm run dev
+```
+
+Mở trình duyệt truy cập: **`http://localhost:5174/`**
+
+---
+
+## 3. CHẠY BỘ KIỂM THỬ TỰ ĐỘNG & KIỂM TRA CHẤT LƯỢNG MÃ NGUỒN
+
+Dự án tích hợp sẵn động cơ PostgreSQL thực (`@electric-sql/pglite` + `Vitest`) để kiểm thử độc lập 100% logic migration SQL, RLS, tính tiền cọc 30%, phạt hủy theo $\Delta T$ và luồng E2E trọn vẹn:
+
+```bash
+cd localbuddy-web
+
+# Chạy toàn bộ 11 bài kiểm thử tự động
+npm test -- --run
+
+# Kiểm tra chất lượng biên dịch TypeScript Strict & Tối ưu hóa bundle production
 npm run build
 
-# 5. Chạy bộ kiểm thử tự động (Tính tiền G, D, B, phí sàn, phạt hủy ΔT)
-npm test
+# Kiểm tra quy tắc code sạch qua Linter
+npm run lint
 ```
-Máy chủ dev sẽ chạy tại địa chỉ: **`http://localhost:5173/`**
+
+**Kết quả kiểm thử tự động:**
+
+- `✓ src/tests/supabase-server-rules.test.ts (8 tests)` — Kiểm thử 27 bảng CSDL, 100% bật RLS, cấm Client ghi tiền, Server RPC và chống đặt trùng lịch.
+- `✓ src/tests/e2e-lifecycle.test.ts (3 tests)` — Kiểm thử E2E trọn vẹn 3 vai trò, lớp `PaymentProvider` Sandbox, chống thu tiền trùng (`Idempotency`), và định dạng tiền tệ VNĐ.
+- **Tổng cộng: 11/11 tests PASSED (100%).**
 
 ---
 
-## 2. Tài khoản Demo có sẵn
+## 4. HƯỚNG DẪN THAY THẾ CỔNG THANH TOÁN THỰC (VNPAY / MOMO)
 
-Hệ thống được cài đặt sẵn 3 tài khoản mẫu đại diện cho 3 vai trò:
+Dự án áp dụng mẫu thiết kế **Adapter Pattern** thông qua giao diện [`IPaymentProvider`](src/services/paymentProvider.ts).
 
-| Vai trò | Email đăng nhập | Mật khẩu | Màn hình chính sau đăng nhập |
-| :--- | :--- | :--- | :--- |
-| **Khách du lịch (Tourist)** | `minhanh.demo@example.com` | `123456` | S-10: Đơn của tôi (`/don-cua-toi`) |
-| **Hướng dẫn viên (Guide)** | `hoangnam.demo@example.com` | `123456` | S-21: Đơn & ca của tôi (`/guide/don-va-ca`) |
-| **Quản trị viên (Admin)** | `admin@localbuddy.vn` | `admin123` | S-26: Thẩm định KYC (`/admin/kyc`) |
+Mặc định, ứng dụng chạy trên `SandboxPaymentProvider` cho phép mô phỏng tức thì mọi tình huống thực tế (Thành công, Lỗi mạng cho phép thử lại, Hủy giữa chừng, Ngân hàng từ chối giải phóng lịch, Hết hạn 15 phút và Chống thanh toán trùng lặp).
 
----
+### Các bước tích hợp Cổng VNPay / MoMo thật:
 
-## 3. Danh mục 24 Màn hình (Screen Inventory S-xx)
+1. Tạo tệp mới `src/services/vnpayPaymentProvider.ts` triển khai giao diện `IPaymentProvider`:
 
-Bạn có thể truy cập trang tra cứu trung tâm tại: **`http://localhost:5173/danh-muc`** hoặc mở trực tiếp từng màn:
+   ```typescript
+   import {
+     IPaymentProvider,
+     PaymentCheckoutRequest,
+     PaymentCheckoutResult,
+   } from "./paymentProvider";
 
-### Nhóm 1: Khách du lịch & Public (Mobile 390px & Desktop 1440px)
-* `S-01`: **Trang chủ** (`/`) — Điểm vào chính, tìm kiếm nhanh và xem Guide nổi bật
-* `S-02`: **Đăng ký** (`/dang-ky`) — 2 tab Tourist & Guide nộp tài liệu KYC
-* `S-04`: **Đăng nhập** (`/dang-nhap`) — Xác thực phân vai trò du khách và HDV
-* `S-06`: **Tìm kiếm, lọc Guide** (`/guides`) — Chỉ hiển thị các Guide đã xác minh (KYC)
-* `S-07`: **Hồ sơ Guide & Lịch rảnh** (`/guides/u-guide-1`) — Xem thông tin và chọn ca trống
-* `S-08`: **Đặt lịch chuyến đi** (`/dat-lich/u-guide-1`) — Form đặt lịch (ẩn phí sàn theo Q13)
-* `S-09`: **Thanh toán cọc 30%** (`/don/BK-1002/dat-coc`) — Đồng hồ 15 phút, cổng giả lập
-* `S-10`: **Đơn của tôi** (`/don-cua-toi`) — Dashboard du khách với 2 huy hiệu độc lập
-* `S-11`: **Chi tiết đơn** (`/don/BK-1001`) — Timeline trạng thái, khiếu nại, đánh giá
-* `S-16`: **Modal hủy đơn** (`/don/BK-1003?huy=1`) — Xem trước tiền phạt và hoàn theo $\Delta T$
-* `S-13`: **Thanh toán 70%** (`/don/BK-1004/thanh-toan-70`) — Quyết toán Online hoặc Tiền mặt
-* `S-17`: **Trung tâm thông báo** (`/thong-bao`) — Cập nhật sự kiện đơn và ví
+   export class VNPayPaymentProvider implements IPaymentProvider {
+     readonly mode = "PRODUCTION";
+     readonly providerName = "VNPay Gateway";
 
-### Nhóm 2: Hướng dẫn viên Guide (Mobile 390px & Desktop 1440px)
-* `S-18`: **Hồ sơ, giá & xác minh** (`/guide/ho-so`) — Chặn giá ngoài khoảng 80k - 500k/h
-* `S-19`: **Cấu hình lịch rảnh** (`/guide/lich-ranh`) — Quản lý ca AVAILABLE, HOLD, BUSY
-* `S-20`: **Đơn đến** (`/guide/don-den`) — Đồng hồ 24h, hiển thị phí sàn và tiền nhận
-* `S-21`: **Đơn & ca của tôi** (`/guide/don-va-ca`) — Yêu cầu hoàn thành & xác nhận tiền mặt
-* `S-24`: **Ví thu nhập & Rút tiền** (`/guide/vi`) — Rút tối thiểu 200.000 đ
+     async processPayment(
+       req: PaymentCheckoutRequest,
+     ): Promise<PaymentCheckoutResult> {
+       // 1. Gọi API Backend / Edge Function để tạo URL thanh toán VNPay có chữ ký HMAC-SHA512
+       const response = await fetch("/api/create-vnpay-url", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({
+           orderId: req.bookingId,
+           amount: req.amount,
+           orderDesc: `Thanh toan LocalBuddy Da Nang don ${req.bookingId}`,
+         }),
+       });
+       const { paymentUrl } = await response.json();
 
-### Nhóm 3: Quản trị viên Admin (Desktop 1440px)
-* `S-05`: **Đăng nhập Admin** (`/admin/dang-nhap`) — Cổng quản trị độc lập
-* `S-26`: **Thẩm định KYC** (`/admin/kyc`) — Duyệt hồ sơ để Guide xuất hiện ở S-06
-* `S-27`: **Quản lý tài khoản** (`/admin/tai-khoan`) — Khóa tài khoản và thu hồi xác minh
-* `S-28`: **Duyệt lệnh rút tiền** (`/admin/rut-tien`) — Duyệt sau khi chuyển khoản thủ công
-* `S-29`: **Xử lý tranh chấp** (`/admin/tranh-chap`) — Chốt đơn Đã hủy, không thu 70%
-* `S-30`: **Báo cáo doanh thu** (`/admin/bao-cao`) — Thống kê phí sàn thu được từ đơn PAID
-* `S-31`: **Cấu hình phí sàn** (`/admin/phi-san`) — Thiết lập Fee_Rate từ 10% đến 15%
+       // 2. Chuyển hướng người dùng sang cổng thanh toán ngân hàng VNPay
+       window.location.href = paymentUrl;
 
----
+       return {
+         ok: true,
+         status: "SUCCESS",
+         transactionRef: req.bookingId,
+         gateway: "VNPAY",
+         messageVi: "Đang chuyển hướng sang cổng VNPay...",
+         processedAt: new Date().toISOString(),
+       };
+     }
+     // ... triển khai các hàm session & khôi phục tab
+   }
+   ```
 
-## 4. Hướng dẫn Nhập vào Figma bằng plugin `html.to.design`
-
-Để nhập các màn hình từ Localhost vào file thiết kế Figma một cách chuẩn xác:
-
-1. **Khởi chạy ứng dụng**: Đảm bảo `npm run dev` đang chạy tại `http://localhost:5173`.
-2. **Sử dụng tham số `?figma=1`**:
-   * Truy cập trang danh mục: `http://localhost:5173/danh-muc`
-   * Tích chọn checkbox: **"Bật tham số ?figma=1"**.
-   * Hệ thống sẽ tự động tắt toàn bộ animation và hiệu ứng CSS transition để `html.to.design` chụp chính xác từng lớp layer.
-3. **Mở Figma & Plugin `html.to.design`**:
-   * Dán URL tương ứng (ví dụ: `http://localhost:5173/guides?figma=1`).
-   * Chọn khung kích thước: **Mobile 390px** hoặc **Desktop 1440px** theo bảng danh mục.
-4. **Quy trình chuẩn hóa trong Figma (7 bước theo Mục 8.3 đặc tả)**:
-   * **Bước 1:** Đặt tên Frame chuẩn theo mã: `"S-11 Chi tiết đơn, Tourist, Mobile"`.
-   * **Bước 2:** Tạo Figma Variables cho màu sắc theo Design Tokens (Primary `#15803D`, Soft `#DCFCE7`, Neutral `#374151`...).
-   * **Bước 3:** Chuyển các thành phần lặp thành Components: `StatusBadge`, `PaymentBadge`, `BookingCard`, `TimeSlot`...
-   * **Bước 4:** Kiểm tra font chữ `Be Vietnam Pro` đã được load đầy đủ.
-   * **Bước 5:** Bật tính năng Auto Layout cho các Card và Form.
-   * **Bước 6:** Nối Prototype theo 5 luồng nghiệp vụ chính: Đặt lịch, Thanh toán cọc, Hoàn thành & Trả 70%, Hủy đơn theo $\Delta T$, Xử lý tranh chấp.
-   * **Bước 7:** Xuất ảnh và bảng ma trận truy vết phục vụ báo cáo bảo vệ đồ án.
+2. Trong `src/services/paymentProvider.ts`, chỉ cần thay đổi dòng xuất bản:
+   ```typescript
+   // Chuyển từ Sandbox sang Cổng thật khi deploy môi trường Production:
+   export const paymentProvider: IPaymentProvider =
+     import.meta.env.VITE_PAYMENT_MODE === "LIVE"
+       ? new VNPayPaymentProvider()
+       : new SandboxPaymentProvider();
+   ```
 
 ---
 
-## 5. Các Quy Tắc Nghiệp Vụ Bất Biến Đã Kiểm Chứng (RQ-01 đến RQ-19)
+## 5. HƯỚNG DẪN TRIỂN KHAI LÊN SUPABASE & VERCEL ĐỂ CÓ LINK CÔNG KHAI
 
-1. **Hai huy hiệu trạng thái độc lập**: `BookingStatus` (dạng đặc có icon) và `PaymentStatus` (dạng viền), không bao giờ gộp nhãn.
-2. **Thời hạn nghiệp vụ**: Guide phản hồi trong 24 giờ; cọc trong 15 phút; Tourist phản hồi trong 24 giờ sau yêu cầu hoàn tất.
-3. **Công thức tiền**: $G = \text{giá} \times \text{giờ}$, cọc $D = 30\% G$, còn lại $B = 70\% G$. Phí sàn $10\% - 15\%$ chụp lúc tạo đơn và **tuyệt đối không hiển thị cho Tourist**.
-4. **Quy tắc phạt hủy đơn theo $\Delta T$**: $\Delta T > 48\text{h}$ phạt $0\%$; $24\text{h} \le \Delta T \le 48\text{h}$ phạt $50\%$; $\Delta T < 24\text{h}$ phạt $100\%$ tiền cọc. Ẩn nút hủy khi $\Delta T \le 0$.
-5. **Đánh giá & Khiếu nại**: Đánh giá chỉ bật khi `COMPLETED` và `PAID`. Khiếu nại bị chặn sau khi đã hoàn thành và quyết toán đủ.
-6. **Ví tiền Guide**: Số dư chỉ được cộng khi đơn chuyển sang `PAID`. Rút tiền tối thiểu $200.000\text{ đ}$.
+### Bước 1: Khởi tạo Supabase Cloud
+
+1. Đăng ký/Đăng nhập tại [https://supabase.com](https://supabase.com) $\rightarrow$ **New Project** đặt tên `localbuddy-danang` (Khu vực Singapore).
+2. Vào **SQL Editor**, lần lượt chạy 4 tệp SQL có sẵn:
+   - `supabase/migrations/20261108000001_init_schema.sql` (Khởi tạo 27 bảng CSDL)
+   - `supabase/migrations/20261108000002_rls_policies.sql` (Bật RLS & phân quyền bảo mật)
+   - `supabase/migrations/20261108000003_server_functions_and_cron.sql` (Hàm server & tự động hóa)
+   - `supabase/seed.sql` (Dữ liệu mẫu Đà Nẵng)
+3. Vào **Database → Extensions**, bật tiện ích mở rộng **`pg_cron`**.
+
+### Bước 2: Deploy lên Vercel
+
+1. Đẩy mã nguồn lên kho chứa GitHub.
+2. Truy cập [https://vercel.com/new](https://vercel.com/new) $\rightarrow$ Chọn repository `localbuddy-web`.
+3. Điền các thông số:
+   - **Framework Preset:** `Vite`
+   - **Root Directory:** `localbuddy-web`
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+4. Khai báo 3 biến môi trường tại mục **Environment Variables**:
+   - `VITE_SUPABASE_URL` = _(URL Project Supabase)_
+   - `VITE_SUPABASE_ANON_KEY` = _(Anon Public Key)_
+   - `VITE_DATA_MODE` = `hybrid`
+5. Nhấn **Deploy**. Sau ~45 giây bạn sẽ nhận được liên kết công khai (Ví dụ: `https://localbuddy-danang.vercel.app`). Tệp `vercel.json` đã cấu hình sẵn SPA Rewrites để chuyển tiếp trang mượt mà.
+
+---
+
+## 6. DANH MỤC TÀI LIỆU HỖ TRỢ KIỂM ĐỊNH
+
+- 📋 **[Kịch bản kiểm thử thủ công 29 Use Cases](file:///c:/Users/HP/OneDrive%20-%20dau.edu.vn/Desktop/WEB%20LOCAL%20BUDDY/docs/KICH_BAN_TEST.md)**: Hướng dẫn chi tiết từng bước kiểm tra từ đăng ký đến giải ngân.
+- 📊 **[Bảng so sánh ngách bổ sung](file:///c:/Users/HP/OneDrive%20-%20dau.edu.vn/Desktop/WEB%20LOCAL%20BUDDY/docs/NGACH_BO_SUNG.md)**: Đối chiếu 20 ngách nghiệp vụ được bổ sung so với đặc tả gốc và nguồn tham chiếu Withlocals / ToursByLocals / ShowAround.
+- 🎨 **[Trang trưng bày Design System](http://localhost:5174/design-system)**: Xem toàn bộ các thành phần giao diện (Buttons, Badges, Pickers, Modals, Cards...) ở mọi trạng thái tương tác.

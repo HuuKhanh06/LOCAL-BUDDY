@@ -1,5 +1,5 @@
 // features/booking/actions.ts
-// Trả về danh sách nút hành động theo (BookingStatus, PaymentStatus, vai trò, đủ điều kiện)
+// Trả về danh sách các nút hành động hợp lệ theo đúng Ma trận Trạng thái (BR-03, BR-06, BR-08, BR-12, BR-13 & UC.12–UC.27)
 
 import { BookingStatus, PaymentStatus, UserRole } from '../../types';
 
@@ -9,70 +9,85 @@ export interface BookingAction {
   variant: 'primary' | 'secondary' | 'danger' | 'ghost';
 }
 
-interface ActionsParams {
+export interface ActionsParams {
   bookingStatus: BookingStatus;
   paymentStatus: PaymentStatus;
   role: UserRole;
-  canReview?: boolean;          // COMPLETED + PAID + chưa đánh giá
-  canConfirmComplete?: boolean; // Tourist: Guide đã yêu cầu hoàn thành hoặc ca đã qua
-  isAfterShiftEnd?: boolean;    // Guide: ca đã kết thúc
-  isCashBranch?: boolean;       // Tourist chọn tiền mặt, chờ Guide xác nhận
-  deltaHours?: number;          // ΔT giờ đến ca (nếu <= 0 thì ẩn nút hủy)
+  guideRequestedCompletion?: boolean; // HDV đã bấm Yêu cầu xác nhận hoàn thành (UC.17)
+  canReview?: boolean;                // COMPLETED + PAID + chưa gửi đánh giá (UC.26)
+  isCashBranch?: boolean;             // Khách chọn trả tiền mặt 70%, chờ HDV xác nhận (UC.21)
+  deltaHours?: number;                // ΔT giờ còn lại đến lúc bắt đầu ca
 }
 
 export function getBookingActions(p: ActionsParams): BookingAction[] {
   const actions: BookingAction[] = [];
-  const { bookingStatus: bs, paymentStatus: ps, role, deltaHours } = p;
+  const { bookingStatus: bs, paymentStatus: ps, role, guideRequestedCompletion } = p;
 
-  // ── TOURIST ──────────────────────────────────────────────
+  // ── 1. VAI TRÒ DU KHÁCH (TOURIST) ─────────────────────────
   if (role === 'tourist') {
-    if (bs === 'WAITING_PAYMENT' && ps === 'WAITING_DEPOSIT') {
-      actions.push({ key: 'pay_deposit', label: 'Thanh toán cọc', variant: 'primary' });
-    }
-    // Hủy đơn chỉ khi CONFIRMED + DEPOSITED và ΔT > 0 (ẩn nút hủy khi ΔT <= 0 theo Q5)
-    if (bs === 'CONFIRMED' && ps === 'DEPOSITED') {
-      if (deltaHours === undefined || deltaHours > 0) {
-        actions.push({ key: 'cancel', label: 'Hủy đơn', variant: 'danger' });
-      }
-      if (p.canConfirmComplete) {
-        actions.push({ key: 'confirm_complete', label: 'Xác nhận hoàn tất', variant: 'primary' });
-      }
-    }
-    if (bs === 'COMPLETED' && ps === 'WAITING_FINAL') {
-      actions.push({ key: 'pay_final', label: 'Thanh toán 70%', variant: 'primary' });
-      actions.push({ key: 'dispute', label: 'Khiếu nại', variant: 'danger' });
-    }
-    if (bs === 'COMPLETED' && ps === 'PAID' && p.canReview) {
-      actions.push({ key: 'review', label: 'Đánh giá', variant: 'secondary' });
-    }
-    // PENDING: không có nút hành động (chờ Guide)
-    // DISPUTED, CANCELLED: chỉ xem
-  }
-
-  // ── GUIDE ────────────────────────────────────────────────
-  if (role === 'guide') {
+    // PENDING: Khách được hủy yêu cầu miễn phí trước khi HDV duyệt (UC.24)
     if (bs === 'PENDING') {
-      actions.push({ key: 'accept', label: 'Chấp nhận', variant: 'primary' });
-      actions.push({ key: 'reject', label: 'Từ chối', variant: 'danger' });
+      actions.push({ key: 'cancel', label: 'Hủy yêu cầu đặt lịch', variant: 'danger' });
     }
-    if (bs === 'CONFIRMED') {
-      if (deltaHours === undefined || deltaHours > 0) {
-        actions.push({ key: 'cancel', label: 'Hủy đơn', variant: 'danger' });
+
+    // WAITING_PAYMENT + WAITING_DEPOSIT: Đặt cọc 30% trong 15 phút (UC.14) hoặc Hủy đơn
+    if (bs === 'WAITING_PAYMENT' && ps === 'WAITING_DEPOSIT') {
+      actions.push({ key: 'pay_deposit', label: 'Thanh toán cọc 30% ngay', variant: 'primary' });
+      actions.push({ key: 'cancel', label: 'Hủy đơn', variant: 'ghost' });
+    }
+
+    // CONFIRMED + DEPOSITED:
+    if (bs === 'CONFIRMED' && ps === 'DEPOSITED') {
+      if (guideRequestedCompletion) {
+        // Cửa sổ 24 giờ sau khi HDV bấm Yêu cầu hoàn thành (UC.17 → UC.18 / UC.19)
+        actions.push({ key: 'confirm_complete', label: 'Xác nhận hoàn thành tour', variant: 'primary' });
+        actions.push({ key: 'dispute', label: 'Gửi khiếu nại', variant: 'danger' });
+      } else {
+        // Trước khi kết thúc tour: Khách có thể hủy đơn theo chính sách ΔT (UC.24)
+        actions.push({ key: 'cancel', label: 'Hủy đơn đặt lịch', variant: 'danger' });
       }
-      if (p.isAfterShiftEnd) {
-        actions.push({ key: 'request_complete', label: 'Yêu cầu hoàn thành', variant: 'primary' });
+    }
+
+    // COMPLETED: Đã hoàn thành tour (Khóa quyền khiếu nại theo BR-12)
+    if (bs === 'COMPLETED') {
+      if (ps === 'WAITING_FINAL') {
+        actions.push({ key: 'pay_final', label: 'Tất toán 70% còn lại', variant: 'primary' });
+      }
+      if (ps === 'PAID' && p.canReview) {
+        actions.push({ key: 'review', label: 'Viết đánh giá HDV', variant: 'primary' });
       }
     }
-    if (bs === 'COMPLETED' && p.isCashBranch) {
-      actions.push({ key: 'confirm_cash', label: 'Xác nhận đã nhận tiền mặt', variant: 'primary' });
-    }
-    // WAITING_PAYMENT, DISPUTED, CANCELLED: chỉ xem
   }
 
-  // ── ADMIN ─────────────────────────────────────────────────
+  // ── 2. VAI TRÒ HƯỚNG DẪN VIÊN (GUIDE) ────────────────────
+  if (role === 'guide') {
+    // PENDING: Chấp nhận (khóa HOLD 15p) hoặc Từ chối (UC.13)
+    if (bs === 'PENDING') {
+      actions.push({ key: 'accept', label: 'Chấp nhận & Giữ lịch 15p', variant: 'primary' });
+      actions.push({ key: 'reject', label: 'Từ chối yêu cầu', variant: 'danger' });
+    }
+
+    // CONFIRMED + DEPOSITED:
+    if (bs === 'CONFIRMED' && ps === 'DEPOSITED') {
+      if (!guideRequestedCompletion) {
+        actions.push({ key: 'request_complete', label: 'Yêu cầu xác nhận hoàn thành', variant: 'primary' });
+        actions.push({ key: 'cancel', label: 'Hủy nhận dẫn khách', variant: 'danger' });
+      } else {
+        // Khi đang trong cửa sổ 24h chờ khách xác nhận, HDV cũng có quyền gửi khiếu nại nếu khách vi phạm (UC.19)
+        actions.push({ key: 'dispute', label: 'Gửi khiếu nại sự cố', variant: 'danger' });
+      }
+    }
+
+    // COMPLETED + WAITING_RECONCILE: Khách chọn trả tiền mặt 70%, chờ HDV xác nhận đã thu đủ (UC.21)
+    if (bs === 'COMPLETED' && (ps === 'WAITING_RECONCILE' || p.isCashBranch)) {
+      actions.push({ key: 'confirm_cash', label: 'Xác nhận đã thu đủ 70% tiền mặt', variant: 'primary' });
+    }
+  }
+
+  // ── 3. VAI TRÒ QUẢN TRỊ VIÊN (ADMIN) ─────────────────────
   if (role === 'admin') {
     if (bs === 'DISPUTED') {
-      actions.push({ key: 'resolve_dispute', label: 'Chốt tranh chấp', variant: 'primary' });
+      actions.push({ key: 'resolve_dispute', label: 'Phán quyết tranh chấp', variant: 'primary' });
     }
   }
 

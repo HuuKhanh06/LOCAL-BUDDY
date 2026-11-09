@@ -1,91 +1,1219 @@
-// data/slots.ts – Khung giờ của Guide Lê Hoàng Nam
-import { TimeSlotData } from '../types';
+// ============================================================
+// DATA LAYER – LOCALBUDDY ĐÀ NẴNG
+// Nguồn dữ liệu tập trung chuẩn hóa theo 21 thực thể CSDL & Biên bản phỏng vấn
+// (Du khách: Dương Đăng Huân; HDV: Nguyễn Hữu Khanh; Admin: Lê Văn Hoàng)
+// ============================================================
 
-export const mockSlots: TimeSlotData[] = [
-  // Ngày 02/11/2026
-  { id: 'slot-1', guideId: 'u-guide-1', date: '2026-11-02', startTime: '09:00', endTime: '12:00', status: 'AVAILABLE' },
-  { id: 'slot-2', guideId: 'u-guide-1', date: '2026-11-02', startTime: '14:00', endTime: '17:00', status: 'HOLD', bookingId: 'BK-1002' },
-  { id: 'slot-3', guideId: 'u-guide-1', date: '2026-11-02', startTime: '18:00', endTime: '20:00', status: 'BUSY', bookingId: 'BK-1003' },
-  // Ngày 03/11/2026
-  { id: 'slot-4', guideId: 'u-guide-1', date: '2026-11-03', startTime: '08:00', endTime: '11:00', status: 'AVAILABLE' },
-  { id: 'slot-5', guideId: 'u-guide-1', date: '2026-11-03', startTime: '13:00', endTime: '16:00', status: 'AVAILABLE' },
-  // Ngày 04/11/2026
-  { id: 'slot-6', guideId: 'u-guide-1', date: '2026-11-04', startTime: '09:00', endTime: '12:00', status: 'AVAILABLE' },
+import {
+  User,
+  GuideProfile,
+  TimeSlotData,
+  Booking,
+  Review,
+  KycRecord,
+  Notification,
+  Wallet,
+  WalletTransaction,
+  WithdrawalRequest,
+  DisputeRecord,
+  CancellationRecord,
+  ChatMessage,
+  Payment,
+  AppConfig,
+} from '../types';
+
+// ---------- Danh mục chuẩn tại Đà Nẵng ----------
+export const DANANG_AREAS = [
+  'Cầu Rồng & Sông Hàn',
+  'Bán đảo Sơn Trà',
+  'Bãi biển Mỹ Khê',
+  'Ngũ Hành Sơn',
+  'Bà Nà Hills',
+  'Phố cổ Hội An',
+  'Chợ Cồn & Chợ Hàn',
+  'Đèo Hải Vân & Lăng Cô',
 ];
 
-// data/reviews.ts
-export const mockReviews = [
+export const GUIDE_LANGUAGES = [
+  'Tiếng Việt',
+  'Tiếng Anh',
+  'Tiếng Hàn',
+  'Tiếng Nhật',
+  'Tiếng Trung',
+  'Tiếng Pháp',
+];
+
+export const GUIDE_SKILLS = [
+  'Ẩm thực bản địa',
+  'Nhiếp ảnh & Check-in',
+  'Lịch sử & Văn hóa Chămpa',
+  'Khám phá Đà Nẵng về đêm',
+  'Lái xe máy an toàn',
+  'Thiên nhiên & Trekking Sơn Trà',
+  'Làng nghề truyền thống',
+];
+
+export const DANANG_MEETING_SPOTS = [
+  'Đầu Cầu Rồng (bờ Đông, đường Trần Hưng Đạo, Sơn Trà)',
+  'Cổng chính Chợ Hàn (119 Trần Phú, Hải Châu)',
+  'Công viên Biển Đông – Bãi biển Mỹ Khê (Võ Nguyên Giáp)',
+  'Sảnh ga đến Quốc nội – Sân bay Quốc tế Đà Nẵng',
+  'Chùa Linh Ứng – Bán đảo Sơn Trà',
+  'Cổng Khu danh thắng Ngũ Hành Sơn (81 Huyền Trân Công Chúa)',
+];
+
+// ---------- 1. USERS (TAIKHOAN) ----------
+export const initialUsers: User[] = [
+  // Du khách
+  {
+    id: 'u-tourist-1',
+    role: 'tourist',
+    fullName: 'Dương Đăng Huân',
+    email: 'huan.duong@gmail.com',
+    phone: '0905123456',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
+    isLocked: false,
+    violationCount: 0,
+    nationality: 'Việt Nam',
+    preferredLanguage: 'Tiếng Việt, Tiếng Anh',
+    createdAt: '2026-09-10T08:00:00Z',
+  },
+  {
+    id: 'u-tourist-2',
+    role: 'tourist',
+    fullName: 'Trần Minh Anh',
+    email: 'minhanh.tran@gmail.com',
+    phone: '0914888999',
+    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80',
+    isLocked: false,
+    violationCount: 1,
+    nationality: 'Việt Nam',
+    preferredLanguage: 'Tiếng Việt',
+    createdAt: '2026-09-18T10:20:00Z',
+  },
+  // Hướng dẫn viên
+  {
+    id: 'u-guide-1',
+    role: 'guide',
+    fullName: 'Nguyễn Hữu Khanh',
+    email: 'khanh.nguyen.dn@gmail.com',
+    phone: '0905678910',
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
+    isLocked: false,
+    violationCount: 0,
+    createdAt: '2026-08-01T09:00:00Z',
+  },
+  {
+    id: 'u-guide-2',
+    role: 'guide',
+    fullName: 'Lê Hoàng Nam',
+    email: 'hoangnam.guide@gmail.com',
+    phone: '0935222333',
+    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
+    isLocked: false,
+    violationCount: 0,
+    createdAt: '2026-08-12T09:00:00Z',
+  },
+  {
+    id: 'u-guide-3',
+    role: 'guide',
+    fullName: 'Phạm Ngọc Lan',
+    email: 'ngoclan.danang@gmail.com',
+    phone: '0905444555',
+    avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80',
+    isLocked: false,
+    violationCount: 0,
+    createdAt: '2026-08-20T09:00:00Z',
+  },
+  {
+    id: 'u-guide-4',
+    role: 'guide',
+    fullName: 'Võ Quốc Tuấn',
+    email: 'quoctuan.son.tra@gmail.com',
+    phone: '0989777666',
+    avatarUrl: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&auto=format&fit=crop&q=80',
+    isLocked: false,
+    violationCount: 0,
+    createdAt: '2026-09-01T09:00:00Z',
+  },
+  {
+    id: 'u-guide-5',
+    role: 'guide',
+    fullName: 'Đặng Thu Hà',
+    email: 'thuha.hoian@gmail.com',
+    phone: '0977111222',
+    avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
+    isLocked: false,
+    violationCount: 0,
+    createdAt: '2026-09-05T09:00:00Z',
+  },
+  {
+    id: 'u-guide-6',
+    role: 'guide',
+    fullName: 'Hoàng Minh Đức',
+    email: 'minhduc.kyc@gmail.com',
+    phone: '0912345678',
+    avatarUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=80',
+    isLocked: false,
+    violationCount: 0,
+    createdAt: '2026-10-25T09:00:00Z',
+  },
+  // Quản trị viên
+  {
+    id: 'u-admin-1',
+    role: 'admin',
+    fullName: 'Lê Văn Hoàng',
+    email: 'admin@localbuddy.vn',
+    phone: '0905000111',
+    avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&auto=format&fit=crop&q=80',
+    isLocked: false,
+    violationCount: 0,
+    createdAt: '2026-07-01T00:00:00Z',
+  },
+];
+
+// ---------- 2. GUIDE PROFILES (HUONG_DAN_VIEN) ----------
+export const initialGuides: GuideProfile[] = [
+  {
+    userId: 'u-guide-1',
+    tagline: 'Thổ địa ẩm thực chợ Cồn, nhiếp ảnh Cầu Rồng & khám phá Bán đảo Sơn Trà',
+    bio: 'Xin chào! Mình là Nguyễn Hữu Khanh, sinh ra và lớn lên tại quận Sơn Trà, Đà Nẵng. Với hơn 5 năm đồng hành cùng du khách trong và ngoài nước, mình chuyên thiết kế các lịch trình linh hoạt theo giờ: từ săn bình minh trên đỉnh Bàn Cờ, khám phá các quán hải sản và bánh tráng cuốn thịt heo chính gốc người Đà Nẵng tại Chợ Cồn, đến chụp ảnh nghệ thuật dọc Cầu Rồng và Phố cổ Hội An.',
+    hourlyRate: 250000,
+    yearsExperience: 5,
+    kycStatus: 'APPROVED',
+    isVerified: true,
+    avgRating: 4.9,
+    totalReviews: 38,
+    completedTours: 124,
+    responseTimeText: 'Thường phản hồi trong 10 phút',
+    responseRate: 99,
+    areas: ['Cầu Rồng & Sông Hàn', 'Bán đảo Sơn Trà', 'Chợ Cồn & Chợ Hàn', 'Bãi biển Mỹ Khê'],
+    languages: ['Tiếng Việt', 'Tiếng Anh', 'Tiếng Hàn'],
+    skills: ['Ẩm thực bản địa', 'Nhiếp ảnh & Check-in', 'Khám phá Đà Nẵng về đêm', 'Lái xe máy an toàn'],
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
+    coverUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=1200&auto=format&fit=crop&q=80',
+    galleryUrls: [
+      'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1528127269322-539801943592?w=800&auto=format&fit=crop&q=80',
+    ],
+    highlights: [
+      'Hỗ trợ chụp ảnh bằng máy ảnh Sony Alpha miễn phí suốt hành trình',
+      'Dẫn đi ăn các quán hẻm địa phương chuẩn vị Quảng – Đà không lo chặt chém',
+      'Linh hoạt thay đổi điểm đến theo thời tiết và sở thích ngay trong buổi đi',
+    ],
+    faqs: [
+      {
+        question: 'Giá 250.000 ₫ / giờ đã bao gồm những gì?',
+        answer: 'Đơn giá theo giờ bao gồm công hướng dẫn viên bản địa, tư vấn lịch trình cá nhân hóa và hỗ trợ chụp ảnh. Chi phí vé tham quan, ăn uống hoặc thuê phương tiện sẽ do bạn tự quyết định theo nhu cầu thực tế.',
+      },
+      {
+        question: 'Khanh có thể đón khách tại khách sạn ở biển Mỹ Khê không?',
+        answer: 'Hoàn toàn được! Mình nhận đón tại tất cả khách sạn khu vực Mỹ Khê, Sơn Trà, Hải Châu hoặc đón trực tiếp tại Cầu Rồng / Sân bay Đà Nẵng.',
+      },
+    ],
+    bankName: 'Vietcombank - CN Đà Nẵng',
+    bankAccountNumber: '0041000987654',
+    bankAccountHolder: 'NGUYEN HUU KHANH',
+  },
+  {
+    userId: 'u-guide-2',
+    tagline: 'Chuyên gia lịch sử Ngũ Hành Sơn, Văn hóa Chămpa & Phố cổ Hội An',
+    bio: 'Mình là Lê Hoàng Nam, cử nhân Văn hóa Du lịch tại Đà Nẵng. Mình đam mê kể những câu chuyện sống động về lịch sử thương cảng Hội An, hệ thống động Huyền Không tại Ngũ Hành Sơn và văn hóa Chămpa cổ đại. Rất phù hợp với gia đình và nhóm bạn thích trải nghiệm chiều sâu văn hóa.',
+    hourlyRate: 280000,
+    yearsExperience: 6,
+    kycStatus: 'APPROVED',
+    isVerified: true,
+    avgRating: 4.8,
+    totalReviews: 29,
+    completedTours: 96,
+    responseTimeText: 'Thường phản hồi trong 15 phút',
+    responseRate: 97,
+    areas: ['Ngũ Hành Sơn', 'Phố cổ Hội An', 'Cầu Rồng & Sông Hàn'],
+    languages: ['Tiếng Việt', 'Tiếng Anh', 'Tiếng Pháp'],
+    skills: ['Lịch sử & Văn hóa Chămpa', 'Làng nghề truyền thống', 'Nhiếp ảnh & Check-in'],
+    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
+    coverUrl: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=1200&auto=format&fit=crop&q=80',
+    galleryUrls: [
+      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&auto=format&fit=crop&q=80',
+    ],
+    highlights: [
+      'Thuyết minh chuyên sâu lịch sử Ngũ Hành Sơn, làng đá Non Nước & Hội An',
+      'Trải nghiệm làm đèn lồng và thưởng trà tại nhà cổ Hội An',
+      'Am hiểu các góc chụp hoàng hôn trên sông Hoài và sông Hàn',
+    ],
+    faqs: [
+      {
+        question: 'Đi Ngũ Hành Sơn kết hợp Hội An nên đặt mấy giờ?',
+        answer: 'Lý tưởng nhất là từ 4 đến 5 giờ (từ 14:30 đến 19:30) để vừa khám phá Ngũ Hành Sơn lúc nắng dịu vừa ngắm Hội An lên đèn lồng buổi tối.',
+      },
+    ],
+    bankName: 'Techcombank - CN Đà Nẵng',
+    bankAccountNumber: '1903456789012',
+    bankAccountHolder: 'LE HOANG NAM',
+  },
+  {
+    userId: 'u-guide-3',
+    tagline: 'Food tour Chợ Cồn, cà phê rooftop & săn mây Bà Nà Hills',
+    bio: 'Chào bạn, mình là Phạm Ngọc Lan! Nếu bạn muốn thưởng thức trọn vẹn ẩm thực đường phố Đà Nẵng từ mì Quảng, bún chả cá, bánh xèo bà Dưỡng cho tới những quán cà phê ẩn mình trong hẻm nhỏ hay hành trình trọn ngày trên đỉnh Bà Nà Hills, hãy đặt lịch cùng Lan nhé!',
+    hourlyRate: 220000,
+    yearsExperience: 4,
+    kycStatus: 'APPROVED',
+    isVerified: true,
+    avgRating: 5.0,
+    totalReviews: 42,
+    completedTours: 115,
+    responseTimeText: 'Thường phản hồi trong 5 phút',
+    responseRate: 100,
+    areas: ['Chợ Cồn & Chợ Hàn', 'Bà Nà Hills', 'Cầu Rồng & Sông Hàn', 'Bãi biển Mỹ Khê'],
+    languages: ['Tiếng Việt', 'Tiếng Anh', 'Tiếng Nhật'],
+    skills: ['Ẩm thực bản địa', 'Nhiếp ảnh & Check-in', 'Khám phá Đà Nẵng về đêm'],
+    avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80',
+    coverUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&auto=format&fit=crop&q=80',
+    galleryUrls: [
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=80',
+    ],
+    highlights: [
+      'Danh sách hơn 30 quán ăn bản địa ngon - sạch - giá gốc tại Chợ Cồn & Hải Châu',
+      'Kinh nghiệm đi cáp treo Bà Nà Hills tránh giờ cao điểm, chụp Cầu Vàng vắng người',
+      'Tặng bộ ảnh chỉnh màu film sau chuyến đi',
+    ],
+    faqs: [
+      {
+        question: 'Mình bị dị ứng hải sản thì đi Food Tour được không?',
+        answer: 'Chắc chắn được! Lan sẽ thiết kế thực đơn riêng với các đặc sản Đà Nẵng không chứa hải sản như bê thui Cầu Mống, mì Quảng gà quê, bánh tráng thịt heo và chè xoa xoa hạt lựu.',
+      },
+    ],
+    bankName: 'MB Bank - CN Đà Nẵng',
+    bankAccountNumber: '0905444555888',
+    bankAccountHolder: 'PHAM NGOC LAN',
+  },
+  {
+    userId: 'u-guide-4',
+    tagline: 'Trekking rừng nguyên sinh Sơn Trà, săn Voọc chà vá & cung đường Đèo Hải Vân',
+    bio: 'Mình là Võ Quốc Tuấn – người mê thiên nhiên và những cung đường ven biển đẹp nhất Đà Nẵng. Mình chuyên dẫn khách đi ngắm Voọc chà vá chân nâu tại Bán đảo Sơn Trà, chèo SUP đón bình minh tại Mân Thái – Mỹ Khê và phượt cung đèo Hải Vân – vịnh Lăng Cô.',
+    hourlyRate: 320000,
+    yearsExperience: 7,
+    kycStatus: 'APPROVED',
+    isVerified: true,
+    avgRating: 4.9,
+    totalReviews: 24,
+    completedTours: 78,
+    responseTimeText: 'Thường phản hồi trong 20 phút',
+    responseRate: 96,
+    areas: ['Bán đảo Sơn Trà', 'Đèo Hải Vân & Lăng Cô', 'Bãi biển Mỹ Khê'],
+    languages: ['Tiếng Việt', 'Tiếng Anh'],
+    skills: ['Thiên nhiên & Trekking Sơn Trà', 'Lái xe máy an toàn', 'Nhiếp ảnh & Check-in'],
+    avatarUrl: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&auto=format&fit=crop&q=80',
+    coverUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&auto=format&fit=crop&q=80',
+    galleryUrls: [
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80',
+    ],
+    highlights: [
+      'Trang bị sẵn ống nhòm chuyên dụng ngắm Voọc chà vá chân nâu tại Sơn Trà',
+      'Tay lái vững vàng trên cung đường Đèo Hải Vân – Đỉnh Bàn Cờ',
+    ],
+    faqs: [
+      {
+        question: 'Khung giờ nào dễ gặp Voọc chà vá chân nâu nhất?',
+        answer: 'Khung giờ vàng là buổi sáng sớm (06:00 – 09:00) hoặc chiều mát (15:00 – 17:30) trên bán đảo Sơn Trà.',
+      },
+    ],
+    bankName: 'BIDV - CN Hải Châu',
+    bankAccountNumber: '56110001234567',
+    bankAccountHolder: 'VO QUOC TUAN',
+  },
+  {
+    userId: 'u-guide-5',
+    tagline: 'Trải nghiệm làng gốm Thanh Hà, rừng dừa Bảy Mẫu & Hội An cổ kính',
+    bio: 'Mình là Đặng Thu Hà, thông thạo tiếng Trung và tiếng Anh. Mình chuyên dẫn các tour trải nghiệm nhẹ nhàng theo giờ từ Đà Nẵng vào rừng dừa Bảy Mẫu, làng rau Trà Quế và phố cổ Hội An.',
+    hourlyRate: 200000,
+    yearsExperience: 3,
+    kycStatus: 'APPROVED',
+    isVerified: true,
+    avgRating: 4.7,
+    totalReviews: 19,
+    completedTours: 54,
+    responseTimeText: 'Thường phản hồi trong 15 phút',
+    responseRate: 95,
+    areas: ['Phố cổ Hội An', 'Ngũ Hành Sơn', 'Cầu Rồng & Sông Hàn'],
+    languages: ['Tiếng Việt', 'Tiếng Trung', 'Tiếng Anh'],
+    skills: ['Làng nghề truyền thống', 'Ẩm thực bản địa', 'Nhiếp ảnh & Check-in'],
+    avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
+    coverUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=1200&auto=format&fit=crop&q=80',
+    galleryUrls: [
+      'https://images.unsplash.com/photo-1528127269322-539801943592?w=800&auto=format&fit=crop&q=80',
+    ],
+    highlights: [
+      'Đón khách tận nơi tại Đà Nẵng đi Hội An và ngược lại',
+      'Trải nghiệm tự tay chuốt gốm Thanh Hà và thưởng thức Cao lầu chính gốc',
+    ],
+    faqs: [],
+    bankName: 'ACB - CN Đà Nẵng',
+    bankAccountNumber: '8899112233',
+    bankAccountHolder: 'DANG THU HA',
+  },
+  {
+    userId: 'u-guide-6',
+    tagline: 'Hướng dẫn viên mới đăng ký (Đang chờ Admin thẩm định hồ sơ KYC)',
+    bio: 'Mình là Hoàng Minh Đức, chuyên dẫn tour khám phá ẩm thực đêm Sơn Trà và du thuyền sông Hàn. Hiện hồ sơ KYC của mình đang chờ Admin phê duyệt.',
+    hourlyRate: 180000,
+    yearsExperience: 2,
+    kycStatus: 'PENDING',
+    isVerified: false,
+    avgRating: 0,
+    totalReviews: 0,
+    completedTours: 0,
+    responseTimeText: 'Mới tham gia',
+    responseRate: 100,
+    areas: ['Cầu Rồng & Sông Hàn', 'Bãi biển Mỹ Khê'],
+    languages: ['Tiếng Việt', 'Tiếng Anh'],
+    skills: ['Khám phá Đà Nẵng về đêm', 'Ẩm thực bản địa'],
+    avatarUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=80',
+    coverUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=1200&auto=format&fit=crop&q=80',
+    galleryUrls: [],
+    highlights: ['Khám phá cầu tình yêu, chợ đêm Sơn Trà và xem Cầu Rồng phun lửa cuối tuần'],
+    faqs: [],
+    bankName: 'VPBank - CN Đà Nẵng',
+    bankAccountNumber: '0912345678',
+    bankAccountHolder: 'HOANG MINH DUC',
+  },
+];
+
+// ---------- 3. TIME SLOTS (AVAILABILITY_CALENDAR - UC.11, BR-04) ----------
+export const initialSlots: TimeSlotData[] = [
+  // Guide 1: Nguyễn Hữu Khanh (u-guide-1)
+  // Ngày 2026-11-12
+  {
+    id: 'slot-101',
+    guideId: 'u-guide-1',
+    date: '2026-11-12',
+    startTime: '08:00',
+    endTime: '11:00',
+    status: 'AVAILABLE', // Đang có đơn BK-1001 ở trạng thái PENDING (theo BR-04: PENDING vẫn giữ AVAILABLE!)
+  },
+  {
+    id: 'slot-102',
+    guideId: 'u-guide-1',
+    date: '2026-11-12',
+    startTime: '14:00',
+    endTime: '17:00',
+    status: 'HOLD', // Đang khóa nguyên tử 15 phút cho đơn BK-1002 (WAITING_PAYMENT)
+    bookingId: 'BK-1002',
+    holdExpiresAt: new Date(Date.now() + 14 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'slot-103',
+    guideId: 'u-guide-1',
+    date: '2026-11-12',
+    startTime: '18:00',
+    endTime: '21:00',
+    status: 'BUSY', // Đã đặt cọc thành công cho đơn BK-1003 (CONFIRMED)
+    bookingId: 'BK-1003',
+  },
+  // Ngày 2026-11-13
+  {
+    id: 'slot-104',
+    guideId: 'u-guide-1',
+    date: '2026-11-13',
+    startTime: '08:00',
+    endTime: '12:00',
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'slot-105',
+    guideId: 'u-guide-1',
+    date: '2026-11-13',
+    startTime: '14:00',
+    endTime: '18:00',
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'slot-106',
+    guideId: 'u-guide-1',
+    date: '2026-11-13',
+    startTime: '18:30',
+    endTime: '21:30',
+    status: 'AVAILABLE',
+  },
+  // Ngày 2026-11-14
+  {
+    id: 'slot-107',
+    guideId: 'u-guide-1',
+    date: '2026-11-14',
+    startTime: '07:30',
+    endTime: '11:30',
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'slot-108',
+    guideId: 'u-guide-1',
+    date: '2026-11-14',
+    startTime: '15:00',
+    endTime: '19:00',
+    status: 'AVAILABLE',
+  },
+
+  // Guide 2: Lê Hoàng Nam (u-guide-2)
+  {
+    id: 'slot-201',
+    guideId: 'u-guide-2',
+    date: '2026-11-12',
+    startTime: '08:30',
+    endTime: '12:30',
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'slot-202',
+    guideId: 'u-guide-2',
+    date: '2026-11-12',
+    startTime: '14:30',
+    endTime: '19:30',
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'slot-203',
+    guideId: 'u-guide-2',
+    date: '2026-11-13',
+    startTime: '09:00',
+    endTime: '13:00',
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'slot-204',
+    guideId: 'u-guide-2',
+    date: '2026-11-13',
+    startTime: '15:00',
+    endTime: '19:00',
+    status: 'AVAILABLE',
+  },
+
+  // Guide 3: Phạm Ngọc Lan (u-guide-3)
+  {
+    id: 'slot-301',
+    guideId: 'u-guide-3',
+    date: '2026-11-12',
+    startTime: '08:00',
+    endTime: '12:00',
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'slot-302',
+    guideId: 'u-guide-3',
+    date: '2026-11-12',
+    startTime: '17:00',
+    endTime: '21:00',
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'slot-303',
+    guideId: 'u-guide-3',
+    date: '2026-11-13',
+    startTime: '07:30',
+    endTime: '15:30',
+    status: 'AVAILABLE',
+  },
+
+  // Guide 4: Võ Quốc Tuấn (u-guide-4)
+  {
+    id: 'slot-401',
+    guideId: 'u-guide-4',
+    date: '2026-11-12',
+    startTime: '06:00',
+    endTime: '10:00',
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'slot-402',
+    guideId: 'u-guide-4',
+    date: '2026-11-13',
+    startTime: '06:00',
+    endTime: '10:00',
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'slot-403',
+    guideId: 'u-guide-4',
+    date: '2026-11-13',
+    startTime: '14:00',
+    endTime: '18:00',
+    status: 'AVAILABLE',
+  },
+
+  // Guide 5: Đặng Thu Hà (u-guide-5)
+  {
+    id: 'slot-501',
+    guideId: 'u-guide-5',
+    date: '2026-11-12',
+    startTime: '14:00',
+    endTime: '19:00',
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'slot-502',
+    guideId: 'u-guide-5',
+    date: '2026-11-13',
+    startTime: '08:30',
+    endTime: '12:30',
+    status: 'AVAILABLE',
+  },
+];
+
+// ---------- 4. BOOKINGS (Đầy đủ 8 kịch bản mẫu để kiểm thử tức thì mọi Use Case) ----------
+export const initialBookings: Booking[] = [
+  // BK-1001: PENDING + UNPAID (Chờ HDV Nguyễn Hữu Khanh phản hồi trong 24h - UC.12, UC.13)
+  {
+    id: 'BK-1001',
+    touristId: 'u-tourist-1',
+    guideId: 'u-guide-1',
+    slotIds: ['slot-101'],
+    date: '2026-11-12',
+    startTime: '08:00',
+    endTime: '11:00',
+    hours: 3,
+    guestCount: 2,
+    meetingLocation: 'Đầu Cầu Rồng (bờ Đông, đường Trần Hưng Đạo, Sơn Trà)',
+    specialRequests: 'Mình muốn đi ngắm Voọc chà vá ở Sơn Trà buổi sáng rồi về ăn bún chả cá Hờn. Nhờ Khanh mang máy ảnh chụp giúp vợ chồng mình nhé!',
+    bookingStatus: 'PENDING',
+    paymentStatus: 'UNPAID',
+    hourlyRateSnapshot: 250000,
+    feeRate: 0.12,
+    totalAmount: 750000,
+    depositAmount: 225000,
+    remainingAmount: 525000,
+    createdAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+    pendingExpiresAt: new Date(Date.now() + 23 * 60 * 60 * 1000).toISOString(),
+  },
+
+  // BK-1002: WAITING_PAYMENT + WAITING_DEPOSIT (HDV đã chấp nhận, đang giữ chỗ HOLD 15 phút chờ khách đặt cọc 30% - UC.14)
+  {
+    id: 'BK-1002',
+    touristId: 'u-tourist-1',
+    guideId: 'u-guide-1',
+    slotIds: ['slot-102'],
+    date: '2026-11-12',
+    startTime: '14:00',
+    endTime: '17:00',
+    hours: 3,
+    guestCount: 3,
+    meetingLocation: 'Cổng chính Chợ Hàn (119 Trần Phú, Hải Châu)',
+    specialRequests: 'Nhóm mình 3 người từ Hà Nội vào, muốn đi thưởng thức ẩm thực Chợ Hàn - Chợ Cồn và uống cà phê muối.',
+    bookingStatus: 'WAITING_PAYMENT',
+    paymentStatus: 'WAITING_DEPOSIT',
+    hourlyRateSnapshot: 250000,
+    feeRate: 0.12,
+    totalAmount: 750000,
+    depositAmount: 225000,
+    remainingAmount: 525000,
+    createdAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+    acceptedAt: new Date(Date.now() - 1 * 60 * 1000).toISOString(),
+    holdExpiresAt: new Date(Date.now() + 14 * 60 * 1000).toISOString(),
+  },
+
+  // BK-1003: CONFIRMED + DEPOSITED (Đã đặt cọc 30%, chờ đi tour - có thể test Hủy đơn theo ΔT UC.24/UC.25 hoặc HDV bấm Yêu cầu hoàn thành UC.17)
+  {
+    id: 'BK-1003',
+    touristId: 'u-tourist-1',
+    guideId: 'u-guide-1',
+    slotIds: ['slot-103'],
+    date: '2026-11-12',
+    startTime: '18:00',
+    endTime: '21:00',
+    hours: 3,
+    guestCount: 2,
+    meetingLocation: 'Công viên Biển Đông – Bãi biển Mỹ Khê (Võ Nguyên Giáp)',
+    specialRequests: 'Dạo biển Mỹ Khê lúc hoàng hôn, ăn hải sản Bé Mặn và xem Cầu Rồng phun lửa lúc 21:00.',
+    bookingStatus: 'CONFIRMED',
+    paymentStatus: 'DEPOSITED',
+    hourlyRateSnapshot: 250000,
+    feeRate: 0.12,
+    totalAmount: 750000,
+    depositAmount: 225000,
+    remainingAmount: 525000,
+    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+    acceptedAt: new Date(Date.now() - 11.5 * 60 * 60 * 1000).toISOString(),
+    confirmedAt: new Date(Date.now() - 11 * 60 * 60 * 1000).toISOString(),
+    guideRequestedCompletion: false,
+  },
+
+  // BK-1008: CONFIRMED + DEPOSITED + guideRequestedCompletion = true (HDV đã bấm Yêu cầu hoàn thành UC.17, đang mở cửa sổ 24h cho khách Xác nhận hoàn thành UC.18 hoặc Gửi khiếu nại UC.19)
+  {
+    id: 'BK-1008',
+    touristId: 'u-tourist-1',
+    guideId: 'u-guide-3',
+    slotIds: [],
+    date: '2026-11-08',
+    startTime: '08:00',
+    endTime: '12:00',
+    hours: 4,
+    guestCount: 2,
+    meetingLocation: 'Cổng chính Chợ Hàn (119 Trần Phú, Hải Châu)',
+    specialRequests: 'Food tour ăn sáng mì Quảng Ếch Bếp Trang và cà phê Cộng Bạch Đằng.',
+    bookingStatus: 'CONFIRMED',
+    paymentStatus: 'DEPOSITED',
+    hourlyRateSnapshot: 220000,
+    feeRate: 0.12,
+    totalAmount: 880000,
+    depositAmount: 264000,
+    remainingAmount: 616000,
+    createdAt: new Date(Date.now() - 36 * 60 * 60 * 1000).toISOString(),
+    acceptedAt: new Date(Date.now() - 35 * 60 * 60 * 1000).toISOString(),
+    confirmedAt: new Date(Date.now() - 34 * 60 * 60 * 1000).toISOString(),
+    guideRequestedCompletion: true,
+    completionRequestedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    completionAutoConfirmAt: new Date(Date.now() + 22 * 60 * 60 * 1000).toISOString(),
+  },
+
+  // BK-1004: COMPLETED + WAITING_FINAL (Đã xác nhận hoàn thành tour, chờ khách Tất toán 70% còn lại Online hoặc Tiền mặt - UC.20)
+  {
+    id: 'BK-1004',
+    touristId: 'u-tourist-1',
+    guideId: 'u-guide-1',
+    slotIds: [],
+    date: '2026-11-06',
+    startTime: '14:00',
+    endTime: '18:00',
+    hours: 4,
+    guestCount: 2,
+    meetingLocation: 'Chùa Linh Ứng – Bán đảo Sơn Trà',
+    specialRequests: 'Tham quan Chùa Linh Ứng, Hải đăng Tiên Sa và ngắm hoàng hôn đỉnh Bàn Cờ.',
+    bookingStatus: 'COMPLETED',
+    paymentStatus: 'WAITING_FINAL',
+    hourlyRateSnapshot: 250000,
+    feeRate: 0.12,
+    totalAmount: 1000000,
+    depositAmount: 300000,
+    remainingAmount: 700000,
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    confirmedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    completedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    guideRequestedCompletion: true,
+    touristConfirmedCompletion: true,
+  },
+
+  // BK-1009: COMPLETED + WAITING_RECONCILE (Khách đã chọn trả Tiền mặt 70%, chờ HDV xác nhận đã thu đủ tiền mặt - UC.21)
+  {
+    id: 'BK-1009',
+    touristId: 'u-tourist-2',
+    guideId: 'u-guide-1',
+    slotIds: [],
+    date: '2026-11-07',
+    startTime: '15:00',
+    endTime: '19:00',
+    hours: 4,
+    guestCount: 4,
+    meetingLocation: 'Cổng Khu danh thắng Ngũ Hành Sơn (81 Huyền Trân Công Chúa)',
+    specialRequests: 'Tham quan động Huyền Không, làng đá mỹ nghệ Non Nước.',
+    bookingStatus: 'COMPLETED',
+    paymentStatus: 'WAITING_RECONCILE',
+    paymentMethod: 'CASH',
+    hourlyRateSnapshot: 250000,
+    feeRate: 0.12,
+    totalAmount: 1000000,
+    depositAmount: 300000,
+    remainingAmount: 700000,
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    confirmedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    completedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+    guideRequestedCompletion: true,
+    touristConfirmedCompletion: true,
+  },
+
+  // BK-1005: COMPLETED + PAID (Đã thanh toán đủ 100%, sẵn sàng cho khách đánh giá hoặc xem lịch sử - UC.26)
+  {
+    id: 'BK-1005',
+    touristId: 'u-tourist-1',
+    guideId: 'u-guide-1',
+    slotIds: [],
+    date: '2026-11-01',
+    startTime: '08:00',
+    endTime: '12:00',
+    hours: 4,
+    guestCount: 2,
+    meetingLocation: 'Đầu Cầu Rồng (bờ Đông, đường Trần Hưng Đạo, Sơn Trà)',
+    specialRequests: 'Tour chụp ảnh áo dài tại Bảo tàng Điêu khắc Chăm và nhà thờ Con Gà.',
+    bookingStatus: 'COMPLETED',
+    paymentStatus: 'PAID',
+    paymentMethod: 'ONLINE',
+    hourlyRateSnapshot: 250000,
+    feeRate: 0.12,
+    totalAmount: 1000000,
+    depositAmount: 300000,
+    remainingAmount: 700000,
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    confirmedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    completedAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+    guideRequestedCompletion: true,
+    touristConfirmedCompletion: true,
+  },
+
+  // BK-1006: DISPUTED + DEPOSITED (Đang có khiếu nại chờ Admin Lê Văn Hoàng xử lý - UC.19, UC.27)
+  {
+    id: 'BK-1006',
+    touristId: 'u-tourist-2',
+    guideId: 'u-guide-2',
+    slotIds: [],
+    date: '2026-11-05',
+    startTime: '14:30',
+    endTime: '18:30',
+    hours: 4,
+    guestCount: 2,
+    meetingLocation: 'Cổng Khu danh thắng Ngũ Hành Sơn (81 Huyền Trân Công Chúa)',
+    specialRequests: 'Đi Ngũ Hành Sơn và Phố cổ Hội An, yêu cầu thuyết minh tiếng Anh cho bạn đi cùng.',
+    bookingStatus: 'DISPUTED',
+    paymentStatus: 'DEPOSITED',
+    hourlyRateSnapshot: 280000,
+    feeRate: 0.12,
+    totalAmount: 1120000,
+    depositAmount: 336000,
+    remainingAmount: 784000,
+    createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    confirmedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    guideRequestedCompletion: true,
+    completionRequestedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+
+  // BK-1007: CANCELLED + REFUNDED (Đơn khách hủy trong khoảng 24h <= ΔT <= 48h, phạt 50% cọc - UC.24, BR-06, BR-07)
+  {
+    id: 'BK-1007',
+    touristId: 'u-tourist-1',
+    guideId: 'u-guide-2',
+    slotIds: [],
+    date: '2026-11-03',
+    startTime: '09:00',
+    endTime: '12:00',
+    hours: 3,
+    guestCount: 2,
+    meetingLocation: 'Cổng chính Chợ Hàn (119 Trần Phú, Hải Châu)',
+    specialRequests: 'Tham quan Bảo tàng Đà Nẵng và chợ Hàn.',
+    bookingStatus: 'CANCELLED',
+    paymentStatus: 'REFUNDED',
+    hourlyRateSnapshot: 280000,
+    feeRate: 0.12,
+    totalAmount: 840000,
+    depositAmount: 252000,
+    remainingAmount: 588000,
+    createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+    confirmedAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+    cancelledAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    cancelReason: 'Chuyến bay của gia đình từ TP.HCM ra Đà Nẵng bị đổi lịch sang ngày hôm sau.',
+    cancellationType: 'TOURIST_CANCEL',
+    deltaHours: 32,
+    penalty: 126000,
+    refund: 126000,
+    guideCompensation: 110880,
+  },
+];
+
+// ---------- 5. DISPUTE RECORDS (DISPUTE - UC.19, UC.27) ----------
+export const initialDisputes: DisputeRecord[] = [
+  {
+    id: 'DSP-2001',
+    bookingId: 'BK-1006',
+    reporterId: 'u-tourist-2',
+    reporterRole: 'tourist',
+    reasonCategory: 'HDV đến trễ giờ hẹn & cắt bớt điểm tham quan',
+    description:
+      'Chúng tôi hẹn lúc 14:30 tại cổng Ngũ Hành Sơn nhưng HDV đến trễ 50 phút (15:20 mới có mặt), khiến thời gian tham quan tại Phố cổ Hội An bị rút ngắn và không kịp đi làng gốm Thanh Hà như thỏa thuận.',
+    evidenceUrls: [
+      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=600&auto=format&fit=crop&q=80',
+    ],
+    status: 'OPEN',
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+];
+
+// ---------- 6. CANCELLATION RECORDS (CANCELLATION_RECORD - UC.24, UC.25) ----------
+export const initialCancellations: CancellationRecord[] = [
+  {
+    id: 'CAN-3001',
+    bookingId: 'BK-1007',
+    cancelledByUserId: 'u-tourist-1',
+    cancellationType: 'TOURIST_CANCEL',
+    reason: 'Chuyến bay của gia đình từ TP.HCM ra Đà Nẵng bị đổi lịch sang ngày hôm sau.',
+    cancelledAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    deltaHours: 32,
+    penaltyRate: 0.5,
+    refundToTourist: 126000,
+    platformFeeRetained: 15120,
+    paidToGuide: 110880,
+  },
+];
+
+// ---------- 7. REVIEWS (REVIEW - UC.26) ----------
+export const initialReviews: Review[] = [
   {
     id: 'rev-1',
     bookingId: 'BK-1005',
     touristId: 'u-tourist-1',
     guideId: 'u-guide-1',
     stars: 5,
-    comment: 'Anh Nam rất nhiệt tình, am hiểu văn hoá địa phương. Chắc chắn sẽ đặt lại!',
+    comment:
+      'Anh Khanh cực kỳ nhiệt tình, đúng giờ và chụp ảnh rất có tâm! Nhờ anh dẫn đường mà hai vợ chồng mình biết thêm nhiều góc đẹp ở Cầu Rồng, Bảo tàng Chăm và quán mì Quảng ngon chuẩn người Đà Nẵng.',
+    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'rev-2',
+    bookingId: 'BK-0991',
+    touristId: 'u-tourist-2',
+    guideId: 'u-guide-1',
+    stars: 5,
+    comment:
+      'Chuyến đi Bán đảo Sơn Trà buổi sáng trên cả tuyệt vời. Anh Khanh chuẩn bị sẵn cả ống nhòm cho tụi mình ngắm Voọc chà vá chân nâu.',
+    createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'rev-3',
+    bookingId: 'BK-0988',
+    touristId: 'u-tourist-1',
+    guideId: 'u-guide-2',
+    stars: 5,
+    comment:
+      'Anh Hoàng Nam kiến thức lịch sử Ngũ Hành Sơn và Hội An rất sâu rộng, nói tiếng Anh lưu loát. Gia đình mình rất hài lòng!',
+    createdAt: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'rev-4',
+    bookingId: 'BK-0985',
+    touristId: 'u-tourist-2',
+    guideId: 'u-guide-3',
+    stars: 5,
+    comment:
+      'Bạn Ngọc Lan dễ thương, dẫn đi ăn ốc hút, bánh tráng kẹp và chè sầu Liên ở Chợ Cồn món nào cũng xuất sắc!',
+    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+];
+
+// ---------- 8. KYC RECORDS (KYC_SUBMISSION - UC.09, UC.10) ----------
+export const initialKycRecords: KycRecord[] = [
+  {
+    id: 'kyc-101',
+    guideId: 'u-guide-6',
+    idNumber: '048099001234',
+    bankName: 'VPBank - CN Đà Nẵng',
+    bankAccountNumber: '0912345678',
+    bankAccountHolder: 'HOANG MINH DUC',
+    documents: [
+      {
+        id: 'doc-1',
+        docType: 'CCCD_FRONT',
+        name: 'CCCD gắn chip mặt trước (Hoàng Minh Đức)',
+        url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 'doc-2',
+        docType: 'CCCD_BACK',
+        name: 'CCCD gắn chip mặt sau',
+        url: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 'doc-3',
+        docType: 'LANGUAGE_CERT',
+        name: 'Chứng chỉ IELTS 7.0 & Thẻ cộng tác viên du lịch Đà Nẵng',
+        url: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=600&auto=format&fit=crop&q=80',
+      },
+    ],
+    status: 'PENDING',
+    submittedAt: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'kyc-100',
+    guideId: 'u-guide-1',
+    idNumber: '048095006789',
+    bankName: 'Vietcombank - CN Đà Nẵng',
+    bankAccountNumber: '0041000987654',
+    bankAccountHolder: 'NGUYEN HUU KHANH',
+    documents: [
+      {
+        id: 'doc-10',
+        docType: 'CCCD_FRONT',
+        name: 'CCCD gắn chip mặt trước (Nguyễn Hữu Khanh)',
+        url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 'doc-11',
+        docType: 'GUIDE_CARD',
+        name: 'Thẻ Hướng dẫn viên Du lịch Quốc tế – Sở Du lịch Đà Nẵng',
+        url: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=600&auto=format&fit=crop&q=80',
+      },
+    ],
+    status: 'APPROVED',
+    submittedAt: '2026-08-01T10:00:00Z',
+    reviewedAt: '2026-08-02T09:00:00Z',
+    reviewNote: 'Hồ sơ hợp lệ, xác thực thẻ HDV Sở Du lịch Đà Nẵng.',
+  },
+];
+
+// ---------- 9. WALLETS & TRANSACTIONS (GUIDE_WALLET, WALLET_TRANSACTION, WITHDRAWAL_REQUEST) ----------
+export const initialWallets: Wallet[] = [
+  {
+    guideId: 'u-guide-1',
+    availableBalance: 1480000,
+    pendingBalance: 180000, // Đơn BK-1009 đang chờ xác nhận thu tiền mặt 70% (D - F = 300k - 120k = 180k)
+    totalWithdrawn: 3500000,
+  },
+  {
+    guideId: 'u-guide-2',
+    availableBalance: 860880,
+    pendingBalance: 0,
+    totalWithdrawn: 1800000,
+  },
+  {
+    guideId: 'u-guide-3',
+    availableBalance: 940000,
+    pendingBalance: 0,
+    totalWithdrawn: 2100000,
+  },
+  {
+    guideId: 'u-guide-4',
+    availableBalance: 650000,
+    pendingBalance: 0,
+    totalWithdrawn: 1200000,
+  },
+  {
+    guideId: 'u-guide-5',
+    availableBalance: 420000,
+    pendingBalance: 0,
+    totalWithdrawn: 800000,
+  },
+  {
+    guideId: 'u-guide-6',
+    availableBalance: 0,
+    pendingBalance: 0,
+    totalWithdrawn: 0,
+  },
+];
+
+export const initialWalletTransactions: WalletTransaction[] = [
+  {
+    id: 'wtx-1',
+    guideId: 'u-guide-1',
+    bookingId: 'BK-1005',
+    type: 'SETTLEMENT_ONLINE',
+    amount: 880000,
+    balanceAfter: 1480000,
+    description: 'Quyết toán đơn BK-1005 (Khách thanh toán 70% Online)',
+    formulaNote: 'Tổng G (1.000.000 ₫) − Phí sàn 12% (120.000 ₫) = +880.000 ₫',
     createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
   },
-];
-
-// data/kyc.ts
-export const mockKycRecords = [
   {
-    id: 'kyc-1',
+    id: 'wtx-2',
+    guideId: 'u-guide-1',
+    bookingId: 'BK-0991',
+    type: 'SETTLEMENT_CASH',
+    amount: 144000,
+    balanceAfter: 600000,
+    description: 'Quyết toán đối soát đơn BK-0991 (Khách trả 70% Tiền mặt trực tiếp)',
+    formulaNote: 'Cọc 30% sàn giữ (240.000 ₫) − Phí sàn 12% trên tổng G (96.000 ₫) = +144.000 ₫',
+    createdAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'wtx-3',
     guideId: 'u-guide-2',
-    documents: [
-      { name: 'CMND mặt trước', url: 'https://placehold.co/400x250?text=CMND+Mat+Truoc' },
-      { name: 'CMND mặt sau', url: 'https://placehold.co/400x250?text=CMND+Mat+Sau' },
-    ],
-    status: 'PENDING' as const,
-    submittedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    bookingId: 'BK-1007',
+    type: 'CANCEL_COMPENSATION',
+    amount: 110880,
+    balanceAfter: 860880,
+    description: 'Bồi thường khách hủy đơn BK-1007 trong khoảng 24h–48h (Phạt 50% cọc)',
+    formulaNote: 'Tiền phạt cọc (126.000 ₫) − Phí sàn 12% (15.120 ₫) = +110.880 ₫',
+    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ];
 
-// data/notifications.ts
-export const mockNotifications = [
+export const initialWithdrawals: WithdrawalRequest[] = [
+  {
+    id: 'WD-4001',
+    guideId: 'u-guide-2',
+    amount: 500000,
+    bankName: 'Techcombank - CN Đà Nẵng',
+    bankAccountNumber: '1903456789012',
+    bankAccountHolder: 'LE HOANG NAM',
+    status: 'PENDING',
+    createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'WD-4000',
+    guideId: 'u-guide-1',
+    amount: 1000000,
+    bankName: 'Vietcombank - CN Đà Nẵng',
+    bankAccountNumber: '0041000987654',
+    bankAccountHolder: 'NGUYEN HUU KHANH',
+    status: 'APPROVED',
+    transactionRef: 'VCB-DN-20261101889',
+    adminNote: 'Đã chuyển khoản qua Vietcombank 24/7',
+    createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+    processedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+];
+
+// ---------- 10. CHAT MESSAGES (MESSAGE - UC.15, UC.16) ----------
+export const initialMessages: ChatMessage[] = [
+  {
+    id: 'msg-1',
+    bookingId: 'BK-1001',
+    senderId: 'u-tourist-1',
+    receiverId: 'u-guide-1',
+    content: 'Chào Khanh, vợ chồng mình vừa gửi yêu cầu đặt lịch sáng 12/11 từ 08:00 - 11:00 đi Sơn Trà và ăn bún chả cá. Bạn xem lịch giúp mình nhé!',
+    isRead: true,
+    createdAt: new Date(Date.now() - 40 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'msg-2',
+    bookingId: 'BK-1001',
+    senderId: 'u-guide-1',
+    receiverId: 'u-tourist-1',
+    content: 'Dạ chào anh Huân! Sáng 12/11 thời tiết Sơn Trà rất đẹp để ngắm Voọc chà vá. Em chuẩn bị sẵn máy ảnh Sony hỗ trợ anh chị luôn ạ!',
+    isRead: false,
+    createdAt: new Date(Date.now() - 32 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'msg-3',
+    bookingId: 'BK-1002',
+    senderId: 'u-guide-1',
+    receiverId: 'u-tourist-1',
+    content: 'Anh Huân ơi, em vừa bấm chấp nhận đơn chiều 12/11 (BK-1002) đi Chợ Hàn - Chợ Cồn rồi ạ. Hệ thống đang giữ khung giờ 15 phút, anh thanh toán cọc 30% để chốt lịch nhé!',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1 * 60 * 1000).toISOString(),
+  },
+];
+
+// ---------- 11. NOTIFICATIONS (NOTIFICATION - UC.05) ----------
+export const initialNotifications: Notification[] = [
   {
     id: 'notif-1',
     userId: 'u-tourist-1',
-    content: 'Guide Lê Hoàng Nam đã chấp nhận đơn BK-1002. Bạn có 15 phút để đặt cọc.',
+    title: 'HDV đã chấp nhận yêu cầu đặt lịch BK-1002',
+    content: 'HDV Nguyễn Hữu Khanh đã chấp nhận đơn BK-1002. Khung giờ đang được giữ nguyên tử trong 15 phút — vui lòng thanh toán cọc 30% (225.000 ₫).',
+    type: 'BOOKING',
     bookingId: 'BK-1002',
+    actionUrl: '/don/BK-1002/dat-coc',
     isRead: false,
-    createdAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+    createdAt: new Date(Date.now() - 1 * 60 * 1000).toISOString(),
   },
   {
     id: 'notif-2',
     userId: 'u-tourist-1',
-    content: 'Đơn BK-1004 đã hoàn thành. Vui lòng thanh toán 70% còn lại.',
-    bookingId: 'BK-1004',
-    isRead: false,
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'notif-3',
-    userId: 'u-guide-1',
-    content: 'Bạn có đơn mới BK-1001 từ Trần Minh Anh.',
-    bookingId: 'BK-1001',
+    title: 'HDV yêu cầu xác nhận hoàn thành tour BK-1008',
+    content: 'HDV Phạm Ngọc Lan đã gửi yêu cầu xác nhận hoàn thành đơn BK-1008. Bạn có 24 giờ để xác nhận hoàn thành hoặc gửi khiếu nại nếu có sự cố.',
+    type: 'BOOKING',
+    bookingId: 'BK-1008',
+    actionUrl: '/don/BK-1008',
     isRead: false,
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   },
-];
-
-// data/wallets.ts
-export const mockWallets = [
   {
-    guideId: 'u-guide-1',
-    availableBalance: 528000, // nhận từ BK-1005
+    id: 'notif-3',
+    userId: 'u-tourist-1',
+    title: 'Đơn BK-1004 chờ tất toán 70% còn lại',
+    content: 'Chuyến đi Bán đảo Sơn Trà (BK-1004) đã hoàn thành. Vui lòng tất toán 70% còn lại (700.000 ₫).',
+    type: 'PAYMENT',
+    bookingId: 'BK-1004',
+    actionUrl: '/don/BK-1004/thanh-toan-70',
+    isRead: false,
+    createdAt: new Date(Date.now() - 20 * 60 * 60 * 1000).toISOString(),
   },
   {
-    guideId: 'u-guide-2',
-    availableBalance: 0,
+    id: 'notif-4',
+    userId: 'u-guide-1',
+    title: 'Yêu cầu đặt lịch mới BK-1001 từ Dương Đăng Huân',
+    content: 'Bạn có yêu cầu đặt lịch mới BK-1001 (12/11/2026 • 08:00 – 11:00). Vui lòng phản hồi trong vòng 24 giờ.',
+    type: 'BOOKING',
+    bookingId: 'BK-1001',
+    actionUrl: '/guide/don-den',
+    isRead: false,
+    createdAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'notif-5',
+    userId: 'u-guide-1',
+    title: 'Chờ xác nhận thu 70% tiền mặt đơn BK-1009',
+    content: 'Du khách Trần Minh Anh đã chọn phương thức trả tiền mặt 70% (700.000 ₫) cho đơn BK-1009. Vui lòng bấm xác nhận khi đã nhận đủ tiền.',
+    type: 'WALLET',
+    bookingId: 'BK-1009',
+    actionUrl: '/guide/don-va-ca',
+    isRead: false,
+    createdAt: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'notif-6',
+    userId: 'u-admin-1',
+    title: 'Khiếu nại mới DSP-2001 cần xử lý',
+    content: 'Đơn BK-1006 có khiếu nại từ du khách Trần Minh Anh đối với HDV Lê Hoàng Nam. Vui lòng kiểm tra bằng chứng và phán quyết.',
+    type: 'DISPUTE',
+    bookingId: 'BK-1006',
+    actionUrl: '/admin/tranh-chap',
+    isRead: false,
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ];
 
-export const mockWithdrawals = [
-  // Không có yêu cầu rút nào để bắt đầu
+// ---------- 12. PAYMENTS (PAYMENT_TRANSACTION) ----------
+export const initialPayments: Payment[] = [
+  {
+    id: 'pay-1',
+    bookingId: 'BK-1003',
+    type: 'deposit',
+    method: 'ONLINE',
+    gateway: 'VNPAY',
+    amount: 225000,
+    result: 'success',
+    referenceCode: 'VNP-DN-100330',
+    createdAt: new Date(Date.now() - 11 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'pay-2',
+    bookingId: 'BK-1004',
+    type: 'deposit',
+    method: 'ONLINE',
+    gateway: 'MOMO',
+    amount: 300000,
+    result: 'success',
+    referenceCode: 'MOMO-DN-100430',
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'pay-3',
+    bookingId: 'BK-1005',
+    type: 'deposit',
+    method: 'ONLINE',
+    gateway: 'VNPAY',
+    amount: 300000,
+    result: 'success',
+    referenceCode: 'VNP-DN-100530',
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'pay-4',
+    bookingId: 'BK-1005',
+    type: 'final',
+    method: 'ONLINE',
+    gateway: 'VNPAY',
+    amount: 700000,
+    result: 'success',
+    referenceCode: 'VNP-DN-100570',
+    createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+  },
 ];
 
-// data/config.ts
-export const mockAppConfig = {
-  feeRate: 0.12, // 12%
+// ---------- 13. APP CONFIG (PLATFORM_FEE_CONFIG - UC.29, BR-13) ----------
+export const initialAppConfig: AppConfig = {
+  feeRate: 0.12, // 12% mặc định (trong dải 10% – 15%)
+  history: [
+    {
+      id: 'fee-1',
+      feeRate: 0.10,
+      effectiveNote: 'Mức phí ưu đãi giai đoạn ra mắt tại Đà Nẵng (10%)',
+      updatedByAdminId: 'u-admin-1',
+      updatedAt: '2026-08-01T00:00:00Z',
+    },
+    {
+      id: 'fee-2',
+      feeRate: 0.12,
+      effectiveNote: 'Điều chỉnh phí hoa hồng vận hành tiêu chuẩn mùa cao điểm (12%)',
+      updatedByAdminId: 'u-admin-1',
+      updatedAt: '2026-10-01T00:00:00Z',
+    },
+  ],
 };
-

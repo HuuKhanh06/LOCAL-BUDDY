@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 
+# Environment variables & secrets (TUYỆT ĐỐI KHÔNG COMMIT KHÓA BÍ MẬT)
+.env
+.env.*
+!.env.example
+
+# Supabase CLI temp files
+.supabase
+supabase/.temp
+supabase/.branches
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1,15 +1,15 @@
-// components/ui/Modal.tsx
+// components/ui/Modal.tsx – Modal trên Desktop/Tablet & Bottom-Sheet mượt mà trên Mobile (430px)
 import React, { useEffect } from 'react';
 import { clsx } from 'clsx';
-import { Button } from './Button';
 
-interface ModalProps {
+export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
-  maxWidth?: 'sm' | 'md' | 'lg';
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -18,7 +18,8 @@ export const Modal: React.FC<ModalProps> = ({
   title,
   children,
   footer,
-  maxWidth = 'md',
+  maxWidth,
+  size,
 }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -30,35 +31,49 @@ export const Modal: React.FC<ModalProps> = ({
 
   if (!isOpen) return null;
 
+  const effectiveSize = size || maxWidth || 'md';
   const maxWClass = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-  }[maxWidth];
+    sm: 'sm:max-w-sm',
+    md: 'sm:max-w-md',
+    lg: 'sm:max-w-lg',
+    xl: 'sm:max-w-2xl',
+  }[effectiveSize];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
-      <div 
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-[#1C1C28]/60 backdrop-blur-xs"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
         className={clsx(
-          'w-full bg-white rounded-[16px] shadow-[0_8px_24px_rgba(0,0,0,0.12)] border border-[#D6E2D9] overflow-hidden flex flex-col',
+          'w-full bg-white rounded-t-[20px] sm:rounded-[16px] shadow-[0_20px_40px_rgba(26,10,15,0.25)] border border-[#E4C3CC] overflow-hidden flex flex-col max-h-[90vh]',
           maxWClass
         )}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#D6E2D9]">
-          <h3 className="text-[18px] font-semibold text-[#14231A]">{title}</h3>
+        {/* Thanh kéo bottom-sheet trên mobile */}
+        <div className="sm:hidden flex justify-center pt-2.5 pb-1">
+          <div className="w-10 h-1.5 rounded-full bg-[#E4C3CC]" />
+        </div>
+
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E4C3CC] bg-[#FBF4F6]">
+          <h3 className="text-[18px] font-bold text-[#1A0A0F]">{title}</h3>
           <button
+            type="button"
             onClick={onClose}
-            className="text-[#4B5B50] hover:text-[#14231A] p-1 rounded-md text-[18px]"
+            className="text-[#52526B] hover:text-[#1A0A0F] hover:bg-[#F6E6EA] w-9 h-9 rounded-full flex items-center justify-center text-[16px] font-bold transition-colors cursor-pointer"
             aria-label="Đóng"
           >
             ✕
           </button>
         </div>
-        <div className="p-6 overflow-y-auto max-h-[80vh] text-[16px] text-[#14231A]">
+
+        <div className="p-6 overflow-y-auto flex-1 text-[15px] text-[#1C1C28]">
           {children}
         </div>
+
         {footer && (
-          <div className="flex items-center justify-end gap-3 px-6 py-4 bg-[#F6FAF6] border-t border-[#D6E2D9]">
+          <div className="flex items-center justify-end gap-3 px-6 py-4 bg-[#FBF4F6] border-t border-[#E4C3CC] flex-wrap">
             {footer}
           </div>
         )}
@@ -66,4 +81,3 @@ export const Modal: React.FC<ModalProps> = ({
     </div>
   );
 };
-

@@ -1,84 +1,166 @@
-// components/common/GuideCard.tsx & TimeSlot.tsx & Countdown.tsx & States
+// components/common/GuideCard.tsx, TimeSlot, Countdown & 4 States (Skeleton, Empty, Error, Success)
+// Phong cách Withlocals + ToursByLocals + ShowAround:
+// - Thẻ hướng ảnh, host avatar tròn nổi bật, điểm đánh giá, ngôn ngữ, kỹ năng
+// - Đơn giá hiển thị bắt buộc dạng: "250.000 ₫ / giờ"
+// - Chữ trên nền cyan (#1EC1CB) luôn là navy (#1C1C28)
+
 import React, { useState, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { SlotStatus } from '../../types';
-import { formatMoney } from '../../utils/money';
+import { formatHourlyRate } from '../../utils/money';
 
-// Guide Card
 export interface GuideCardProps {
   id: string;
   name: string;
+  tagline?: string;
   bio: string;
   hourlyRate: number;
   avgRating: number;
   totalReviews: number;
+  completedTours?: number;
   areas: string[];
+  languages?: string[];
+  skills?: string[];
+  avatarUrl?: string;
+  coverUrl?: string;
   isVerified: boolean;
   onClick?: () => void;
 }
 
 export const GuideCard: React.FC<GuideCardProps> = ({
   name,
+  tagline,
   bio,
   hourlyRate,
   avgRating,
   totalReviews,
+  completedTours = 50,
   areas,
+  languages = ['Tiếng Việt', 'Tiếng Anh'],
+  avatarUrl,
+  coverUrl,
   isVerified,
   onClick,
 }) => {
   return (
-    <div
+    <article
       onClick={onClick}
-      className="bg-white border border-[#D6E2D9] rounded-[12px] p-5 shadow-sm hover:border-[#15803D] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between"
+      className="group bg-white border border-[#E4C3CC] rounded-[12px] overflow-hidden shadow-[0_2px_10px_rgba(26,10,15,0.05)] hover:shadow-[0_12px_28px_rgba(26,10,15,0.12)] hover:border-[#1EC1CB] transition-all cursor-pointer flex flex-col justify-between"
     >
       <div>
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-12 h-12 rounded-full bg-[#DCFCE7] text-[#15803D] font-bold flex items-center justify-center text-[18px]">
-            {name.charAt(0)}
+        {/* Ảnh bìa địa danh Đà Nẵng kiểu Withlocals */}
+        <div className="relative h-44 w-full bg-[#1C1C28] overflow-hidden">
+          {coverUrl ? (
+            <img
+              src={coverUrl}
+              alt={`Khám phá Đà Nẵng cùng ${name}`}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#1A0A0F] to-[#1C1C28]" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1A0A0F]/80 via-[#1A0A0F]/20 to-transparent" />
+
+          {/* Badge xác minh KYC */}
+          {isVerified && (
+            <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#1EC1CB] text-[#1C1C28] shadow-sm">
+              ✓ Đã xác minh KYC
+            </span>
+          )}
+
+          {/* Điểm đánh giá góc trên phải */}
+          <div className="absolute top-3 right-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#1C1C28]/90 text-white text-[12px] font-bold backdrop-blur-xs">
+            <span className="text-amber-400">★</span>
+            <span className="tabular-nums">{avgRating > 0 ? avgRating.toFixed(1) : 'Mới'}</span>
+            <span className="text-white/75 font-normal">({totalReviews})</span>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h4 className="text-[16px] font-bold text-[#14231A]">{name}</h4>
-              {isVerified && (
-                <span className="text-[11px] bg-[#DCFCE7] text-[#166534] px-2 py-0.5 rounded-full font-semibold">
-                  ✓ Đã xác minh
-                </span>
+
+          {/* Avatar tròn của Host đè lên mép ảnh bìa (Chuẩn Withlocals) */}
+          <div className="absolute bottom-3 left-4 flex items-center gap-3 right-4">
+            <div className="w-14 h-14 rounded-full border-2 border-[#1EC1CB] bg-[#F6E6EA] overflow-hidden shrink-0 shadow-md">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={name}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center font-bold text-[#1A0A0F] text-[18px]">
+                  {name.charAt(0)}
+                </div>
               )}
             </div>
-            <div className="flex items-center gap-1 text-[13px] text-[#4B5B50]">
-              <span className="text-amber-500">★</span>
-              <span className="font-semibold text-[#14231A]">{avgRating.toFixed(1)}</span>
-              <span>({totalReviews} đánh giá)</span>
+            <div className="min-w-0 text-white">
+              <p className="text-[11px] uppercase tracking-wider text-[#1EC1CB] font-bold">
+                Hướng dẫn viên bản địa
+              </p>
+              <h3 className="text-[17px] font-extrabold text-white truncate leading-tight">
+                {name}
+              </h3>
+              <p className="text-[12px] text-white/85 truncate">
+                🗣 {languages.join(' • ')}
+              </p>
             </div>
           </div>
         </div>
 
-        <p className="text-[14px] text-[#4B5B50] line-clamp-2 mb-3">{bio}</p>
+        {/* Nội dung thẻ */}
+        <div className="p-4 pb-3">
+          {tagline && (
+            <h4 className="text-[15px] font-bold text-[#1A0A0F] line-clamp-2 mb-1.5 group-hover:text-[#1C1C28]">
+              {tagline}
+            </h4>
+          )}
+          <p className="text-[13px] text-[#52526B] line-clamp-2 mb-3 leading-relaxed">
+            {bio}
+          </p>
 
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {areas.map((a, idx) => (
-            <span key={idx} className="text-[12px] bg-[#F6FAF6] border border-[#D6E2D9] px-2 py-0.5 rounded-md text-[#4B5B50]">
-              📍 {a}
-            </span>
-          ))}
+          {/* Khu vực Đà Nẵng */}
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {areas.slice(0, 3).map((area, idx) => (
+              <span
+                key={idx}
+                className="text-[11px] font-semibold bg-[#F6E6EA] text-[#1A0A0F] px-2.5 py-1 rounded-full"
+              >
+                📍 {area}
+              </span>
+            ))}
+            {areas.length > 3 && (
+              <span className="text-[11px] font-semibold bg-[#FBF4F6] border border-[#E4C3CC] text-[#52526B] px-2 py-1 rounded-full">
+                +{areas.length - 3} khu vực
+              </span>
+            )}
+          </div>
+
+          {/* Hàng trấn an hủy miễn phí (Withlocals reassurance row) */}
+          <div className="flex items-center justify-between text-[11px] text-[#52526B] bg-[#FBF4F6] px-2.5 py-1.5 rounded-[8px] border border-[#E4C3CC]/60">
+            <span>🛡 Cọc trước 30% • Giữ lịch 15p</span>
+            <span>✓ {completedTours}+ chuyến đi</span>
+          </div>
         </div>
       </div>
 
-      <div className="border-t border-[#D6E2D9] pt-3 flex items-center justify-between">
+      {/* Chân thẻ: Đơn giá chuẩn "250.000 ₫ / giờ" + Nút CTA */}
+      <div className="px-4 py-3.5 bg-[#FBF4F6] border-t border-[#E4C3CC] flex items-center justify-between gap-2">
         <div>
-          <span className="text-[12px] text-[#4B5B50]">Giá theo giờ: </span>
-          <span className="text-[16px] font-bold text-[#15803D] tabular-nums">
-            {formatMoney(hourlyRate)}/h
+          <span className="block text-[11px] text-[#52526B] font-medium">
+            Đơn giá thuê riêng
+          </span>
+          <span className="text-[16px] font-extrabold text-[#1A0A0F] tabular-nums">
+            {formatHourlyRate(hourlyRate)}
           </span>
         </div>
-        <span className="text-[14px] font-semibold text-[#15803D]">Xem lịch →</span>
+        <span className="inline-flex items-center gap-1 px-3.5 py-2 rounded-[10px] bg-[#1EC1CB] text-[#1C1C28] text-[13px] font-bold group-hover:bg-[#18A7B0] transition-colors">
+          Xem lịch & Đặt →
+        </span>
       </div>
-    </div>
+    </article>
   );
 };
 
-// TimeSlot (4 trạng thái: AVAILABLE, HOLD, BUSY, SELECTED)
+// ---------- TimeSlot (4 trạng thái: AVAILABLE, HOLD, BUSY, SELECTED) ----------
 export interface TimeSlotProps {
   startTime: string;
   endTime: string;
@@ -104,70 +186,89 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
       disabled={!isAvailable}
       onClick={isAvailable ? onClick : undefined}
       className={clsx(
-        'px-3 py-2 rounded-[8px] border text-[13px] font-medium transition-all flex flex-col items-center justify-center min-h-[44px]',
-        isSelected && 'bg-[#15803D] text-white border-[#15803D] shadow-sm',
-        !isSelected && isAvailable && 'bg-white border-[#D6E2D9] text-[#14231A] hover:border-[#15803D]',
-        status === 'HOLD' && 'bg-[#FFEDD5] border-[#FDBA74] text-[#9A3412] cursor-not-allowed',
-        status === 'BUSY' && 'bg-[#E5E7EB] border-[#D1D5DB] text-[#6B7280] cursor-not-allowed line-through'
+        'px-3.5 py-2.5 rounded-[12px] border text-[13px] font-bold transition-all flex flex-col items-center justify-center min-h-[52px] cursor-pointer disabled:cursor-not-allowed',
+        isSelected &&
+          'bg-[#1EC1CB] text-[#1C1C28] border-[#1C1C28] ring-2 ring-[#1EC1CB]/40 shadow-sm',
+        !isSelected &&
+          isAvailable &&
+          'bg-white border-[#E4C3CC] text-[#1C1C28] hover:border-[#1EC1CB] hover:bg-[#E5F8F9]/40',
+        status === 'HOLD' &&
+          'bg-[#FEF1DC] border-[#F8CA84] text-[#8C4A08]',
+        status === 'BUSY' &&
+          'bg-[#F6E6EA]/70 border-[#E4C3CC] text-[#52526B]/60 line-through'
       )}
     >
-      <span>{startTime} – {endTime}</span>
+      <span className="tabular-nums">
+        {startTime} – {endTime}
+      </span>
       {status === 'HOLD' && (
-        <span className="text-[10px] font-normal">
-          {holdSecondsLeft ? `Giữ chỗ (${Math.floor(holdSecondsLeft / 60)}p)` : 'Đang giữ'}
+        <span className="text-[11px] font-semibold mt-0.5">
+          {holdSecondsLeft
+            ? `⏱ Đang giữ chỗ (${Math.ceil(holdSecondsLeft / 60)}p)`
+            : '⏱ Tạm giữ 15p'}
         </span>
       )}
-      {status === 'BUSY' && <span className="text-[10px] font-normal">Đã có lịch</span>}
-      {status === 'AVAILABLE' && !isSelected && <span className="text-[10px] text-[#15803D]">Trống</span>}
+      {status === 'BUSY' && (
+        <span className="text-[11px] font-normal mt-0.5 no-underline">Đã kín lịch</span>
+      )}
+      {status === 'AVAILABLE' && (
+        <span
+          className={clsx(
+            'text-[11px] font-semibold mt-0.5',
+            isSelected ? 'text-[#1C1C28]' : 'text-[#0F6E4B]'
+          )}
+        >
+          {isSelected ? '✓ Đang chọn' : '● Đang trống'}
+        </span>
+      )}
     </button>
   );
 };
 
-// Countdown
-export const Countdown: React.FC<{ seconds: number; onExpire?: () => void; label?: string }> = ({
-  seconds,
-  onExpire,
-  label,
-}) => {
+// ---------- Countdown (Đồng hồ đếm ngược trực quan cho 15m HOLD & 24h Window) ----------
+export const Countdown: React.FC<{
+  seconds: number;
+  onExpire?: () => void;
+  label?: string;
+}> = ({ seconds, onExpire, label }) => {
   const [timeLeft, setTimeLeft] = useState(seconds);
 
   useEffect(() => {
-    setTimeLeft(seconds);
-  }, [seconds]);
-
-  useEffect(() => {
-    if (timeLeft <= 0) {
+    let current = seconds;
+    if (current <= 0) {
       onExpire?.();
       return;
     }
     const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          onExpire?.();
-          return 0;
-        }
-        return prev - 1;
-      });
+      current -= 1;
+      if (current <= 0) {
+        clearInterval(timer);
+        setTimeLeft(0);
+        onExpire?.();
+      } else {
+        setTimeLeft(current);
+      }
     }, 1000);
     return () => clearInterval(timer);
-  }, [timeLeft, onExpire]);
+  }, [seconds, onExpire]);
 
   const hrs = Math.floor(timeLeft / 3600);
   const mins = Math.floor((timeLeft % 3600) / 60);
   const secs = timeLeft % 60;
-  const isUrgent = timeLeft < 300; // dưới 5 phút chuyển cam/đỏ
+  const isUrgent = timeLeft < 300; // dưới 5 phút
 
   return (
-    <div className={clsx(
-      'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] font-mono text-[14px] font-semibold border',
-      isUrgent
-        ? 'bg-[#FEF3C7] text-[#92400E] border-[#F59E0B]'
-        : 'bg-[#F6FAF6] text-[#15803D] border-[#15803D]'
-    )}>
+    <div
+      className={clsx(
+        'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[12px] text-[14px] font-bold border',
+        isUrgent
+          ? 'bg-[#FCE8EB] text-[#A61B2B] border-[#F5B2BA]'
+          : 'bg-[#FEF1DC] text-[#8C4A08] border-[#F8CA84]'
+      )}
+    >
       <span>⏱</span>
-      {label && <span className="font-sans font-normal text-[12px]">{label}:</span>}
-      <span className="tabular-nums">
+      {label && <span className="font-semibold text-[13px]">{label}:</span>}
+      <span className="font-mono tabular-nums text-[15px]">
         {hrs > 0 && `${String(hrs).padStart(2, '0')}:`}
         {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
       </span>
@@ -175,21 +276,28 @@ export const Countdown: React.FC<{ seconds: number; onExpire?: () => void; label
   );
 };
 
-// Empty State
+// ---------- 4 Trạng thái giao diện chuẩn: EmptyState, LoadingState (Skeleton), ErrorState ----------
 export const EmptyState: React.FC<{
   title: string;
   description?: string;
   actionText?: string;
   onAction?: () => void;
 }> = ({ title, description, actionText, onAction }) => (
-  <div className="flex flex-col items-center justify-center py-12 px-4 text-center border-2 border-dashed border-[#D6E2D9] rounded-[16px] bg-white">
-    <span className="text-4xl mb-3">🍃</span>
-    <h3 className="text-[18px] font-semibold text-[#14231A]">{title}</h3>
-    {description && <p className="text-[14px] text-[#4B5B50] mt-1 max-w-sm">{description}</p>}
+  <div className="flex flex-col items-center justify-center py-12 px-6 text-center border-2 border-dashed border-[#E4C3CC] rounded-[16px] bg-white">
+    <div className="w-14 h-14 rounded-full bg-[#F6E6EA] text-[#1A0A0F] flex items-center justify-center text-2xl mb-3">
+      🧭
+    </div>
+    <h3 className="text-[18px] font-bold text-[#1A0A0F]">{title}</h3>
+    {description && (
+      <p className="text-[14px] text-[#52526B] mt-1.5 max-w-md leading-relaxed">
+        {description}
+      </p>
+    )}
     {actionText && onAction && (
       <button
+        type="button"
         onClick={onAction}
-        className="mt-4 px-4 py-2 bg-[#15803D] text-white rounded-[8px] text-[14px] font-semibold hover:bg-[#14532D]"
+        className="mt-5 px-5 py-2.5 bg-[#1EC1CB] text-[#1C1C28] rounded-[12px] text-[14px] font-bold hover:bg-[#18A7B0] transition-colors cursor-pointer"
       >
         {actionText}
       </button>
@@ -197,28 +305,47 @@ export const EmptyState: React.FC<{
   </div>
 );
 
-// Loading State
-export const LoadingState: React.FC<{ message?: string }> = ({ message = 'Đang tải dữ liệu...' }) => (
-  <div className="flex flex-col items-center justify-center py-12 px-4 space-y-3">
-    <div className="w-8 h-8 border-4 border-[#15803D] border-t-transparent rounded-full animate-spin" />
-    <span className="text-[14px] text-[#4B5B50] font-medium">{message}</span>
+export const LoadingState: React.FC<{ message?: string; rows?: number }> = ({
+  message = 'Đang tải dữ liệu từ hệ thống...',
+  rows = 3,
+}) => (
+  <div className="space-y-4 py-6" aria-busy="true" aria-label={message}>
+    <div className="flex items-center gap-2.5 text-[13px] text-[#52526B] font-semibold">
+      <span className="inline-block w-3 h-3 rounded-full bg-[#1EC1CB] animate-pulse" />
+      <span>{message}</span>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {Array.from({ length: rows }).map((_, i) => (
+        <div
+          key={i}
+          className="bg-white border border-[#E4C3CC] rounded-[12px] p-5 space-y-3 animate-pulse"
+        >
+          <div className="h-32 bg-[#F6E6EA] rounded-[10px]" />
+          <div className="h-4 bg-[#F6E6EA] rounded w-3/4" />
+          <div className="h-3 bg-[#F6E6EA]/70 rounded w-1/2" />
+          <div className="h-9 bg-[#F6E6EA] rounded-[8px] mt-2" />
+        </div>
+      ))}
+    </div>
   </div>
 );
 
-// Error State
-export const ErrorState: React.FC<{ message: string; onRetry?: () => void }> = ({ message, onRetry }) => (
-  <div className="flex flex-col items-center justify-center py-12 px-4 text-center border border-[#FEE2E2] rounded-[16px] bg-[#FEF2F2]">
+export const ErrorState: React.FC<{ message: string; onRetry?: () => void }> = ({
+  message,
+  onRetry,
+}) => (
+  <div className="flex flex-col items-center justify-center py-12 px-6 text-center border border-[#F5B2BA] rounded-[16px] bg-[#FCE8EB]/50">
     <span className="text-3xl mb-2">⚠️</span>
-    <h4 className="text-[16px] font-semibold text-[#B91C1C]">Có lỗi xảy ra</h4>
-    <p className="text-[14px] text-[#4B5B50] mt-1 max-w-sm mb-4">{message}</p>
+    <h4 className="text-[17px] font-bold text-[#A61B2B]">Không thể hoàn tất thao tác</h4>
+    <p className="text-[14px] text-[#1C1C28] mt-1.5 max-w-md mb-5">{message}</p>
     {onRetry && (
       <button
+        type="button"
         onClick={onRetry}
-        className="px-4 py-2 border border-[#B91C1C] text-[#B91C1C] rounded-[8px] text-[14px] font-semibold hover:bg-white"
+        className="px-5 py-2.5 bg-[#1EC1CB] text-[#1C1C28] rounded-[12px] text-[14px] font-bold hover:bg-[#18A7B0] cursor-pointer"
       >
-        Thử lại
+        Thử lại ngay
       </button>
     )}
   </div>
 );
-
