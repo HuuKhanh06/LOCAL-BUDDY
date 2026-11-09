@@ -1,8 +1,5 @@
 // components/ui/Button.tsx
-// Bảng màu bắt buộc:
-// - primary CTA: nền cyan (#1EC1CB), chữ navy (#1C1C28) — TUYỆT ĐỐI KHÔNG dùng chữ trắng trên nền cyan!
-// - secondary / outline: nền blush (#F6E6EA) hoặc trắng, viền navy/blush, chữ burgundy/navy
-// - danger: nền đỏ ngữ nghĩa (#A61B2B), chữ trắng
+// Phong cách tối giản 1 tông nền sáng: nút chính màu than ấm (#1C1917) chữ sáng hoặc nền sáng viền mảnh, không dùng nhiều màu sặc sỡ.
 
 import React from 'react';
 import { clsx } from 'clsx';
@@ -20,23 +17,23 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'bg-[#1EC1CB] text-[#1C1C28] font-bold hover:bg-[#18A7B0] active:bg-[#138E96] shadow-sm focus-visible:ring-[#1EC1CB] disabled:bg-[#1EC1CB]/40 disabled:text-[#1C1C28]/60',
+    'bg-[#1C1917] text-white font-semibold hover:bg-[#292524] active:bg-[#0C0A09] shadow-2xs focus-visible:ring-[#1C1917] disabled:bg-[#E7E5E4] disabled:text-[#A8A29E]',
   secondary:
-    'bg-[#F6E6EA] text-[#1A0A0F] font-semibold border border-[#E4C3CC] hover:bg-[#EDD2D9] focus-visible:ring-[#1EC1CB]',
+    'bg-[#F3F1EC] text-[#1C1917] font-semibold border border-[#E7E5E4] hover:bg-[#E7E5E4]/70 focus-visible:ring-[#1C1917]',
   outline:
-    'bg-white text-[#1C1C28] font-semibold border border-[#D4C0C6] hover:bg-[#F6E6EA]/70 focus-visible:ring-[#1EC1CB]',
+    'bg-white text-[#1C1917] font-semibold border border-[#E7E5E4] hover:bg-[#FAF9F6] focus-visible:ring-[#1C1917]',
   dark:
-    'bg-[#1C1C28] text-white font-semibold hover:bg-[#2B2B3D] focus-visible:ring-[#1EC1CB]',
+    'bg-[#1C1917] text-white font-semibold hover:bg-[#292524] focus-visible:ring-[#1C1917]',
   danger:
-    'bg-[#A61B2B] text-white font-semibold hover:bg-[#881422] focus-visible:ring-[#A61B2B] disabled:bg-[#F5B2BA] disabled:text-[#A61B2B]/60',
+    'bg-[#B91C1C] text-white font-semibold hover:bg-[#991B1B] focus-visible:ring-[#B91C1C] disabled:bg-[#FECACA] disabled:text-[#B91C1C]/60',
   ghost:
-    'bg-transparent text-[#1C1C28] font-semibold hover:bg-[#F6E6EA] focus-visible:ring-[#1EC1CB]',
+    'bg-transparent text-[#57534E] font-medium hover:bg-[#F3F1EC] hover:text-[#1C1917] focus-visible:ring-[#1C1917]',
 };
 
 const sizeClasses: Record<'sm' | 'md' | 'lg', string> = {
-  sm: 'px-3.5 min-h-[38px] text-[13px] rounded-[10px]',
-  md: 'px-4 min-h-[44px] text-[14px] rounded-[12px]',
-  lg: 'px-6 min-h-[50px] text-[15px] rounded-[12px]',
+  sm: 'px-3.5 min-h-[36px] text-[13px] rounded-full',
+  md: 'px-5 min-h-[42px] text-[13px] rounded-full',
+  lg: 'px-6 min-h-[48px] text-[14px] rounded-full',
 };
 
 export const Button: React.FC<ButtonProps> = ({

@@ -1,13 +1,10 @@
 // components/layout/Header.tsx
-// Hệ thống điều hướng chuẩn cho:
-// 1. Layout Công khai & Tourist: Sticky Header (Logo, Tìm HDV nhanh, Ngôn ngữ Tiếng Việt, Chuông thông báo, Đăng nhập/Đăng ký hoặc Avatar) + TouristBottomNav trên mobile (Trang chủ, Tìm HDV, Đặt lịch của tôi, Tin nhắn, Tài khoản).
-// 2. Layout Dashboard (Guide & Admin): Sidebar 240px màu Navy (#1C1C28) trên desktop, thu thành Drawer trên mobile; Topbar có tìm nhanh, chuông thông báo có số đếm, Avatar kèm badge vai trò.
-// Tuân thủ nghiêm ngặt: Chữ trên nền Cyan (#1EC1CB) luôn là Navy (#1C1C28).
+// Thiết kế tối giản 1 tông nền sáng (#FAF9F6 / #FFFFFF), rất ít chữ, thanh thoát.
 
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
-import { Bell, Search, Menu, X, Globe } from 'lucide-react';
+import { Bell, Search, Menu, X } from 'lucide-react';
 import { UserRole } from '../../types';
 import { useBookingContext } from '../../context/BookingContext';
 import { useToast } from '../ui/Toast';
@@ -41,16 +38,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
 
   const handleQuickRoleSwitch = (targetRole: UserRole, userId?: string) => {
     const switchedUser = switchRoleQuickly(targetRole, userId);
-    showToast(
-      `Đã chuyển sang vai trò ${
-        targetRole === 'tourist'
-          ? 'Du khách'
-          : targetRole === 'guide'
-            ? 'Hướng dẫn viên'
-            : 'Quản trị viên'
-      }: ${switchedUser.fullName}`,
-      'info'
-    );
+    showToast(`Đã chuyển: ${switchedUser.fullName}`, 'info');
     if (targetRole === 'tourist') navigate('/');
     if (targetRole === 'guide') navigate('/guide/don-den');
     if (targetRole === 'admin') navigate('/admin/kyc');
@@ -58,7 +46,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
 
   const handleLogout = () => {
     logout();
-    showToast('Đã đăng xuất khỏi tài khoản.', 'info');
+    showToast('Đã đăng xuất.', 'info');
     navigate('/dang-nhap');
   };
 
@@ -70,174 +58,136 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#1C1C28] text-white border-b border-white/10 shadow-md">
-      {/* Thanh trên cùng: Cam kết thương hiệu & Chuyển đổi vai trò kiểm thử nhanh */}
-      <div className="bg-[#1A0A0F] border-b border-white/10 text-[12px] text-[#F6E6EA]/90">
-        <div className="max-w-[1280px] mx-auto px-4 py-1.5 flex items-center justify-between gap-2 flex-wrap">
-          <div className="hidden md:flex items-center gap-3">
-            <span>📍 Đà Nẵng, Việt Nam</span>
-            <span>•</span>
-            <span>🛡 Đặt cọc 30% giữ lịch nguyên tử 15 phút</span>
-            <span>•</span>
-            <span>✓ 100% HDV bản địa xác thực KYC</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 ml-auto">
-            <span className="text-[11px] text-[#F6E6EA]/70 mr-1 hidden sm:inline">
-              Chuyển vai trò nhanh:
-            </span>
-            <button
-              type="button"
-              onClick={() => handleQuickRoleSwitch('tourist', 'u-tourist-1')}
-              className={clsx(
-                'px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer',
-                activeRole === 'tourist'
-                  ? 'bg-[#1EC1CB] text-[#1C1C28]'
-                  : 'bg-white/10 text-white hover:bg-white/20'
-              )}
-            >
-              🧳 Du khách
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickRoleSwitch('guide', 'u-guide-1')}
-              className={clsx(
-                'px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer',
-                activeRole === 'guide'
-                  ? 'bg-[#1EC1CB] text-[#1C1C28]'
-                  : 'bg-white/10 text-white hover:bg-white/20'
-              )}
-            >
-              🧭 HDV Dashboard
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickRoleSwitch('admin', 'u-admin-1')}
-              className={clsx(
-                'px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer',
-                activeRole === 'admin'
-                  ? 'bg-[#1EC1CB] text-[#1C1C28]'
-                  : 'bg-white/10 text-white hover:bg-white/20'
-              )}
-            >
-              ⚖️ Admin Portal
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Thanh điều hướng chính (Sticky Header cho Public / Tourist) */}
-      <div className="max-w-[1280px] mx-auto px-4 h-16 flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-40 bg-[#FAF9F6]/90 backdrop-blur-md text-[#1C1917] border-b border-[#E7E5E4]">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        {/* Logo tối giản */}
         <Link to="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="w-10 h-10 rounded-[12px] bg-[#1EC1CB] text-[#1C1C28] flex items-center justify-center font-black text-[18px] shadow-sm">
+          <div className="w-9 h-9 rounded-full bg-[#1C1917] text-white flex items-center justify-center font-black text-[14px]">
             LB
           </div>
-          <div>
-            <span className="text-[19px] font-extrabold tracking-tight text-white block leading-none">
-              LocalBuddy
-            </span>
-            <span className="text-[11px] font-semibold text-[#1EC1CB] tracking-wider uppercase">
-              Đà Nẵng • Theo Giờ
-            </span>
-          </div>
+          <span className="text-[18px] font-black tracking-tight text-[#1C1917]">
+            LocalBuddy
+          </span>
         </Link>
 
-        {/* Ô tìm nhanh HDV trên Header */}
+        {/* Ô tìm nhanh tối giản */}
         <form
           onSubmit={handleQuickSearchSubmit}
-          className="hidden md:flex items-center bg-white/10 border border-white/15 focus-within:border-[#1EC1CB] rounded-[12px] px-3 h-10 w-56 xl:w-72 transition-all"
+          className="hidden md:flex items-center bg-white border border-[#E7E5E4] focus-within:border-[#1C1917] rounded-full px-3.5 h-9 w-52 lg:w-64 transition-all"
         >
-          <Search className="w-4 h-4 text-[#1EC1CB] shrink-0 mr-2" />
+          <Search className="w-3.5 h-3.5 text-[#78716C] shrink-0 mr-2" />
           <input
             type="text"
             value={quickQuery}
             onChange={(e) => setQuickQuery(e.target.value)}
-            placeholder="Tìm HDV Sơn Trà, Chợ Cồn..."
-            aria-label="Tìm nhanh Hướng dẫn viên Đà Nẵng"
-            className="bg-transparent text-[13px] text-white placeholder:text-white/60 w-full focus:outline-none"
+            placeholder="Sơn Trà, Hội An..."
+            aria-label="Tìm nhanh"
+            className="bg-transparent text-[13px] text-[#1C1917] placeholder:text-[#A8A29E] w-full focus:outline-none"
           />
         </form>
 
-        {/* Menu điều hướng Desktop */}
-        <nav className="hidden lg:flex items-center gap-1 text-[13px] font-semibold">
+        {/* Điều hướng chính ít chữ */}
+        <nav className="hidden lg:flex items-center gap-1 text-[13px] font-medium">
           <Link
             to="/"
             className={clsx(
-              'px-3 py-2 rounded-[10px] transition-colors',
+              'px-3.5 py-1.5 rounded-full transition-colors',
               location.pathname === '/'
-                ? 'bg-[#1EC1CB] text-[#1C1C28] font-bold'
-                : 'text-white/90 hover:bg-white/10'
+                ? 'bg-[#1C1917] text-white font-semibold'
+                : 'text-[#57534E] hover:text-[#1C1917] hover:bg-[#F3F1EC]'
             )}
           >
-            Trang chủ
+            Khám phá
           </Link>
           <Link
             to="/guides"
             className={clsx(
-              'px-3 py-2 rounded-[10px] transition-colors',
+              'px-3.5 py-1.5 rounded-full transition-colors',
               location.pathname.startsWith('/guides')
-                ? 'bg-[#1EC1CB] text-[#1C1C28] font-bold'
-                : 'text-white/90 hover:bg-white/10'
+                ? 'bg-[#1C1917] text-white font-semibold'
+                : 'text-[#57534E] hover:text-[#1C1917] hover:bg-[#F3F1EC]'
             )}
           >
-            Tìm HDV
+            Hướng dẫn viên
           </Link>
           <Link
             to="/don-cua-toi"
             className={clsx(
-              'px-3 py-2 rounded-[10px] transition-colors',
+              'px-3.5 py-1.5 rounded-full transition-colors',
               location.pathname.startsWith('/don')
-                ? 'bg-[#1EC1CB] text-[#1C1C28] font-bold'
-                : 'text-white/90 hover:bg-white/10'
+                ? 'bg-[#1C1917] text-white font-semibold'
+                : 'text-[#57534E] hover:text-[#1C1917] hover:bg-[#F3F1EC]'
             )}
           >
-            Đặt lịch của tôi
+            Lịch đặt
           </Link>
           <Link
             to="/tin-nhan"
             className={clsx(
-              'px-3 py-2 rounded-[10px] transition-colors flex items-center gap-1.5',
+              'px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5',
               location.pathname === '/tin-nhan'
-                ? 'bg-[#1EC1CB] text-[#1C1C28] font-bold'
-                : 'text-white/90 hover:bg-white/10'
+                ? 'bg-[#1C1917] text-white font-semibold'
+                : 'text-[#57534E] hover:text-[#1C1917] hover:bg-[#F3F1EC]'
             )}
           >
             <span>Tin nhắn</span>
             {unreadMessagesCount > 0 && (
-              <span
-                className={clsx(
-                  'px-1.5 py-0.2 rounded-full text-[11px] font-extrabold',
-                  location.pathname === '/tin-nhan'
-                    ? 'bg-[#1C1C28] text-[#1EC1CB]'
-                    : 'bg-[#1EC1CB] text-[#1C1C28]'
-                )}
-              >
+              <span className="px-1.5 rounded-full text-[10px] font-bold bg-[#1C1917] text-white">
                 {unreadMessagesCount}
               </span>
             )}
           </Link>
         </nav>
 
-        {/* Ngôn ngữ + Chuông thông báo + Tài khoản góc phải */}
+        {/* Chuyển vai trò gọn + Thông báo + Avatar */}
         <div className="flex items-center gap-2">
-          {/* Ngôn ngữ Tiếng Việt */}
-          <div
-            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[10px] bg-white/10 text-[12px] font-bold text-[#F6E6EA]"
-            title="Ngôn ngữ giao diện: Tiếng Việt (VNĐ)"
-          >
-            <Globe className="w-3.5 h-3.5 text-[#1EC1CB]" />
-            <span>VI • VNĐ</span>
+          <div className="hidden sm:flex items-center bg-[#F3F1EC] p-0.5 rounded-full border border-[#E7E5E4]">
+            <button
+              type="button"
+              onClick={() => handleQuickRoleSwitch('tourist', 'u-tourist-1')}
+              className={clsx(
+                'px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer',
+                activeRole === 'tourist'
+                  ? 'bg-white text-[#1C1917] shadow-2xs'
+                  : 'text-[#78716C] hover:text-[#1C1917]'
+              )}
+            >
+              Khách
+            </button>
+            <button
+              type="button"
+              onClick={() => handleQuickRoleSwitch('guide', 'u-guide-1')}
+              className={clsx(
+                'px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer',
+                activeRole === 'guide'
+                  ? 'bg-white text-[#1C1917] shadow-2xs'
+                  : 'text-[#78716C] hover:text-[#1C1917]'
+              )}
+            >
+              HDV
+            </button>
+            <button
+              type="button"
+              onClick={() => handleQuickRoleSwitch('admin', 'u-admin-1')}
+              className={clsx(
+                'px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer',
+                activeRole === 'admin'
+                  ? 'bg-white text-[#1C1917] shadow-2xs'
+                  : 'text-[#78716C] hover:text-[#1C1917]'
+              )}
+            >
+              Admin
+            </button>
           </div>
 
-          {/* Chuông thông báo kèm số đếm */}
           <Link
             to="/thong-bao"
-            aria-label="Trung tâm thông báo"
-            className="relative p-2 rounded-[10px] bg-white/10 hover:bg-white/20 text-white transition-colors"
+            aria-label="Thông báo"
+            className="relative p-2 rounded-full bg-white border border-[#E7E5E4] hover:border-[#1C1917] text-[#1C1917] transition-colors"
           >
             <Bell className="w-4 h-4" />
             {unreadNotifsCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#1EC1CB] text-[#1C1C28] text-[10px] font-black flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-[#1C1917] text-white text-[10px] font-bold flex items-center justify-center">
                 {unreadNotifsCount}
               </span>
             )}
@@ -253,7 +203,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                       ? '/admin/kyc'
                       : '/ho-so-ca-nhan'
                 }
-                className="flex items-center gap-2 px-2.5 py-1.5 rounded-[12px] bg-white/10 hover:bg-white/15 transition-colors"
+                className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full bg-white border border-[#E7E5E4] hover:border-[#1C1917] transition-colors"
               >
                 <img
                   src={
@@ -261,98 +211,73 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'
                   }
                   alt={displayUserName}
-                  className="w-8 h-8 rounded-full object-cover border border-[#1EC1CB]"
+                  className="w-7 h-7 rounded-full object-cover"
                 />
-                <div className="hidden xl:block text-left">
-                  <span className="block text-[13px] font-bold text-white leading-tight max-w-[120px] truncate">
-                    {displayUserName}
-                  </span>
-                  <span className="block text-[10px] text-[#1EC1CB] font-semibold">
-                    {activeRole === 'guide'
-                      ? 'Local Guide'
-                      : activeRole === 'admin'
-                        ? 'Admin'
-                        : 'Du khách'}
-                  </span>
-                </div>
+                <span className="hidden xl:block text-[12px] font-semibold text-[#1C1917] max-w-[96px] truncate">
+                  {displayUserName.split(' ').slice(-2).join(' ')}
+                </span>
               </Link>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="hidden sm:inline-block px-2.5 py-2 rounded-[10px] text-[12px] font-semibold text-[#F6E6EA] hover:bg-white/10 transition-colors cursor-pointer"
+                className="hidden sm:inline-block px-2 py-1 text-[12px] text-[#78716C] hover:text-[#1C1917] cursor-pointer"
               >
-                Đăng xuất
+                Thoát
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                to="/dang-nhap"
-                className="px-3 py-2 rounded-[12px] text-[13px] font-semibold text-white hover:bg-white/10 transition-colors"
-              >
-                Đăng nhập
-              </Link>
-              <Link
-                to="/dang-ky"
-                className="px-3.5 py-2 rounded-[12px] bg-[#1EC1CB] text-[#1C1C28] text-[13px] font-bold hover:bg-[#18A7B0] transition-colors"
-              >
-                Đăng ký
-              </Link>
-            </div>
+            <Link
+              to="/dang-nhap"
+              className="px-4 py-1.5 rounded-full bg-[#1C1917] text-white text-[12px] font-semibold hover:bg-[#292524]"
+            >
+              Đăng nhập
+            </Link>
           )}
 
-          {/* Nút mở menu phụ trên Mobile */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen((v) => !v)}
-            className="lg:hidden p-2 rounded-[10px] bg-white/10 text-white hover:bg-white/20 cursor-pointer"
-            aria-label="Mở menu điều hướng"
+            className="lg:hidden p-2 rounded-full bg-white border border-[#E7E5E4] text-[#1C1917] cursor-pointer"
+            aria-label="Menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
-      {/* Menu xổ xuống trên Mobile (Kèm ô tìm kiếm nhanh) */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#1C1C28] border-t border-white/10 px-4 py-3 space-y-2.5">
-          <form
-            onSubmit={(e) => {
-              handleQuickSearchSubmit(e);
-              setMobileMenuOpen(false);
-            }}
-            className="flex items-center bg-white/10 border border-white/20 rounded-[12px] px-3 h-10"
-          >
-            <Search className="w-4 h-4 text-[#1EC1CB] mr-2" />
-            <input
-              type="text"
-              value={quickQuery}
-              onChange={(e) => setQuickQuery(e.target.value)}
-              placeholder="Tìm HDV Đà Nẵng theo khu vực, tên..."
-              className="bg-transparent text-sm text-white placeholder:text-white/60 w-full focus:outline-none"
-            />
-          </form>
-
-          <div className="grid grid-cols-2 gap-2 text-[13px] font-semibold">
-            <Link
-              to="/design-system"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-[10px] bg-white/10 text-[#1EC1CB]"
+        <div className="lg:hidden bg-[#FAF9F6] border-t border-[#E7E5E4] px-4 py-3 space-y-2.5">
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                handleQuickRoleSwitch('tourist', 'u-tourist-1');
+                setMobileMenuOpen(false);
+              }}
+              className="flex-1 py-1.5 rounded-full bg-white border border-[#E7E5E4] text-[12px] font-semibold"
             >
-              🎨 Design System
-            </Link>
-            {displayUserName && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  handleLogout();
-                }}
-                className="px-3 py-2 rounded-[10px] bg-white/10 text-left text-[#F6E6EA] cursor-pointer"
-              >
-                🚪 Đăng xuất
-              </button>
-            )}
+              Khách
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                handleQuickRoleSwitch('guide', 'u-guide-1');
+                setMobileMenuOpen(false);
+              }}
+              className="flex-1 py-1.5 rounded-full bg-white border border-[#E7E5E4] text-[12px] font-semibold"
+            >
+              HDV
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                handleQuickRoleSwitch('admin', 'u-admin-1');
+                setMobileMenuOpen(false);
+              }}
+              className="flex-1 py-1.5 rounded-full bg-white border border-[#E7E5E4] text-[12px] font-semibold"
+            >
+              Admin
+            </button>
           </div>
         </div>
       )}
@@ -360,7 +285,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
   );
 };
 
-// ---------- BottomNav cho Mobile (Public & Tourist: Trang chủ, Tìm HDV, Đặt lịch của tôi, Tin nhắn, Tài khoản) ----------
+// ---------- BottomNav cho Mobile (1 tông nền sáng) ----------
 export const TouristBottomNav: React.FC = () => {
   const location = useLocation();
   const { currentUser, messages } = useBookingContext();
@@ -370,11 +295,11 @@ export const TouristBottomNav: React.FC = () => {
   ).length;
 
   const links = [
-    { to: '/', label: 'Trang chủ', icon: '🏠', match: (p: string) => p === '/' },
-    { to: '/guides', label: 'Tìm HDV', icon: '🔍', match: (p: string) => p.startsWith('/guides') },
+    { to: '/', label: 'Khám phá', icon: '🏠', match: (p: string) => p === '/' },
+    { to: '/guides', label: 'HDV', icon: '🔍', match: (p: string) => p.startsWith('/guides') },
     {
       to: '/don-cua-toi',
-      label: 'Đặt lịch của tôi',
+      label: 'Lịch đặt',
       icon: '📋',
       match: (p: string) => p.startsWith('/don'),
     },
@@ -395,8 +320,8 @@ export const TouristBottomNav: React.FC = () => {
 
   return (
     <nav
-      aria-label="Điều hướng di động Du khách"
-      className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#1C1C28] text-white border-t border-white/15 z-40 flex items-center justify-around h-16 shadow-xl"
+      aria-label="Điều hướng di động"
+      className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#FAF9F6]/95 backdrop-blur-md text-[#1C1917] border-t border-[#E7E5E4] z-40 flex items-center justify-around h-15"
     >
       {links.map((l) => {
         const isActive = l.match(location.pathname);
@@ -405,14 +330,14 @@ export const TouristBottomNav: React.FC = () => {
             key={l.to}
             to={l.to}
             className={clsx(
-              'relative flex flex-col items-center justify-center flex-1 h-full text-[10px] sm:text-[11px] font-bold gap-0.5 transition-colors',
-              isActive ? 'text-[#1EC1CB]' : 'text-white/70 hover:text-white'
+              'relative flex flex-col items-center justify-center flex-1 h-full text-[10px] font-semibold gap-0.5 transition-colors',
+              isActive ? 'text-[#1C1917] font-bold' : 'text-[#78716C]'
             )}
           >
             <span className="text-base leading-none">{l.icon}</span>
-            <span className="truncate max-w-[72px]">{l.label}</span>
+            <span>{l.label}</span>
             {l.badge !== undefined && l.badge > 0 && (
-              <span className="absolute top-1.5 right-3 px-1.5 rounded-full bg-[#1EC1CB] text-[#1C1C28] text-[9px] font-black">
+              <span className="absolute top-1.5 right-4 px-1.5 rounded-full bg-[#1C1917] text-white text-[9px] font-bold">
                 {l.badge}
               </span>
             )}
@@ -423,7 +348,7 @@ export const TouristBottomNav: React.FC = () => {
   );
 };
 
-// ---------- Sidebar 240px chuẩn màu Navy (#1C1C28) dùng chung cho cả Guide & Admin (Desktop + Drawer Mobile) ----------
+// ---------- Sidebar 240px nền sáng đồng nhất cho Guide & Admin ----------
 export interface DashboardNavLink {
   to: string;
   label: string;
@@ -443,22 +368,22 @@ export const DashboardSidebarContent: React.FC<{
   const { showToast } = useToast();
 
   return (
-    <div className="w-[240px] bg-[#1C1C28] text-white h-full flex flex-col justify-between p-4 border-r border-white/10 select-none">
+    <div className="w-[240px] bg-white text-[#1C1917] h-full flex flex-col justify-between p-4 border-r border-[#E7E5E4] select-none">
       <div>
-        <div className="flex items-center justify-between px-1 pb-4 border-b border-white/15 mb-4">
+        <div className="flex items-center justify-between px-1 pb-4 border-b border-[#E7E5E4] mb-4">
           <Link
             to="/"
             onClick={onCloseDrawer}
             className="flex items-center gap-2.5"
           >
-            <div className="w-9 h-9 rounded-[12px] bg-[#1EC1CB] text-[#1C1C28] flex items-center justify-center font-black text-[16px]">
+            <div className="w-8 h-8 rounded-full bg-[#1C1917] text-white flex items-center justify-center font-black text-[13px]">
               LB
             </div>
             <div>
-              <span className="font-extrabold text-[16px] text-white block leading-tight">
+              <span className="font-bold text-[15px] text-[#1C1917] block leading-tight">
                 LocalBuddy
               </span>
-              <span className="text-[10px] text-[#1EC1CB] tracking-wider uppercase font-bold">
+              <span className="text-[10px] text-[#78716C] uppercase font-semibold">
                 {portalTitle}
               </span>
             </div>
@@ -467,8 +392,8 @@ export const DashboardSidebarContent: React.FC<{
             <button
               type="button"
               onClick={onCloseDrawer}
-              aria-label="Đóng thanh bên"
-              className="lg:hidden p-1.5 rounded-[8px] bg-white/10 text-white hover:bg-white/20 cursor-pointer"
+              aria-label="Đóng"
+              className="lg:hidden p-1.5 rounded-full bg-[#F3F1EC] text-[#1C1917] cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -486,38 +411,33 @@ export const DashboardSidebarContent: React.FC<{
                 className={clsx(
                   'flex items-center justify-between px-3 py-2.5 rounded-[12px] text-[13px] transition-all',
                   isActive
-                    ? 'bg-[#1EC1CB] text-[#1C1C28] font-bold shadow-sm'
-                    : 'text-white/85 hover:bg-white/10 hover:text-white font-medium'
+                    ? 'bg-[#1C1917] text-white font-semibold'
+                    : 'text-[#57534E] hover:bg-[#F3F1EC] hover:text-[#1C1917] font-medium'
                 )}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className="shrink-0">{link.icon}</span>
                   <span className="truncate">{link.label}</span>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  {link.badge !== undefined && link.badge > 0 && (
-                    <span
-                      className={clsx(
-                        'px-1.5 py-0.5 rounded-full text-[10px] font-extrabold',
-                        isActive
-                          ? 'bg-[#1C1C28] text-[#1EC1CB]'
-                          : 'bg-[#1EC1CB] text-[#1C1C28]'
-                      )}
-                    >
-                      {link.badge}
-                    </span>
-                  )}
-                  {link.sub && (
-                    <span className="text-[10px] opacity-70 font-mono">{link.sub}</span>
-                  )}
-                </div>
+                {link.badge !== undefined && link.badge > 0 && (
+                  <span
+                    className={clsx(
+                      'px-1.5 py-0.5 rounded-full text-[10px] font-bold',
+                      isActive
+                        ? 'bg-white text-[#1C1917]'
+                        : 'bg-[#1C1917] text-white'
+                    )}
+                  >
+                    {link.badge}
+                  </span>
+                )}
               </Link>
             );
           })}
         </nav>
       </div>
 
-      <div className="border-t border-white/15 pt-3 space-y-1.5 text-[12px]">
+      <div className="border-t border-[#E7E5E4] pt-3 space-y-1 text-[12px]">
         <button
           type="button"
           onClick={() => {
@@ -525,20 +445,20 @@ export const DashboardSidebarContent: React.FC<{
             switchRoleQuickly('tourist', 'u-tourist-1');
             navigate('/');
           }}
-          className="w-full text-left px-3 py-2 rounded-[10px] text-[#1EC1CB] hover:bg-white/10 font-semibold cursor-pointer"
+          className="w-full text-left px-3 py-2 rounded-[10px] text-[#1C1917] hover:bg-[#F3F1EC] font-medium cursor-pointer"
         >
-          ← Giao diện Du khách
+          ← Trang Du khách
         </button>
         <button
           type="button"
           onClick={() => {
             onCloseDrawer?.();
             resetAllDataToDefault();
-            showToast('Đã khôi phục dữ liệu mẫu Đà Nẵng về mặc định!', 'success');
+            showToast('Đã khôi phục dữ liệu gốc!', 'success');
           }}
-          className="w-full text-left px-3 py-2 rounded-[10px] text-[#F6E6EA]/80 hover:bg-white/10 cursor-pointer"
+          className="w-full text-left px-3 py-2 rounded-[10px] text-[#78716C] hover:bg-[#F3F1EC] cursor-pointer"
         >
-          🔄 Khôi phục dữ liệu gốc
+          🔄 Đặt lại dữ liệu
         </button>
         <button
           type="button"
@@ -547,16 +467,15 @@ export const DashboardSidebarContent: React.FC<{
             logout();
             navigate('/dang-nhap');
           }}
-          className="w-full text-left px-3 py-2 rounded-[10px] text-[#F5B2BA] hover:bg-white/10 font-semibold cursor-pointer"
+          className="w-full text-left px-3 py-2 rounded-[10px] text-[#B91C1C] hover:bg-[#FEF2F2] font-medium cursor-pointer"
         >
-          🚪 Đăng xuất phiên
+          🚪 Đăng xuất
         </button>
       </div>
     </div>
   );
 };
 
-// Giữ export tương thích ngược
 export const GuideBottomNav: React.FC = () => {
   const location = useLocation();
   const { walletBalance } = useBookingContext();
@@ -565,12 +484,12 @@ export const GuideBottomNav: React.FC = () => {
     { to: '/guide/don-den', label: 'Đơn đến', icon: '🔔' },
     { to: '/guide/don-va-ca', label: 'Đơn & Ca', icon: '📋' },
     { to: '/guide/lich-ranh', label: 'Lịch rảnh', icon: '📅' },
-    { to: '/guide/vi', label: `Ví (${formatMoney(walletBalance)})`, icon: '💰' },
+    { to: '/guide/vi', label: `${formatMoney(walletBalance)}`, icon: '💰' },
     { to: '/guide/ho-so', label: 'Hồ sơ', icon: '👤' },
   ];
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#1C1C28] text-white border-t border-white/15 z-30 flex items-center justify-around h-16 shadow-xl">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#FAF9F6] text-[#1C1917] border-t border-[#E7E5E4] z-30 flex items-center justify-around h-15">
       {links.map((l) => {
         const isActive = location.pathname === l.to;
         return (
@@ -578,8 +497,8 @@ export const GuideBottomNav: React.FC = () => {
             key={l.to}
             to={l.to}
             className={clsx(
-              'flex flex-col items-center justify-center flex-1 h-full text-[10px] font-bold gap-0.5 transition-colors',
-              isActive ? 'text-[#1EC1CB]' : 'text-white/70 hover:text-white'
+              'flex flex-col items-center justify-center flex-1 h-full text-[10px] font-semibold gap-0.5',
+              isActive ? 'text-[#1C1917] font-bold' : 'text-[#78716C]'
             )}
           >
             <span className="text-base">{l.icon}</span>
