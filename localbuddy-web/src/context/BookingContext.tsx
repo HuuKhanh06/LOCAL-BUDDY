@@ -51,7 +51,7 @@ import {
   StorageBucketName,
 } from '../lib/supabase';
 
-const STORAGE_KEY = 'localbuddy_danang_db_v2';
+const STORAGE_KEY = 'localbuddy_danang_clean_v1';
 
 export interface ActionResult {
   ok: boolean;
@@ -278,7 +278,7 @@ function getDefaultState(): StoredState {
     payments: initialPayments,
     feeRate: initialAppConfig.feeRate,
     feeHistory: initialAppConfig.history,
-    currentUserId: 'u-tourist-1',
+    currentUserId: null,
   };
 }
 
@@ -625,8 +625,11 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!content.trim()) {
       return { ok: false, message: 'Vui lòng nhập nội dung tin nhắn.' };
     }
-    const senderId = currentUser?.id || 'u-tourist-1';
-    const senderName = currentUser?.fullName || 'Người dùng';
+    if (!currentUser) {
+      return { ok: false, message: 'Vui lòng đăng ký hoặc đăng nhập tài khoản để gửi tin nhắn.' };
+    }
+    const senderId = currentUser.id;
+    const senderName = currentUser.fullName;
     const newMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
       bookingId,
@@ -680,10 +683,8 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const nextIdNumber = 1000 + state.bookings.length + 1;
     const newId = `BK-${nextIdNumber}`;
-    const touristId =
-      currentUser?.role === 'tourist' ? currentUser.id : 'u-tourist-1';
-    const touristName =
-      state.users.find((u) => u.id === touristId)?.fullName || 'Dương Đăng Huân';
+    const touristId = currentUser ? currentUser.id : `guest-${Date.now()}`;
+    const touristName = currentUser?.fullName || 'Du khách';
 
     // Tìm các slot tương ứng nhưng KHÔNG đổi sang HOLD ở bước PENDING (theo đúng BR-04)
     const matchedSlots = state.slots.filter(

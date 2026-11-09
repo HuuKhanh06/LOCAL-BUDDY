@@ -126,19 +126,19 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto py-6 px-4">
-      <div className="bg-white border border-[#E4C3CC] rounded-[16px] p-6 sm:p-8 shadow-md">
-        <h1 className="text-[24px] font-extrabold text-[#1A0A0F] text-center">
-          Đăng ký tài khoản LocalBuddy Đà Nẵng
+    <div className="max-w-xl mx-auto py-8 px-4">
+      <div className="bg-white border border-[#E7E5E4] rounded-[24px] p-6 sm:p-8 shadow-xs">
+        <h1 className="text-[22px] font-black tracking-tight text-[#1C1917] text-center">
+          Đăng ký tài khoản
         </h1>
-        <p className="text-[14px] text-[#52526B] text-center mt-1 mb-6">
-          Chọn vai trò của bạn để bắt đầu hành trình tại Đà Nẵng (UC.01)
+        <p className="text-[13px] text-[#78716C] text-center mt-1 mb-6">
+          Chọn vai trò của bạn để bắt đầu trên LocalBuddy Đà Nẵng
         </p>
 
         <Tabs
           tabs={[
-            { id: 'tourist', label: '🧳 Du khách (Tourist)' },
-            { id: 'guide', label: '🧭 Hướng dẫn viên bản địa (Local Guide)' },
+            { id: 'tourist', label: 'Du khách' },
+            { id: 'guide', label: 'Hướng dẫn viên bản địa' },
           ]}
           activeTab={roleTab}
           onChange={(id) => setRoleTab(id as 'tourist' | 'guide')}
@@ -146,8 +146,8 @@ export const RegisterPage: React.FC = () => {
         />
 
         {roleTab === 'guide' && (
-          <div className="mb-5 p-4 bg-[#FEF1DC] border border-[#F8CA84] rounded-[12px] text-[13px] text-[#8C4A08]">
-            <strong>Quy định xác thực KYC (BR-01):</strong> Sau khi tạo tài khoản Hướng dẫn viên, bạn sẽ được chuyển tới trang nộp hồ sơ CCCD & Chứng chỉ để Admin thẩm định trước khi mở lịch đón khách.
+          <div className="mb-5 p-3.5 bg-[#FEF3C7] border border-[#FDE68A] rounded-[14px] text-[12px] text-[#92400E]">
+            <strong>Quy định KYC:</strong> Sau khi tạo tài khoản HDV, bạn sẽ được chuyển tới trang nộp hồ sơ CCCD & Chứng chỉ để Admin thẩm định trước khi mở lịch đón khách.
           </div>
         )}
 
@@ -155,7 +155,7 @@ export const RegisterPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Họ và tên *"
-              placeholder="Ví dụ: Nguyễn Văn An"
+              placeholder="Nguyễn Văn An"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
             />
@@ -184,14 +184,14 @@ export const RegisterPage: React.FC = () => {
               />
             ) : (
               <Input
-                label="Đơn giá dự kiến (VNĐ / giờ) *"
+                label="Đơn giá (VNĐ / giờ) *"
                 type="number"
                 min={80000}
                 max={500000}
                 step={10000}
                 value={hourlyRate}
                 onChange={(e) => setHourlyRate(e.target.value)}
-                hint="Từ 80.000 ₫ đến 500.000 ₫ / giờ (BR-02)"
+                hint="Từ 80.000 ₫ đến 500.000 ₫ / giờ"
               />
             )}
           </div>
@@ -199,7 +199,7 @@ export const RegisterPage: React.FC = () => {
           {roleTab === 'guide' && (
             <div className="space-y-3 pt-1">
               <div>
-                <label className="text-[13px] font-bold text-[#1A0A0F] block mb-1.5">
+                <label className="text-[12px] font-bold text-[#1C1917] block mb-1.5">
                   Khu vực dẫn khách tại Đà Nẵng:
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -210,10 +210,10 @@ export const RegisterPage: React.FC = () => {
                         key={area}
                         type="button"
                         onClick={() => toggleItem(selectedAreas, area, setSelectedAreas)}
-                        className={`px-3 py-1 rounded-full text-[12px] font-semibold border transition-colors cursor-pointer ${
+                        className={`px-3 py-1 rounded-full text-[11px] font-semibold border transition-colors cursor-pointer ${
                           active
-                            ? 'bg-[#1EC1CB] text-[#1C1C28] border-[#1C1C28]'
-                            : 'bg-[#FBF4F6] text-[#52526B] border-[#E4C3CC]'
+                            ? 'bg-[#1C1917] text-white border-[#1C1917]'
+                            : 'bg-[#FAF9F6] text-[#78716C] border-[#E7E5E4]'
                         }`}
                       >
                         {active ? '✓ ' : '+ '}
@@ -225,7 +225,7 @@ export const RegisterPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-[13px] font-bold text-[#1A0A0F] block mb-1.5">
+                <label className="text-[12px] font-bold text-[#1C1917] block mb-1.5">
                   Ngôn ngữ giao tiếp:
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -236,10 +236,10 @@ export const RegisterPage: React.FC = () => {
                         key={lang}
                         type="button"
                         onClick={() => toggleItem(selectedLangs, lang, setSelectedLangs)}
-                        className={`px-3 py-1 rounded-full text-[12px] font-semibold border transition-colors cursor-pointer ${
+                        className={`px-3 py-1 rounded-full text-[11px] font-semibold border transition-colors cursor-pointer ${
                           active
-                            ? 'bg-[#1EC1CB] text-[#1C1C28] border-[#1C1C28]'
-                            : 'bg-[#FBF4F6] text-[#52526B] border-[#E4C3CC]'
+                            ? 'bg-[#1C1917] text-white border-[#1C1917]'
+                            : 'bg-[#FAF9F6] text-[#78716C] border-[#E7E5E4]'
                         }`}
                       >
                         {active ? '✓ ' : '+ '}
@@ -270,29 +270,29 @@ export const RegisterPage: React.FC = () => {
           </div>
 
           {verifySentMessage && (
-            <div className="p-3.5 bg-[#E3F7EF] border border-[#99E2C4] text-[#0F6E4B] rounded-[12px] text-[13px] font-semibold">
+            <div className="p-3 bg-[#DCFCE7] border border-[#BBF7D0] text-[#166534] rounded-[12px] text-[12px] font-medium">
               ✉️ {verifySentMessage}
             </div>
           )}
 
           {errorMsg && (
-            <div className="p-3.5 bg-[#FCE8EB] border border-[#F5B2BA] text-[#A61B2B] rounded-[12px] text-[13px] font-semibold">
+            <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] rounded-[12px] text-[12px] font-medium">
               ⚠️ {errorMsg}
             </div>
           )}
 
           <Button type="submit" variant="primary" size="lg" className="w-full" isLoading={isSubmitting}>
             {roleTab === 'guide'
-              ? 'Tạo tài khoản HDV & Tiếp tục nộp KYC →'
-              : 'Hoàn tất đăng ký tài khoản Du khách'}
+              ? 'Tạo tài khoản HDV & Nộp KYC →'
+              : 'Hoàn tất đăng ký Du khách'}
           </Button>
         </form>
 
-        <div className="mt-6 text-center text-[14px] text-[#52526B] border-t border-[#E4C3CC] pt-4">
+        <div className="mt-6 text-center text-[13px] text-[#78716C] border-t border-[#E7E5E4] pt-4">
           Đã có tài khoản?{' '}
           <Link
             to="/dang-nhap"
-            className="font-bold text-[#1A0A0F] underline decoration-[#1EC1CB] decoration-2"
+            className="font-bold text-[#1C1917] hover:underline"
           >
             Đăng nhập ngay
           </Link>

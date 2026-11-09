@@ -28,6 +28,7 @@ export const GuideProfilePage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { showToast } = useToast();
   const {
+    currentUser,
     getGuideById,
     slots,
     reviews,
@@ -92,12 +93,24 @@ export const GuideProfilePage: React.FC = () => {
       showToast('Vui lòng chọn 1 khung giờ trống!', 'warning');
       return;
     }
+    if (!currentUser) {
+      showToast('Vui lòng đăng ký hoặc đăng nhập tài khoản để đặt lịch!', 'info');
+      navigate(
+        `/dang-nhap?returnTo=${encodeURIComponent(`/dat-lich/${user.id}?date=${selectedSlot.date}&start=${selectedSlot.startTime}&end=${selectedSlot.endTime}&slotId=${selectedSlot.id}`)}`
+      );
+      return;
+    }
     navigate(
       `/dat-lich/${user.id}?date=${selectedSlot.date}&start=${selectedSlot.startTime}&end=${selectedSlot.endTime}&slotId=${selectedSlot.id}`
     );
   };
 
   const handleSendQuickMessage = () => {
+    if (!currentUser) {
+      showToast('Vui lòng đăng ký hoặc đăng nhập tài khoản để gửi tin nhắn!', 'info');
+      navigate(`/dang-nhap?returnTo=${encodeURIComponent(`/guides/${user.id}`)}`);
+      return;
+    }
     const res = sendMessage(user.id, quickMessage);
     if (!res.ok) {
       showToast(res.message, 'error');

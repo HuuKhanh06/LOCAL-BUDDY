@@ -1,4 +1,7 @@
-// pages/tourist/LoginPage.tsx (UC.02: Đăng nhập đa vai trò với Supabase Auth & Xử lý ngách lỗi)
+// pages/tourist/LoginPage.tsx (UC.02: Đăng nhập đa vai trò với Supabase Auth)
+// Thiết kế tối giản 1 tông nền sáng (#FAF9F6 / #FFFFFF), rất ít chữ.
+// Giữ đúng 2 tài khoản hệ thống (1 HDV, 1 Admin), người dùng mới bấm Đăng ký.
+
 import React, { useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
@@ -13,8 +16,8 @@ export const LoginPage: React.FC = () => {
   const { login, allUsers } = useBookingContext();
   const { showToast } = useToast();
 
-  const [identifier, setIdentifier] = useState('huan.duong@gmail.com');
-  const [password, setPassword] = useState('123456');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -53,7 +56,6 @@ export const LoginPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Nếu đã cấu hình Supabase Cloud và người dùng nhập email không phải tài khoản mẫu 1-chạm
       const isLocalDemoAccount = allUsers.some(
         (u) =>
           u.email.toLowerCase() === identifier.trim().toLowerCase() ||
@@ -95,130 +97,96 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto py-8 px-4">
-      <div className="bg-white border border-[#E4C3CC] rounded-[16px] p-6 sm:p-8 shadow-md space-y-5">
+    <div className="max-w-md mx-auto py-10 px-4">
+      <div className="bg-white border border-[#E7E5E4] rounded-[24px] p-6 sm:p-8 shadow-xs space-y-6">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-[12px] bg-[#1EC1CB] text-[#1C1C28] font-black text-[20px] flex items-center justify-center mx-auto mb-3">
+          <div className="w-11 h-11 rounded-full bg-[#1C1917] text-white font-black text-[15px] flex items-center justify-center mx-auto mb-3">
             LB
           </div>
-          <h1 className="text-[24px] font-extrabold text-[#1A0A0F]">
-            Đăng nhập LocalBuddy Đà Nẵng
+          <h1 className="text-[22px] font-black tracking-tight text-[#1C1917]">
+            Đăng nhập
           </h1>
-          <p className="text-[14px] text-[#52526B] mt-1">
-            Quản lý lịch trình, đặt cọc và trò chuyện trực tiếp cùng Hướng dẫn viên bản địa
+          <p className="text-[13px] text-[#78716C] mt-1">
+            LocalBuddy Đà Nẵng
           </p>
         </div>
 
-        {/* Các thông báo trạng thái phiên / xác minh email / đặt lại mật khẩu */}
         {isSessionExpired && (
-          <div className="p-3.5 rounded-[12px] bg-[#FEF1DC] border border-[#F8CA84] text-[13px] text-[#8C4A08] font-semibold">
-            ⏰ Phiên đăng nhập của bạn đã hết hạn để đảm bảo an toàn. Vui lòng đăng nhập lại để tiếp tục thao tác.
+          <div className="p-3 rounded-[12px] bg-[#FEF3C7] border border-[#FDE68A] text-[12px] text-[#92400E] font-medium">
+            Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.
           </div>
         )}
         {isEmailVerified && (
-          <div className="p-3.5 rounded-[12px] bg-[#E3F7EF] border border-[#99E2C4] text-[13px] text-[#0F6E4B] font-semibold">
-            ✓ Địa chỉ Email của bạn đã được xác minh thành công! Hãy đăng nhập ngay bên dưới.
+          <div className="p-3 rounded-[12px] bg-[#DCFCE7] border border-[#BBF7D0] text-[12px] text-[#166534] font-medium">
+            Xác minh email thành công! Hãy đăng nhập ngay.
           </div>
         )}
         {isResetSuccess && (
-          <div className="p-3.5 rounded-[12px] bg-[#E3F7EF] border border-[#99E2C4] text-[13px] text-[#0F6E4B] font-semibold">
-            ✓ Đã cập nhật mật khẩu mới thành công! Vui lòng đăng nhập bằng mật khẩu mới.
+          <div className="p-3 rounded-[12px] bg-[#DCFCE7] border border-[#BBF7D0] text-[12px] text-[#166534] font-medium">
+            Đã đổi mật khẩu mới thành công.
           </div>
         )}
 
-        {/* Khung chọn nhanh 3 vai trò Demo */}
-        <div className="bg-[#FBF4F6] border border-[#E4C3CC] rounded-[12px] p-4 space-y-2.5">
-          <span className="text-[12px] font-extrabold uppercase tracking-wider text-[#1A0A0F] block">
-            ⚡ Đăng nhập 1 chạm theo vai trò (3 Tài khoản Demo):
-          </span>
-
-          <div className="grid grid-cols-1 gap-2 text-[13px]">
-            <div className="flex items-center justify-between bg-white px-3 py-2 rounded-[10px] border border-[#E4C3CC]">
-              <div>
-                <strong className="text-[#1A0A0F]">🧳 Du khách: Dương Đăng Huân</strong>
-                <span className="block text-[11px] text-[#52526B]">
-                  huan.duong@gmail.com • MK: 123456
-                </span>
+        {/* 2 Tài khoản hệ thống sẵn sàng */}
+        <div className="bg-[#FAF9F6] border border-[#E7E5E4] rounded-[16px] p-3.5 space-y-2">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-[#78716C]">
+            Tài khoản mẫu có sẵn
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between bg-white px-3 py-2 rounded-[12px] border border-[#E7E5E4]">
+              <div className="min-w-0 pr-2">
+                <div className="text-[12px] font-bold text-[#1C1917] truncate">
+                  🧭 HDV: Nguyễn Hữu Khanh
+                </div>
+                <div className="text-[11px] text-[#78716C] truncate">
+                  khanh.nguyen.dn@gmail.com
+                </div>
               </div>
-              <Button
+              <button
                 type="button"
-                size="sm"
-                variant="primary"
-                onClick={() => quickFillAndLogin('huan.duong@gmail.com')}
-              >
-                Vào ngay
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-between bg-white px-3 py-2 rounded-[10px] border border-[#E4C3CC]">
-              <div>
-                <strong className="text-[#1A0A0F]">🧭 HDV: Nguyễn Hữu Khanh (Đã KYC)</strong>
-                <span className="block text-[11px] text-[#52526B]">
-                  khanh.nguyen.dn@gmail.com • MK: 123456
-                </span>
-              </div>
-              <Button
-                type="button"
-                size="sm"
-                variant="primary"
                 onClick={() => quickFillAndLogin('khanh.nguyen.dn@gmail.com')}
+                className="shrink-0 px-3 py-1 rounded-full bg-[#1C1917] text-white text-[11px] font-semibold hover:bg-[#292524] cursor-pointer"
               >
-                Vào ngay
-              </Button>
+                Vào HDV
+              </button>
             </div>
 
-            <div className="flex items-center justify-between bg-white px-3 py-2 rounded-[10px] border border-[#E4C3CC]">
-              <div>
-                <strong className="text-[#1A0A0F]">🪪 HDV mới: Hoàng Minh Đức (Chờ KYC)</strong>
-                <span className="block text-[11px] text-[#52526B]">
-                  minhduc.kyc@gmail.com • MK: 123456
-                </span>
+            <div className="flex items-center justify-between bg-white px-3 py-2 rounded-[12px] border border-[#E7E5E4]">
+              <div className="min-w-0 pr-2">
+                <div className="text-[12px] font-bold text-[#1C1917] truncate">
+                  ⚖️ Admin: Lê Văn Hoàng
+                </div>
+                <div className="text-[11px] text-[#78716C] truncate">
+                  admin@localbuddy.vn
+                </div>
               </div>
-              <Button
+              <button
                 type="button"
-                size="sm"
-                variant="secondary"
-                onClick={() => quickFillAndLogin('minhduc.kyc@gmail.com')}
-              >
-                Vào ngay
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-between bg-white px-3 py-2 rounded-[10px] border border-[#E4C3CC]">
-              <div>
-                <strong className="text-[#1A0A0F]">⚖️ Admin: Lê Văn Hoàng</strong>
-                <span className="block text-[11px] text-[#52526B]">
-                  admin@localbuddy.vn • MK: 123456
-                </span>
-              </div>
-              <Button
-                type="button"
-                size="sm"
-                variant="dark"
                 onClick={() => quickFillAndLogin('admin@localbuddy.vn')}
+                className="shrink-0 px-3 py-1 rounded-full bg-[#F3F1EC] text-[#1C1917] hover:bg-[#E7E5E4] text-[11px] font-semibold cursor-pointer border border-[#E7E5E4]"
               >
                 Vào Admin
-              </Button>
+              </button>
             </div>
           </div>
         </div>
 
-        <form onSubmit={(e) => void handleLogin(e)} className="space-y-4">
+        <form onSubmit={(e) => void handleLogin(e)} className="space-y-3.5">
           <Input
-            label="Email hoặc Số điện thoại *"
-            placeholder="Nhập email hoặc số điện thoại"
+            label="Email hoặc Số điện thoại"
+            placeholder="dukhach@gmail.com hoặc 0905..."
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
           />
 
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label htmlFor="login-password" className="text-[14px] font-semibold text-[#1A0A0F]">
-                Mật khẩu *
+              <label htmlFor="login-password" className="text-[13px] font-medium text-[#1C1917]">
+                Mật khẩu
               </label>
               <Link
                 to="/quen-mat-khau"
-                className="text-[12px] font-bold text-[#118B93] hover:text-[#1A0A0F] underline"
+                className="text-[12px] text-[#78716C] hover:text-[#1C1917]"
               >
                 Quên mật khẩu?
               </Link>
@@ -233,23 +201,23 @@ export const LoginPage: React.FC = () => {
           </div>
 
           {errorMsg && (
-            <div className="p-3.5 bg-[#FCE8EB] border border-[#F5B2BA] text-[#A61B2B] rounded-[12px] text-[13px] font-semibold">
-              ⚠️ {errorMsg}
+            <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] rounded-[12px] text-[12px] font-medium">
+              {errorMsg}
             </div>
           )}
 
           <Button type="submit" variant="primary" size="lg" fullWidth isLoading={isLoading}>
-            Đăng nhập vào hệ thống
+            Đăng nhập
           </Button>
         </form>
 
-        <div className="text-center text-[14px] text-[#52526B] border-t border-[#E4C3CC] pt-4">
-          Chưa có tài khoản LocalBuddy?{' '}
+        <div className="text-center text-[13px] text-[#78716C] border-t border-[#E7E5E4] pt-4">
+          Chưa có tài khoản?{' '}
           <Link
             to="/dang-ky"
-            className="font-bold text-[#1A0A0F] underline decoration-[#1EC1CB] decoration-2"
+            className="font-bold text-[#1C1917] hover:underline"
           >
-            Đăng ký tài khoản mới
+            Đăng ký ngay
           </Link>
         </div>
       </div>

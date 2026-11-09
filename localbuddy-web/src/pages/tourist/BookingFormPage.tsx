@@ -18,7 +18,7 @@ export const BookingFormPage: React.FC = () => {
   const { guideId } = useParams<{ guideId: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { getGuideById, createBooking, slots } = useBookingContext();
+  const { currentUser, getGuideById, createBooking, slots } = useBookingContext();
   const { showToast } = useToast();
 
   const guideItem = getGuideById(guideId || '');
@@ -60,6 +60,12 @@ export const BookingFormPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+
+    if (!currentUser) {
+      showToast('Vui lòng đăng ký hoặc đăng nhập tài khoản để đặt lịch!', 'info');
+      navigate(`/dang-nhap?returnTo=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      return;
+    }
 
     if (!guestCount || guestCount < 1 || guestCount > 20) {
       setErrorMsg('Số lượng khách tham gia phải từ 1 đến 20 người.');

@@ -139,21 +139,9 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
           </Link>
         </nav>
 
-        {/* Chuyển vai trò gọn + Thông báo + Avatar */}
+        {/* Chuyển nhanh 2 tài khoản hệ thống (HDV / Admin) + Thông báo + Tài khoản */}
         <div className="flex items-center gap-2">
           <div className="hidden sm:flex items-center bg-[#F3F1EC] p-0.5 rounded-full border border-[#E7E5E4]">
-            <button
-              type="button"
-              onClick={() => handleQuickRoleSwitch('tourist', 'u-tourist-1')}
-              className={clsx(
-                'px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer',
-                activeRole === 'tourist'
-                  ? 'bg-white text-[#1C1917] shadow-2xs'
-                  : 'text-[#78716C] hover:text-[#1C1917]'
-              )}
-            >
-              Khách
-            </button>
             <button
               type="button"
               onClick={() => handleQuickRoleSwitch('guide', 'u-guide-1')}
@@ -164,7 +152,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                   : 'text-[#78716C] hover:text-[#1C1917]'
               )}
             >
-              HDV
+              HDV Khanh
             </button>
             <button
               type="button"
@@ -176,7 +164,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                   : 'text-[#78716C] hover:text-[#1C1917]'
               )}
             >
-              Admin
+              Admin Hoàng
             </button>
           </div>
 
@@ -226,12 +214,20 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
               </button>
             </div>
           ) : (
-            <Link
-              to="/dang-nhap"
-              className="px-4 py-1.5 rounded-full bg-[#1C1917] text-white text-[12px] font-semibold hover:bg-[#292524]"
-            >
-              Đăng nhập
-            </Link>
+            <div className="flex items-center gap-1.5">
+              <Link
+                to="/dang-nhap"
+                className="px-3 py-1.5 rounded-full text-[#1C1917] text-[12px] font-semibold hover:bg-[#F3F1EC] transition-colors"
+              >
+                Đăng nhập
+              </Link>
+              <Link
+                to="/dang-ky"
+                className="px-3.5 py-1.5 rounded-full bg-[#1C1917] text-white text-[12px] font-semibold hover:bg-[#292524] transition-colors shadow-2xs"
+              >
+                Đăng ký
+              </Link>
+            </div>
           )}
 
           <button
@@ -251,22 +247,12 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
             <button
               type="button"
               onClick={() => {
-                handleQuickRoleSwitch('tourist', 'u-tourist-1');
-                setMobileMenuOpen(false);
-              }}
-              className="flex-1 py-1.5 rounded-full bg-white border border-[#E7E5E4] text-[12px] font-semibold"
-            >
-              Khách
-            </button>
-            <button
-              type="button"
-              onClick={() => {
                 handleQuickRoleSwitch('guide', 'u-guide-1');
                 setMobileMenuOpen(false);
               }}
               className="flex-1 py-1.5 rounded-full bg-white border border-[#E7E5E4] text-[12px] font-semibold"
             >
-              HDV
+              HDV Khanh
             </button>
             <button
               type="button"
@@ -276,9 +262,27 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
               }}
               className="flex-1 py-1.5 rounded-full bg-white border border-[#E7E5E4] text-[12px] font-semibold"
             >
-              Admin
+              Admin Hoàng
             </button>
           </div>
+          {!currentUser && (
+            <div className="flex items-center gap-2 pt-1 border-t border-[#E7E5E4]">
+              <Link
+                to="/dang-nhap"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 py-2 text-center rounded-full bg-white border border-[#E7E5E4] text-[13px] font-semibold"
+              >
+                Đăng nhập
+              </Link>
+              <Link
+                to="/dang-ky"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 py-2 text-center rounded-full bg-[#1C1917] text-white text-[13px] font-semibold"
+              >
+                Đăng ký
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </header>
@@ -442,12 +446,11 @@ export const DashboardSidebarContent: React.FC<{
           type="button"
           onClick={() => {
             onCloseDrawer?.();
-            switchRoleQuickly('tourist', 'u-tourist-1');
             navigate('/');
           }}
           className="w-full text-left px-3 py-2 rounded-[10px] text-[#1C1917] hover:bg-[#F3F1EC] font-medium cursor-pointer"
         >
-          ← Trang Du khách
+          ← Về Trang chủ
         </button>
         <button
           type="button"
