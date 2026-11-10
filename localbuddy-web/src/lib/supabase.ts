@@ -108,11 +108,71 @@ export async function uploadFileToSupabase(
 }
 
 // =============================================================================
-// 2. SUPABASE REALTIME SUBSCRIPTION (ĐỒNG BỘ TRẠNG THÁI ĐƠN, KHUNG GIỜ, VÍ, CHAT)
+// 2. SUPABASE REALTIME & CLOUD STATE SYNC (ĐỒNG BỘ ĐA THIẾT BỊ THỜI GIAN THỰC)
 // =============================================================================
 
+export async function fetchCloudSyncState(): Promise<Record<string, any> | null> {
+  if (!supabase || !isSupabaseConfigured) return null;
+  try {
+    const { data, error } = await supabase
+      .from('cloud_shared_sync')
+      .select('key, payload');
+    if (error || !data) return null;
+    const result: Record<string, any> = {};
+    for (const row of data) {
+      result[row.key] = row.payload;
+    }
+    return result;
+  } catch {
+    return null;
+  }
+}
+
+let syncBroadcastChannel: RealtimeChannel | null = null;
+
+export function getSyncBroadcastChannel(): RealtimeChannel | null {
+  if (!supabase || !isSupabaseConfigured) return null;
+  if (!syncBroadcastChannel) {
+    syncBroadcastChannel = supabase.channel('localbuddy-cloud-broadcast', {
+      config: { broadcast: { self: false } },
+    });
+    syncBroadcastChannel.subscribe();
+  }
+  return syncBroadcastChannel;
+}
+
+export async function broadcastCloudSync(payload: any): Promise<void> {
+  if (!supabase || !isSupabaseConfigured) return;
+  try {
+    const ch = getSyncBroadcastChannel();
+    if (ch) {
+      await ch.send({
+        type: 'broadcast',
+        event: 'CLOUD_SYNC_ACTION',
+        payload,
+      });
+    }
+  } catch {
+    // Bỏ qua lỗi mạng ngắt quãng
+  }
+}
+
+export async function persistCloudSyncKey(key: string, payload: any): Promise<void> {
+  if (!supabase || !isSupabaseConfigured) return;
+  try {
+    await supabase.from('cloud_shared_sync').upsert({
+      key,
+      payload,
+      updated_at: new Date().toISOString(),
+    });
+  } catch {
+    // Bỏ qua nếu offline
+  }
+}
+
 export function subscribeToLocalBuddyRealtime(
-  onTableChange: (payload: { table: string; eventType: string }) => void
+  onTableChange: (payload: { table: string; eventType: string }) => void,
+  onBroadcast?: (payload: any) => void
 ): () => void {
   if (!supabase || !isSupabaseConfigured) {
     return () => {};
@@ -120,6 +180,11 @@ export function subscribeToLocalBuddyRealtime(
 
   const channel: RealtimeChannel = supabase
     .channel('localbuddy-danang-live')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'cloud_shared_sync' },
+      (payload) => onTableChange({ table: 'cloud_shared_sync', eventType: payload.eventType })
+    )
     .on(
       'postgres_changes',
       { event: '*', schema: 'public', table: 'booking' },
@@ -132,18 +197,13 @@ export function subscribeToLocalBuddyRealtime(
     )
     .on(
       'postgres_changes',
-      { event: '*', schema: 'public', table: 'wallet' },
-      (payload) => onTableChange({ table: 'wallet', eventType: payload.eventType })
-    )
-    .on(
-      'postgres_changes',
       { event: '*', schema: 'public', table: 'notification' },
       (payload) => onTableChange({ table: 'notification', eventType: payload.eventType })
     )
     .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'message' },
-      (payload) => onTableChange({ table: 'message', eventType: payload.eventType })
+      'broadcast',
+      { event: 'CLOUD_SYNC_ACTION' },
+      ({ payload }) => onBroadcast?.(payload)
     )
     .subscribe();
 
