@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test": "vitest run",
+    "audit:clean": "node ../scripts/audit-clean.mjs",
+    "check:contrast": "node ../scripts/check-contrast.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

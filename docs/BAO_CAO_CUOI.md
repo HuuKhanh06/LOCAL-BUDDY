@@ -42,3 +42,17 @@ Hệ thống đã được thiết lập quy trình tự động hóa CI/CD thô
 - **Tài khoản Hướng dẫn viên**: Email `nguyenhuukhanh.guide@gmail.com` | Mật khẩu `Guide@123456`
 - **Tài khoản Quản trị viên (Admin)**: Email `admin.localbuddy@gmail.com` | Mật khẩu `Admin@123456`
 - Du khách mới có thể bấm **Đăng ký** trực tiếp trên trang web để trải nghiệm ngay.
+
+---
+
+## 6. HƯỚNG DẪN CHẠY LOCAL & TỔNG HỢP HỒ SƠ
+- **Chạy local (3 lệnh)**:
+  1. `cd localbuddy-web`
+  2. `npm install`
+  3. `npm run dev` (hoặc `npm run test` để chạy toàn bộ 11 tests)
+- **Hồ sơ thiết kế & quyết định nghiệp vụ**:
+  - `docs/QUYET_DINH_NGACH.md`: Quy tắc bất biến mục [2][3] và 17 quyết định ngách (QĐ-01 đến QĐ-17).
+  - `docs/VAN_DE_TON_DONG.md`: Ghi nhận rào cản bên ngoài (SMS trả phí, sandbox payment).
+  - `docs/UC_TRACE.md`: Ma trận truy vết đầy đủ 29/29 Use Case (đạt 100% ✅).
+  - `docs/CREDITS.md`: Bản quyền media Mixkit / Wikimedia / Unsplash.
+
