@@ -402,6 +402,19 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     ...prevNotifications,
   ];
 
+  const pushNotifications = (
+    prevNotifications: Notification[],
+    notifs: Omit<Notification, 'id' | 'isRead' | 'createdAt'>[]
+  ): Notification[] => [
+    ...notifs.map((notif, idx) => ({
+      ...notif,
+      id: `notif-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 6)}`,
+      isRead: false,
+      createdAt: new Date().toISOString(),
+    })),
+    ...prevNotifications,
+  ];
+
   // ── 1. AUTH & USER PROFILE (UC.01, UC.02, UC.03, UC.04) ──────
   const login = (
     emailOrPhone: string,
@@ -735,17 +748,44 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       pendingExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Hạn 24h HDV phản hồi (BR-03)
     };
 
-    setState((prev) => ({
-      ...prev,
-      bookings: [newBooking, ...prev.bookings],
-      notifications: pushNotification(prev.notifications, {
+    const adminUser = state.users.find((u) => u.role === 'admin') || { id: 'u-admin-1' };
+    const guideUser = state.users.find((u) => u.id === params.guideId);
+    const guideName = guideUser?.fullName || 'Thổ địa';
+
+    const newNotifs: Omit<Notification, 'id' | 'isRead' | 'createdAt'>[] = [
+      // 1. Cho Hướng dẫn viên (HDV)
+      {
         userId: params.guideId,
         title: `Yêu cầu đặt lịch mới ${newId} từ ${touristName}`,
-        content: `Khung giờ ${params.date} (${params.startTime} – ${params.endTime}) • ${params.guestCount} khách. Vui lòng phản hồi trong 24 giờ.`,
+        content: `Khung giờ ${params.date} (${params.startTime} – ${params.endTime}) • ${params.guestCount} khách • Điểm hẹn: ${params.meetingLocation}. Vui lòng phản hồi trong 24 giờ (BR-03).`,
         type: 'BOOKING',
         bookingId: newId,
         actionUrl: '/guide/don-den',
-      }),
+      },
+      // 2. Cho Quản trị viên (Admin)
+      {
+        userId: adminUser.id,
+        title: `Đơn đặt lịch mới ${newId} cần giám sát`,
+        content: `Du khách ${touristName} vừa gửi yêu cầu đặt Thổ địa ${guideName} (${params.date}, ${params.startTime}–${params.endTime}) • ${params.guestCount} khách. Chờ HDV phản hồi 24h.`,
+        type: 'BOOKING',
+        bookingId: newId,
+        actionUrl: '/admin/bao-cao?tab=monitoring',
+      },
+      // 3. Cho Du khách (Tourist)
+      {
+        userId: touristId,
+        title: `Đã gửi yêu cầu đặt lịch ${newId}`,
+        content: `Yêu cầu đặt Thổ địa ${guideName} (${params.date}, ${params.startTime}–${params.endTime}) đã gửi thành công. Thổ địa có 24 giờ để phản hồi.`,
+        type: 'BOOKING',
+        bookingId: newId,
+        actionUrl: `/don/${newId}`,
+      },
+    ];
+
+    setState((prev) => ({
+      ...prev,
+      bookings: [newBooking, ...prev.bookings],
+      notifications: pushNotifications(prev.notifications, newNotifs),
     }));
 
     return newBooking;
@@ -807,16 +847,26 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           ? { ...s, status: 'HOLD', bookingId, holdExpiresAt }
           : s
       ),
-      notifications: pushNotification(prev.notifications, {
-        userId: target.touristId,
-        title: `HDV ${guideName} đã chấp nhận đơn ${bookingId}!`,
-        content: `Khung giờ đang được giữ nguyên tử (HOLD) trong 15 phút. Vui lòng đặt cọc 30% (${formatMoney(
-          target.depositAmount
-        )}) để xác nhận lịch.`,
-        type: 'BOOKING',
-        bookingId,
-        actionUrl: `/don/${bookingId}/dat-coc`,
-      }),
+      notifications: pushNotifications(prev.notifications, [
+        {
+          userId: target.touristId,
+          title: `HDV ${guideName} đã chấp nhận đơn ${bookingId}!`,
+          content: `Khung giờ đang được giữ nguyên tử (HOLD) trong 15 phút. Vui lòng đặt cọc 30% (${formatMoney(
+            target.depositAmount
+          )}) để xác nhận lịch.`,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: `/don/${bookingId}/dat-coc`,
+        },
+        {
+          userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+          title: `Đơn ${bookingId} đã được HDV ${guideName} chấp nhận`,
+          content: `Khung giờ đang HOLD 15 phút chờ du khách đặt cọc 30% (${formatMoney(target.depositAmount)}).`,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: '/admin/bao-cao?tab=monitoring',
+        },
+      ]),
     }));
 
     return {
@@ -863,14 +913,24 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           : b
       ),
       cancellations: [cancelRecord, ...prev.cancellations],
-      notifications: pushNotification(prev.notifications, {
-        userId: target.touristId,
-        title: `Đơn đặt lịch ${bookingId} đã bị từ chối`,
-        content: `Lý do từ HDV: "${rejectReason}". Bạn chưa bị trừ bất kỳ khoản phí nào.`,
-        type: 'BOOKING',
-        bookingId,
-        actionUrl: `/don/${bookingId}`,
-      }),
+      notifications: pushNotifications(prev.notifications, [
+        {
+          userId: target.touristId,
+          title: `Đơn đặt lịch ${bookingId} đã bị từ chối`,
+          content: `Lý do từ HDV: "${rejectReason}". Bạn chưa bị trừ bất kỳ khoản phí nào.`,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: `/don/${bookingId}`,
+        },
+        {
+          userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+          title: `HDV đã từ chối đơn ${bookingId}`,
+          content: `Lý do: "${rejectReason}". Đơn đã chuyển sang trạng thái CANCELLED.`,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: '/admin/bao-cao?tab=monitoring',
+        },
+      ]),
     }));
 
     return { ok: true, message: `Đã từ chối đơn ${bookingId}.` };
@@ -996,14 +1056,32 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           ? { ...s, status: 'BUSY', bookingId, holdExpiresAt: undefined }
           : s
       ),
-      notifications: pushNotification(prev.notifications, {
-        userId: target.guideId,
-        title: `Du khách đã đặt cọc 30% cho đơn ${bookingId}!`,
-        content: `Đơn ${bookingId} (${target.date} • ${target.startTime} – ${target.endTime}) đã chính thức xác nhận (CONFIRMED). Lịch của bạn đã chuyển sang BUSY.`,
-        type: 'PAYMENT',
-        bookingId,
-        actionUrl: '/guide/don-va-ca',
-      }),
+      notifications: pushNotifications(prev.notifications, [
+        {
+          userId: target.guideId,
+          title: `Du khách đã đặt cọc 30% cho đơn ${bookingId}!`,
+          content: `Đơn ${bookingId} (${target.date} • ${target.startTime} – ${target.endTime}) đã chính thức xác nhận (CONFIRMED). Lịch của bạn đã chuyển sang BUSY.`,
+          type: 'PAYMENT',
+          bookingId,
+          actionUrl: '/guide/don-va-ca',
+        },
+        {
+          userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+          title: `Đã nhận tiền cọc 30% cho đơn ${bookingId}`,
+          content: `Du khách vừa thanh toán cọc ${formatMoney(target.depositAmount)} qua ${gateway}. Đơn chuyển sang CONFIRMED.`,
+          type: 'PAYMENT',
+          bookingId,
+          actionUrl: '/admin/bao-cao?tab=monitoring',
+        },
+        {
+          userId: target.touristId,
+          title: `Đặt cọc thành công cho đơn ${bookingId}!`,
+          content: `Bạn đã đặt cọc 30% (${formatMoney(target.depositAmount)}) thành công qua ${gateway}. Lịch trình đã được xác nhận chính thức.`,
+          type: 'PAYMENT',
+          bookingId,
+          actionUrl: `/don/${bookingId}`,
+        },
+      ]),
     }));
 
     return {
@@ -1061,14 +1139,32 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           ? { ...s, status: 'AVAILABLE', bookingId: undefined, holdExpiresAt: undefined }
           : s
       ),
-      notifications: pushNotification(prev.notifications, {
-        userId: target.touristId,
-        title: `Đơn ${bookingId} đã tự động hủy do hết 15 phút giữ chỗ`,
-        content: reason,
-        type: 'BOOKING',
-        bookingId,
-        actionUrl: `/don/${bookingId}`,
-      }),
+      notifications: pushNotifications(prev.notifications, [
+        {
+          userId: target.touristId,
+          title: `Đơn ${bookingId} đã tự động hủy do hết 15 phút giữ chỗ`,
+          content: reason,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: `/don/${bookingId}`,
+        },
+        {
+          userId: target.guideId,
+          title: `Đơn ${bookingId} đã tự động hủy (khách không cọc 15p)`,
+          content: `Khung giờ ${target.date} (${target.startTime} – ${target.endTime}) đã tự động giải phóng về trạng thái Trống (AVAILABLE).`,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: '/guide/lich-ranh',
+        },
+        {
+          userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+          title: `Đơn ${bookingId} tự động hủy (hết hạn giữ chỗ 15p)`,
+          content: reason,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: '/admin/bao-cao?tab=monitoring',
+        },
+      ]),
     }));
   };
 
@@ -1095,14 +1191,32 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             }
           : b
       ),
-      notifications: pushNotification(prev.notifications, {
-        userId: target.touristId,
-        title: `Đơn ${bookingId} đã hết hạn chờ phản hồi 24 giờ`,
-        content: reason,
-        type: 'BOOKING',
-        bookingId,
-        actionUrl: `/don/${bookingId}`,
-      }),
+      notifications: pushNotifications(prev.notifications, [
+        {
+          userId: target.touristId,
+          title: `Đơn ${bookingId} đã hết hạn chờ phản hồi 24 giờ`,
+          content: reason,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: `/don/${bookingId}`,
+        },
+        {
+          userId: target.guideId,
+          title: `Đơn ${bookingId} tự động hủy do quá 24h không phản hồi`,
+          content: `Bạn chưa phản hồi đơn ${bookingId} trong thời hạn 24 giờ quy định (BR-03). Đơn đã tự động hủy.`,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: '/guide/don-den',
+        },
+        {
+          userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+          title: `Đơn ${bookingId} tự động hủy (HDV không phản hồi 24h)`,
+          content: reason,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: '/admin/bao-cao?tab=monitoring',
+        },
+      ]),
     }));
   };
 
@@ -1229,18 +1343,38 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             ? { ...s, status: 'AVAILABLE', bookingId: undefined, holdExpiresAt: undefined }
             : s
         ),
-        notifications: pushNotification(prev.notifications, {
-          userId: b.guideId,
-          title: `Du khách đã hủy đơn ${bookingId}`,
-          content: isDeposited
-            ? `Đơn ${bookingId} bị hủy trước giờ hẹn ${delta}h. Bạn nhận được ${formatMoney(
-                split.guideCompensation
-              )} tiền bồi thường vào ví.`
-            : `Đơn ${bookingId} đã bị hủy trước khi đặt cọc.`,
-          type: 'BOOKING',
-          bookingId,
-          actionUrl: '/guide/don-va-ca',
-        }),
+        notifications: pushNotifications(prev.notifications, [
+          {
+            userId: b.guideId,
+            title: `Du khách đã hủy đơn ${bookingId}`,
+            content: isDeposited
+              ? `Đơn ${bookingId} bị hủy trước giờ hẹn ${delta}h. Bạn nhận được ${formatMoney(
+                  split.guideCompensation
+                )} tiền bồi thường vào ví.`
+              : `Đơn ${bookingId} đã bị hủy trước khi đặt cọc.`,
+            type: 'BOOKING',
+            bookingId,
+            actionUrl: '/guide/don-va-ca',
+          },
+          {
+            userId: b.touristId,
+            title: `Bạn đã hủy đơn ${bookingId}`,
+            content: isDeposited
+              ? `Hủy đơn trước ${delta}h. Tiền hoàn: ${formatMoney(split.refundToTourist)}.`
+              : `Đã hủy yêu cầu đặt lịch ${bookingId}.`,
+            type: 'BOOKING',
+            bookingId,
+            actionUrl: `/don/${bookingId}`,
+          },
+          {
+            userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+            title: `Du khách đã hủy đơn ${bookingId} (ΔT = ${delta}h)`,
+            content: `Khách hủy đơn. Hoàn khách: ${formatMoney(split.refundToTourist)}, bồi thường HDV: ${formatMoney(split.guideCompensation)}.`,
+            type: 'BOOKING',
+            bookingId,
+            actionUrl: '/admin/bao-cao?tab=monitoring',
+          },
+        ]),
       };
     });
 
@@ -1311,16 +1445,34 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           ? { ...s, status: 'AVAILABLE', bookingId: undefined, holdExpiresAt: undefined }
           : s
       ),
-      notifications: pushNotification(prev.notifications, {
-        userId: b.touristId,
-        title: `HDV đã hủy đơn ${bookingId} — Hoàn 100% tiền cọc`,
-        content: `Lý do: "${finalReason}". Hệ thống đã hoàn trả 100% tiền cọc (${formatMoney(
-          b.depositAmount
-        )}) cho bạn và ghi nhận vi phạm đối với HDV.`,
-        type: 'BOOKING',
-        bookingId,
-        actionUrl: `/don/${bookingId}`,
-      }),
+      notifications: pushNotifications(prev.notifications, [
+        {
+          userId: b.touristId,
+          title: `HDV đã hủy đơn ${bookingId} — Hoàn 100% tiền cọc`,
+          content: `Lý do: "${finalReason}". Hệ thống đã hoàn trả 100% tiền cọc (${formatMoney(
+            b.depositAmount
+          )}) cho bạn và ghi nhận vi phạm đối với HDV.`,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: `/don/${bookingId}`,
+        },
+        {
+          userId: b.guideId,
+          title: `Đã xác nhận bạn hủy đơn ${bookingId}`,
+          content: `Bạn đã hủy đơn ${bookingId}. Khách được hoàn 100% cọc và hồ sơ ghi nhận +1 vi phạm.`,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: '/guide/don-va-ca',
+        },
+        {
+          userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+          title: `HDV đã hủy đơn ${bookingId} (Vi phạm BR-06)`,
+          content: `HDV hủy đơn đã CONFIRMED. Hoàn 100% cọc cho khách. HDV bị tính +1 vi phạm.`,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: '/admin/bao-cao?tab=monitoring',
+        },
+      ]),
     }));
 
     return {
@@ -1357,15 +1509,25 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             }
           : b
       ),
-      notifications: pushNotification(prev.notifications, {
-        userId: target.touristId,
-        title: `HDV yêu cầu xác nhận hoàn thành tour ${bookingId}`,
-        content:
-          'Bạn có 24 giờ để bấm "Xác nhận hoàn thành" (UC.18) hoặc "Gửi khiếu nại" (UC.19) nếu có sự cố. Sau 24 giờ không có khiếu nại, hệ thống sẽ tự động hoàn tất.',
-        type: 'BOOKING',
-        bookingId,
-        actionUrl: `/don/${bookingId}`,
-      }),
+      notifications: pushNotifications(prev.notifications, [
+        {
+          userId: target.touristId,
+          title: `HDV yêu cầu xác nhận hoàn thành tour ${bookingId}`,
+          content:
+            'Bạn có 24 giờ để bấm "Xác nhận hoàn thành" (UC.18) hoặc "Gửi khiếu nại" (UC.19) nếu có sự cố. Sau 24 giờ không có khiếu nại, hệ thống sẽ tự động hoàn tất.',
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: `/don/${bookingId}`,
+        },
+        {
+          userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+          title: `Đơn ${bookingId} mở cửa sổ hoàn thành 24h`,
+          content: `HDV đã gửi yêu cầu xác nhận hoàn tất đơn ${bookingId}. Đang đếm ngược 24h phản hồi từ du khách.`,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: '/admin/bao-cao?tab=monitoring',
+        },
+      ]),
     }));
 
     return {
@@ -1402,16 +1564,36 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           ? { ...gp, completedTours: gp.completedTours + 1 }
           : gp
       ),
-      notifications: pushNotification(prev.notifications, {
-        userId: target.touristId,
-        title: `Tour ${bookingId} đã hoàn thành — Vui lòng tất toán 70% còn lại`,
-        content: `Cảm ơn bạn đã xác nhận hoàn thành tour! Vui lòng thanh toán 70% còn lại (${formatMoney(
-          target.remainingAmount
-        )}) bằng Online hoặc Tiền mặt.`,
-        type: 'PAYMENT',
-        bookingId,
-        actionUrl: `/don/${bookingId}/thanh-toan-70`,
-      }),
+      notifications: pushNotifications(prev.notifications, [
+        {
+          userId: target.touristId,
+          title: `Tour ${bookingId} đã hoàn thành — Vui lòng tất toán 70% còn lại`,
+          content: `Cảm ơn bạn đã xác nhận hoàn thành tour! Vui lòng thanh toán 70% còn lại (${formatMoney(
+            target.remainingAmount
+          )}) bằng Online hoặc Tiền mặt.`,
+          type: 'PAYMENT',
+          bookingId,
+          actionUrl: `/don/${bookingId}/thanh-toan-70`,
+        },
+        {
+          userId: target.guideId,
+          title: `Du khách đã xác nhận hoàn thành tour ${bookingId}!`,
+          content: `Khách đã bấm xác nhận hoàn thành tour ${bookingId}. Chờ khách thanh toán 70% còn lại (${formatMoney(
+            target.remainingAmount
+          )}).`,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: '/guide/don-va-ca',
+        },
+        {
+          userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+          title: `Tour ${bookingId} đã hoàn tất, chờ tất toán 70%`,
+          content: `Đơn ${bookingId} đã chuyển sang COMPLETED (WAITING_FINAL).`,
+          type: 'BOOKING',
+          bookingId,
+          actionUrl: '/admin/bao-cao?tab=monitoring',
+        },
+      ]),
     }));
 
     return {
@@ -1489,16 +1671,36 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             ? { ...w, pendingBalance: w.pendingBalance + deltaCredit }
             : w
         ),
-        notifications: pushNotification(prev.notifications, {
-          userId: target.guideId,
-          title: `Khách chọn trả Tiền mặt 70% cho đơn ${bookingId}`,
-          content: `Du khách sẽ trao trực tiếp ${formatMoney(
-            target.remainingAmount
-          )} tiền mặt cho bạn. Sau khi nhận đủ tiền, vui lòng bấm "Xác nhận đã thu đủ 70% tiền mặt" để hệ thống đối soát ví.`,
-          type: 'WALLET',
-          bookingId,
-          actionUrl: '/guide/don-va-ca',
-        }),
+        notifications: pushNotifications(prev.notifications, [
+          {
+            userId: target.guideId,
+            title: `Khách chọn trả Tiền mặt 70% cho đơn ${bookingId}`,
+            content: `Du khách sẽ trao trực tiếp ${formatMoney(
+              target.remainingAmount
+            )} tiền mặt cho bạn. Sau khi nhận đủ tiền, vui lòng bấm "Xác nhận đã thu đủ 70% tiền mặt" để hệ thống đối soát ví.`,
+            type: 'WALLET',
+            bookingId,
+            actionUrl: '/guide/don-va-ca',
+          },
+          {
+            userId: target.touristId,
+            title: `Đã chọn thanh toán Tiền mặt 70% cho đơn ${bookingId}`,
+            content: `Vui lòng trao trực tiếp ${formatMoney(
+              target.remainingAmount
+            )} cho Thổ địa khi kết thúc chuyến đi.`,
+            type: 'PAYMENT',
+            bookingId,
+            actionUrl: `/don/${bookingId}`,
+          },
+          {
+            userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+            title: `Đơn ${bookingId} chọn trả 70% tiền mặt (Chờ đối soát)`,
+            content: `Khách chọn trả ${formatMoney(target.remainingAmount)} tiền mặt trực tiếp cho HDV. Trạng thái WAITING_RECONCILE.`,
+            type: 'PAYMENT',
+            bookingId,
+            actionUrl: '/admin/bao-cao?tab=reconcile',
+          },
+        ]),
       }));
 
       return {
@@ -1565,20 +1767,38 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             : w
         ),
         walletTransactions: [newTx, ...prev.walletTransactions],
-        notifications: pushNotification(prev.notifications, {
-          userId: target.guideId,
-          title: `Đơn ${bookingId} đã tất toán Online 100% — Cộng ví +${formatMoney(
-            guideReceives
-          )}`,
-          content: `Khách đã thanh toán 70% cuối qua cổng Online. Sau khi khấu trừ phí sàn ${(
-            target.feeRate * 100
-          ).toFixed(0)}% (${formatMoney(fee)}), ví khả dụng của bạn được cộng +${formatMoney(
-            guideReceives
-          )}.`,
-          type: 'WALLET',
-          bookingId,
-          actionUrl: '/guide/vi',
-        }),
+        notifications: pushNotifications(prev.notifications, [
+          {
+            userId: target.guideId,
+            title: `Đơn ${bookingId} đã tất toán Online 100% — Cộng ví +${formatMoney(
+              guideReceives
+            )}`,
+            content: `Khách đã thanh toán 70% cuối qua cổng Online. Sau khi khấu trừ phí sàn ${(
+              target.feeRate * 100
+            ).toFixed(0)}% (${formatMoney(fee)}), ví khả dụng của bạn được cộng +${formatMoney(
+              guideReceives
+            )}.`,
+            type: 'WALLET',
+            bookingId,
+            actionUrl: '/guide/vi',
+          },
+          {
+            userId: target.touristId,
+            title: `Tất toán thành công 70% cho đơn ${bookingId}`,
+            content: `Bạn đã thanh toán ${formatMoney(target.remainingAmount)} thành công. Đơn hàng đã hoàn tất 100% (PAID). Hãy để lại đánh giá nhé!`,
+            type: 'PAYMENT',
+            bookingId,
+            actionUrl: `/don/${bookingId}`,
+          },
+          {
+            userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+            title: `Đơn ${bookingId} đã tất toán Online 100%`,
+            content: `Khách đã thanh toán 70% Online (${formatMoney(target.remainingAmount)}). Sàn thu phí ${formatMoney(fee)}.`,
+            type: 'PAYMENT',
+            bookingId,
+            actionUrl: '/admin/bao-cao?tab=monitoring',
+          },
+        ]),
       };
     });
 
@@ -1660,15 +1880,33 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             : w
         ),
         walletTransactions: [newTx, ...prev.walletTransactions],
-        notifications: pushNotification(prev.notifications, {
-          userId: target.touristId,
-          title: `HDV đã xác nhận thu đủ 70% tiền mặt đơn ${bookingId}`,
-          content:
-            'Đơn đặt lịch của bạn đã hoàn tất thanh toán 100% (PAID). Hãy để lại đánh giá cho chuyến đi nhé!',
-          type: 'PAYMENT',
-          bookingId,
-          actionUrl: `/don/${bookingId}`,
-        }),
+        notifications: pushNotifications(prev.notifications, [
+          {
+            userId: target.touristId,
+            title: `HDV đã xác nhận thu đủ 70% tiền mặt đơn ${bookingId}`,
+            content:
+              'Đơn đặt lịch của bạn đã hoàn tất thanh toán 100% (PAID). Hãy để lại đánh giá cho chuyến đi nhé!',
+            type: 'PAYMENT',
+            bookingId,
+            actionUrl: `/don/${bookingId}`,
+          },
+          {
+            userId: target.guideId,
+            title: `Xác nhận thu 70% tiền mặt đơn ${bookingId} thành công`,
+            content: `Đã đối soát đối ứng cọc và phí sàn. Ví khả dụng được cộng +${formatMoney(addition)}.`,
+            type: 'WALLET',
+            bookingId,
+            actionUrl: '/guide/vi',
+          },
+          {
+            userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+            title: `Đơn ${bookingId} hoàn tất đối soát tiền mặt`,
+            content: `HDV đã xác nhận thu đủ tiền mặt. Đơn chuyển PAID, ví cộng +${formatMoney(addition)}.`,
+            type: 'PAYMENT',
+            bookingId,
+            actionUrl: '/admin/bao-cao?tab=reconcile',
+          },
+        ]),
       };
     });
 
@@ -1731,14 +1969,24 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       bookings: prev.bookings.map((b) =>
         b.id === bookingId ? { ...b, bookingStatus: 'DISPUTED' } : b
       ),
-      notifications: pushNotification(prev.notifications, {
-        userId: 'u-admin-1',
-        title: `Khiếu nại mới ${newDispute.id} cho đơn ${bookingId}`,
-        content: `Lý do: ${reasonCategory}. Vui lòng kiểm tra bằng chứng và đưa ra phán quyết (UC.27).`,
-        type: 'DISPUTE',
-        bookingId,
-        actionUrl: '/admin/tranh-chap',
-      }),
+      notifications: pushNotifications(prev.notifications, [
+        {
+          userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
+          title: `Khiếu nại mới ${newDispute.id} cho đơn ${bookingId}`,
+          content: `Lý do: ${reasonCategory}. Vui lòng kiểm tra bằng chứng và đưa ra phán quyết (UC.27).`,
+          type: 'DISPUTE',
+          bookingId,
+          actionUrl: '/admin/tranh-chap',
+        },
+        {
+          userId: reporterId === target.touristId ? target.guideId : target.touristId,
+          title: `Đơn ${bookingId} có khiếu nại phát sinh (${newDispute.id})`,
+          content: `Đối phương đã gửi khiếu nại: "${reasonCategory}". Quản trị viên đang thụ lý theo quy trình UC.27.`,
+          type: 'DISPUTE',
+          bookingId,
+          actionUrl: reporterId === target.touristId ? '/guide/don-va-ca' : `/don/${bookingId}`,
+        },
+      ]),
     }));
 
     return {
@@ -1861,18 +2109,32 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             ? { ...s, status: 'AVAILABLE', bookingId: undefined }
             : s
         ),
-        notifications: pushNotification(prev.notifications, {
-          userId: target.touristId,
-          title: `Kết quả phán quyết tranh chấp đơn ${bookingId}`,
-          content: isGuideFault
-            ? `Admin xác định lỗi thuộc về HDV: Bạn được hoàn 100% tiền cọc (${formatMoney(
-                refundAmount
-              )}). Biên bản: "${adminNote.trim()}"`
-            : `Admin xác định lỗi thuộc về Du khách: Tiền cọc được dùng để bồi thường cho HDV. Biên bản: "${adminNote.trim()}"`,
-          type: 'DISPUTE',
-          bookingId,
-          actionUrl: `/don/${bookingId}`,
-        }),
+        notifications: pushNotifications(prev.notifications, [
+          {
+            userId: target.touristId,
+            title: `Kết quả phán quyết tranh chấp đơn ${bookingId}`,
+            content: isGuideFault
+              ? `Admin xác định lỗi thuộc về HDV: Bạn được hoàn 100% tiền cọc (${formatMoney(
+                  refundAmount
+                )}). Biên bản: "${adminNote.trim()}"`
+              : `Admin xác định lỗi thuộc về Du khách: Tiền cọc được dùng để bồi thường cho HDV. Biên bản: "${adminNote.trim()}"`,
+            type: 'DISPUTE',
+            bookingId,
+            actionUrl: `/don/${bookingId}`,
+          },
+          {
+            userId: target.guideId,
+            title: `Kết quả phán quyết tranh chấp đơn ${bookingId}`,
+            content: isGuideFault
+              ? `Admin xác định lỗi thuộc về HDV: Đơn bị hủy hoàn cọc cho khách và ghi nhận +1 vi phạm. Biên bản: "${adminNote.trim()}"`
+              : `Admin xác định lỗi thuộc về Du khách: Ví của bạn được cộng +${formatMoney(
+                  guidePayoutAmount
+                )} bồi thường. Biên bản: "${adminNote.trim()}"`,
+            type: 'DISPUTE',
+            bookingId,
+            actionUrl: '/guide/don-va-ca',
+          },
+        ]),
       };
     });
 

@@ -106,8 +106,16 @@ const DashboardShell: React.FC<{
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [quickSearch, setQuickSearch] = useState('');
 
+  const isMatchUser = (n: { userId?: string; type?: string }) => {
+    if (!currentUser) return true;
+    if (currentUser.role === 'admin') {
+      return n.userId === currentUser.id || n.userId === 'u-admin-1' || n.type === 'BOOKING';
+    }
+    return n.userId === currentUser.id;
+  };
+
   const unreadNotifs = notifications.filter(
-    (n) => !n.isRead && (!currentUser || n.userId === currentUser.id)
+    (n) => !n.isRead && isMatchUser(n)
   ).length;
 
   const handleSearch = (e: React.FormEvent) => {
@@ -216,11 +224,14 @@ const DashboardShell: React.FC<{
 
 export const GuideLayout: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, bookings, walletBalance } = useBookingContext();
+  const { currentUser, bookings, walletBalance, notifications } = useBookingContext();
 
   const guideId = currentUser?.role === 'guide' ? currentUser.id : 'u-guide-1';
   const pendingCount = bookings.filter(
     (b) => b.guideId === guideId && b.bookingStatus === 'PENDING'
+  ).length;
+  const unreadGuideNotifs = notifications.filter(
+    (n) => !n.isRead && n.userId === guideId
   ).length;
 
   const guideLinks: DashboardNavLink[] = [
@@ -230,7 +241,7 @@ export const GuideLayout: React.FC = () => {
     { to: '/guide/vi', label: 'Ví & Rút tiền', icon: '💰', sub: formatMoney(walletBalance) },
     { to: '/guide/ho-so', label: 'Hồ sơ & Giá', icon: '👤' },
     { to: '/guide/kyc', label: 'Định danh KYC', icon: '🪪' },
-    { to: '/guide/thong-bao', label: 'Thông báo', icon: '📣' },
+    { to: '/guide/thong-bao', label: 'Thông báo', icon: '📣', badge: unreadGuideNotifs },
   ];
 
   return (
@@ -249,13 +260,21 @@ export const GuideLayout: React.FC = () => {
 
 export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
-  const { kycRecords, disputes, withdrawals } = useBookingContext();
+  const { currentUser, kycRecords, disputes, withdrawals, bookings, notifications } = useBookingContext();
 
   const pendingKycCount = kycRecords.filter((k) => k.status === 'PENDING').length;
   const openDisputesCount = disputes.filter((d) => d.status === 'OPEN').length;
   const pendingWithdrawalsCount = withdrawals.filter((w) => w.status === 'PENDING').length;
+  const pendingBookingsCount = bookings.filter((b) => b.bookingStatus === 'PENDING').length;
+
+  const adminId = currentUser?.id || 'u-admin-1';
+  const unreadAdminNotifs = notifications.filter(
+    (n) => !n.isRead && (n.userId === adminId || n.userId === 'u-admin-1' || n.type === 'BOOKING')
+  ).length;
 
   const adminLinks: DashboardNavLink[] = [
+    { to: '/admin/thong-bao', label: 'Thông báo', icon: '🔔', badge: unreadAdminNotifs },
+    { to: '/admin/giam-sat', label: 'Giám sát đơn', icon: '📋', badge: pendingBookingsCount },
     { to: '/admin/kyc', label: 'Duyệt KYC', icon: '🪪', badge: pendingKycCount },
     { to: '/admin/tranh-chap', label: 'Tranh chấp', icon: '⚖️', badge: openDisputesCount },
     { to: '/admin/rut-tien', label: 'Rút tiền', icon: '💰', badge: pendingWithdrawalsCount },
@@ -269,7 +288,7 @@ export const AdminLayout: React.FC = () => {
       portalTitle="Admin"
       headerTitle="Quản trị LocalBuddy"
       roleBadgeText="Admin"
-      notifLink="/thong-bao"
+      notifLink="/admin/thong-bao"
       searchPlaceholder="Tìm kiếm..."
       onSearchSubmit={(q) =>
         navigate(q.toUpperCase().startsWith('BK-') ? '/admin/tranh-chap' : '/admin/tai-khoan')

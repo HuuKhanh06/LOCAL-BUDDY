@@ -264,6 +264,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="/admin/doi-soat" element={<Navigate to="/admin/bao-cao?tab=reconcile" replace />} />
           <Route path="/admin/giam-sat" element={<Navigate to="/admin/bao-cao?tab=monitoring" replace />} />
           <Route path="/admin/phi-san" element={<FeeConfigPage />} />
+          <Route path="/admin/thong-bao" element={<NotificationsPage />} />
         </Route>
 
         {/* 404 Not Found Page */}

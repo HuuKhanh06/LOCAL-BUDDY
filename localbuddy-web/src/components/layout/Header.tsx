@@ -29,8 +29,16 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
   const activeRole: UserRole = currentUser?.role || propRole || 'tourist';
   const displayUserName = currentUser?.fullName;
 
+  const isMatchUser = (n: { userId?: string; type?: string }) => {
+    if (!currentUser) return true;
+    if (currentUser.role === 'admin') {
+      return n.userId === currentUser.id || n.userId === 'u-admin-1' || n.type === 'BOOKING';
+    }
+    return n.userId === currentUser.id;
+  };
+
   const unreadNotifsCount = notifications.filter(
-    (n) => !n.isRead && (!currentUser || n.userId === currentUser.id)
+    (n) => !n.isRead && isMatchUser(n)
   ).length;
 
   const handleQuickRoleSwitch = (targetRole: UserRole, userId?: string) => {
@@ -174,7 +182,13 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
           </div>
 
           <Link
-            to="/thong-bao"
+            to={
+              activeRole === 'guide'
+                ? '/guide/thong-bao'
+                : activeRole === 'admin'
+                  ? '/admin/thong-bao'
+                  : '/thong-bao'
+            }
             aria-label="Thông báo"
             className="relative p-2 rounded-full bg-white border border-[#EAD7C2] hover:border-[#D12B79] text-[#1C1917] transition-colors shadow-xs"
           >
