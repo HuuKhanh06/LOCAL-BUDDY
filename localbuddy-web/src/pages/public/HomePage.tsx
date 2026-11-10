@@ -194,34 +194,52 @@ const NUMBERED_TOURS: NumberedTourItem[] = [
   },
 ];
 
-const EXPERIENCES = [
+interface ExperienceItem {
+  id: string;
+  title: string;
+  desc: string;
+  icon: string;
+  image: string;
+  param: string;
+  tag: string;
+}
+
+const EXPERIENCES: ExperienceItem[] = [
   {
     id: 'exp-1',
     title: 'Ẩm thực đêm & Chợ Cồn',
     desc: 'Mì Quảng ếch, bánh xèo tôm nhảy, hải sản Sơn Trà chuẩn vị người bản xứ.',
     icon: '🍜',
+    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=85',
     param: 'Ẩm thực bản địa',
+    tag: 'Đặc sản xứ Quảng',
   },
   {
     id: 'exp-2',
     title: 'Cầu Rồng & Sông Hàn về đêm',
     desc: 'Xem Rồng phun lửa, du thuyền sông Hàn và ngắm hoàng hôn vịnh biển.',
     icon: '🐉',
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Marine_da_nang.jpg/1280px-Marine_da_nang.jpg',
     param: 'Khám phá Đà Nẵng về đêm',
+    tag: 'Phố đêm sông Hàn',
   },
   {
     id: 'exp-3',
     title: 'Sơn Trà & Bán đảo hoang sơ',
     desc: 'Trekking ngắm Voọc chà vá chân nâu, Đỉnh Bàn Cờ và Chùa Linh Ứng.',
     icon: '🐒',
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=85',
     param: 'Thiên nhiên & Trekking Sơn Trà',
+    tag: 'Rừng & Voọc chà vá',
   },
   {
     id: 'exp-4',
     title: 'Nhiếp ảnh & Check-in di sản',
     desc: 'Những góc máy tại Cầu Vàng, Làng đá Non Nước và Ngũ Hành Sơn.',
     icon: '📸',
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Golden_Bridge_%28Vietnam%29.jpg/1280px-Golden_Bridge_%28Vietnam%29.jpg',
     param: 'Nhiếp ảnh & Check-in',
+    tag: 'Cầu Vàng Bà Nà',
   },
 ];
 
@@ -790,21 +808,38 @@ export const HomePage: React.FC = () => {
             <div
               key={exp.id}
               onClick={() => navigate(`/guides?skill=${encodeURIComponent(exp.param)}`)}
-              className="bg-white border border-[#EAD7C2] hover:border-[#D12B79] rounded-[24px] p-6 cursor-pointer transition-all hover:shadow-md space-y-3 group shadow-xs"
+              className="bg-white border border-[#EAD7C2] hover:border-[#D12B79] rounded-[24px] overflow-hidden cursor-pointer transition-all hover:shadow-xl flex flex-col justify-between group shadow-xs"
             >
-              <div className="flex items-center justify-between">
-                <span className="text-3xl group-hover:scale-110 transition-transform">{exp.icon}</span>
-                <span className="text-[12px] font-bold text-[#78716C] group-hover:text-[#D12B79]">
-                  Khám phá →
+              {/* Ảnh thực tế địa danh Đà Nẵng */}
+              <div className="relative h-44 sm:h-48 overflow-hidden bg-stone-100">
+                <img
+                  src={exp.image}
+                  alt={exp.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/95 text-[#1C1917] text-[11px] font-bold border border-[#EAD7C2] shadow-xs flex items-center gap-1.5">
+                  <span>{exp.icon}</span>
+                  <span>{exp.tag}</span>
                 </span>
               </div>
-              <div>
-                <h3 className="text-[17px] font-bold text-[#1C1917] group-hover:text-[#D12B79] transition-colors">
-                  {exp.title}
-                </h3>
-                <p className="text-[13px] text-[#6E6259] mt-1 line-clamp-2">
-                  {exp.desc}
-                </p>
+
+              {/* Nội dung mô tả */}
+              <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-[17px] font-bold text-[#1C1917] group-hover:text-[#D12B79] transition-colors leading-snug">
+                    {exp.title}
+                  </h3>
+                  <p className="text-[13px] text-[#6E6259] mt-1.5 line-clamp-2 leading-relaxed">
+                    {exp.desc}
+                  </p>
+                </div>
+
+                <div className="pt-2 flex items-center justify-between text-[12px] font-bold text-[#D12B79]">
+                  <span>Khám phá ngay</span>
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </div>
               </div>
             </div>
           ))}
