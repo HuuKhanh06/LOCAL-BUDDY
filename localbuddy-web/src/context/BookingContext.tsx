@@ -233,6 +233,7 @@ export interface BookingContextType {
     adminNote: string,
     decision?: DisputeFaultDecision
   ) => ActionResult;
+  adminReconcilePayment: (bookingId: string, adminNote?: string) => ActionResult;
 
   // Demo & Reset Utilities
   resetAllDataToDefault: () => void;
@@ -350,7 +351,22 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 
   const getBookingById = (id: string) => state.bookings.find((b) => b.id === id);
-  const getGuideById = (guideId: string) => allGuides.find((g) => g.user.id === guideId);
+  const toSlug = (str: string) =>
+    str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+  const getGuideById = (idOrSlug: string) =>
+    allGuides.find(
+      (g) =>
+        g.user.id === idOrSlug ||
+        toSlug(g.user.fullName) === idOrSlug ||
+        g.user.fullName.toLowerCase() === idOrSlug.toLowerCase()
+    );
   const getUserById = (userId: string) => state.users.find((u) => u.id === userId);
   const getDisputeByBookingId = (bookingId: string) =>
     state.disputes.find((d) => d.bookingId === bookingId);
@@ -2524,6 +2540,96 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setState(getDefaultState());
   };
 
+  /**
+   * QĐ-09: Admin xác nhận đối soát thủ công đơn chưa thanh toán 70%
+   */
+  const adminReconcilePayment = (bookingId: string, adminNote?: string): ActionResult => {
+    const target = state.bookings.find((b) => b.id === bookingId);
+    if (!target) return { ok: false, message: 'Không tìm thấy đơn đặt lịch này.' };
+    if (target.paymentStatus === 'PAID') {
+      return { ok: false, message: 'Đơn này đã được quyết toán 100% trước đó.' };
+    }
+
+    const platformFee = Math.round(target.totalAmount * target.feeRate);
+    const addition = target.totalAmount - platformFee;
+
+    const reconcilePayment: Payment = {
+      id: `pay-${Date.now()}`,
+      bookingId,
+      type: 'final',
+      method: target.paymentMethod || 'ONLINE',
+      gateway: 'BANK_CARD',
+      amount: target.remainingAmount,
+      result: 'success',
+      referenceCode: `RECONCILE-ADMIN-${bookingId}`,
+      createdAt: new Date().toISOString(),
+    };
+
+    setState((prev) => {
+      const currentWallet =
+        prev.wallets.find((w) => w.guideId === target.guideId) || {
+          guideId: target.guideId,
+          availableBalance: 0,
+          pendingBalance: 0,
+          totalWithdrawn: 0,
+        };
+      const updatedBalance = currentWallet.availableBalance + addition;
+
+      const newTx: WalletTransaction = {
+        id: `wtx-${Date.now()}`,
+        guideId: target.guideId,
+        bookingId,
+        type: 'SETTLEMENT_ONLINE',
+        amount: addition,
+        balanceAfter: updatedBalance,
+        description: `Admin đối soát thủ công đơn ${bookingId}: ${adminNote || 'Đã kiểm tra cổng thanh toán'}`,
+        formulaNote: `Tổng G (${formatMoney(target.totalAmount)}) − Phí sàn (${formatMoney(platformFee)}) = +${formatMoney(addition)}`,
+        createdAt: new Date().toISOString(),
+      };
+
+      return {
+        ...prev,
+        payments: [reconcilePayment, ...prev.payments],
+        bookings: prev.bookings.map((b) =>
+          b.id === bookingId
+            ? { ...b, bookingStatus: 'COMPLETED', paymentStatus: 'PAID' }
+            : b
+        ),
+        wallets: prev.wallets.map((w) =>
+          w.guideId === target.guideId
+            ? { ...w, availableBalance: updatedBalance }
+            : w
+        ),
+        walletTransactions: [newTx, ...prev.walletTransactions],
+        notifications: [
+          {
+            id: `notif-${Date.now()}-1`,
+            userId: target.touristId,
+            title: `Đơn ${bookingId} đã hoàn tất đối soát`,
+            content: `Quản trị viên đã xác nhận giao dịch tất toán 70% thành công.`,
+            type: 'BOOKING',
+            bookingId,
+            isRead: false,
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: `notif-${Date.now()}-2`,
+            userId: target.guideId,
+            title: `Ví đã cộng tiền đơn ${bookingId}`,
+            content: `Ví của bạn đã được cộng +${formatMoney(addition)} sau khi Admin hoàn tất đối soát.`,
+            type: 'WALLET',
+            bookingId,
+            isRead: false,
+            createdAt: new Date().toISOString(),
+          },
+          ...prev.notifications,
+        ],
+      };
+    });
+
+    return { ok: true, message: `Đã đối soát thủ công đơn ${bookingId} thành công!` };
+  };
+
   return (
     <BookingContext.Provider
       value={{
@@ -2595,6 +2701,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         approveWithdrawal,
         rejectWithdrawal,
         resolveDispute,
+        adminReconcilePayment,
         resetAllDataToDefault,
       }}
     >

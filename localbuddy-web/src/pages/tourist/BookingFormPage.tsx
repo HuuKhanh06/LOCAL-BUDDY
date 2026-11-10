@@ -40,9 +40,7 @@ export const BookingFormPage: React.FC = () => {
   const [meetingLocation, setMeetingLocation] = useState<string>(
     DANANG_MEETING_SPOTS[0]
   );
-  const [specialRequests, setSpecialRequests] = useState<string>(
-    'Nhóm mình muốn khám phá ẩm thực địa phương và chụp ảnh tại các điểm nổi bật ở Đà Nẵng.'
-  );
+  const [specialRequests, setSpecialRequests] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
 
   if (!guideItem) {

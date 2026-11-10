@@ -1,3 +1,6 @@
+// pages/admin/PayoutsPage.tsx (UC.23: Duyệt Rút tiền HDV & BR-09)
+// Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
+
 import React, { useState, useEffect } from 'react';
 import {
   Building2,
@@ -89,8 +92,8 @@ export const PayoutsPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-28 bg-white rounded-[12px] border border-[#E8CED5]" />
-        <div className="h-96 bg-white rounded-[12px] border border-[#E8CED5]" />
+        <div className="h-28 bg-white rounded-2xl border border-[#E7E5E4]" />
+        <div className="h-96 bg-white rounded-2xl border border-[#E7E5E4]" />
       </div>
     );
   }
@@ -100,23 +103,23 @@ export const PayoutsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#118B93] bg-[#E6F9FA] px-3 py-1 rounded-full mb-2">
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#347CCB] bg-sky-50 border border-sky-200 px-3 py-1 rounded-full mb-2">
             <Building2 className="w-3.5 h-3.5" /> Đối soát & Giải ngân Ví HDV • UC.23 & BR-09
           </span>
-          <h1 className="text-2xl font-extrabold text-[#1A0A0F]">
+          <h1 className="text-2xl font-extrabold text-[#1C1917]">
             Duyệt yêu cầu rút tiền Hướng dẫn viên
           </h1>
-          <p className="text-sm text-[#525266] mt-0.5">
+          <p className="text-sm text-[#78716C] mt-0.5">
             Kiểm tra số dư ví, thực hiện chuyển khoản ngân hàng và cập nhật mã Ủy nhiệm chi (UNC).
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 rounded-[10px] bg-[#FFF5E5] border border-[#F8D39A] text-xs font-bold text-[#9A5B06]">
+          <span className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-xs font-bold text-amber-700">
             Chờ giải ngân: {pendingList.length} (
             {formatMoney(pendingList.reduce((acc, w) => acc + w.amount, 0))})
           </span>
-          <span className="px-3 py-1.5 rounded-[10px] bg-[#E6F7F0] border border-[#B2E5D0] text-xs font-bold text-[#146C43]">
+          <span className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-700">
             Đã chuyển: {approvedList.length} (
             {formatMoney(approvedList.reduce((acc, w) => acc + w.amount, 0))})
           </span>
@@ -137,10 +140,10 @@ export const PayoutsPage: React.FC = () => {
             key={tab.key}
             type="button"
             onClick={() => setFilterStatus(tab.key)}
-            className={`px-4 py-2 rounded-[10px] text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               filterStatus === tab.key
-                ? 'bg-[#1EC1CB] text-[#1C1C28] shadow-xs'
-                : 'bg-white text-[#525266] hover:bg-[#F6E6EA]/60 border border-[#E8CED5]'
+                ? 'bg-[#EB5B38] text-white shadow-xs'
+                : 'bg-white text-[#78716C] hover:bg-[#F3F1EC] border border-[#E7E5E4]'
             }`}
           >
             {tab.label}
@@ -149,11 +152,11 @@ export const PayoutsPage: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-[12px] border border-[#E8CED5] shadow-xs overflow-hidden">
+      <div className="bg-white rounded-2xl border border-[#E7E5E4] shadow-xs overflow-hidden">
         {filteredList.length === 0 ? (
           <div className="p-12 text-center">
-            <WalletIcon className="w-10 h-10 text-[#6E7085] mx-auto mb-3" />
-            <h3 className="text-base font-bold text-[#1A0A0F]">
+            <WalletIcon className="w-10 h-10 text-[#78716C] mx-auto mb-3" />
+            <h3 className="text-base font-bold text-[#1C1917]">
               Không có yêu cầu rút tiền nào trong trạng thái này
             </h3>
           </div>
@@ -161,7 +164,7 @@ export const PayoutsPage: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#FDF7F9] border-b border-[#E8CED5] text-[11px] font-bold uppercase tracking-wider text-[#525266]">
+                <tr className="bg-[#F3F1EC] border-b border-[#E7E5E4] text-[11px] font-bold uppercase tracking-wider text-[#78716C]">
                   <th className="py-3.5 px-4">Mã lệnh / Thời gian</th>
                   <th className="py-3.5 px-4">Hướng dẫn viên</th>
                   <th className="py-3.5 px-4">Tài khoản thụ hưởng</th>
@@ -170,50 +173,50 @@ export const PayoutsPage: React.FC = () => {
                   <th className="py-3.5 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E8CED5] text-sm">
+              <tbody className="divide-y divide-[#E7E5E4] text-sm">
                 {filteredList.map((wd) => {
                   const guide = getGuideById(wd.guideId);
                   const wallet = getWalletByGuideId(wd.guideId);
                   return (
-                    <tr key={wd.id} className="hover:bg-[#FDF7F9]/60 transition-colors">
+                    <tr key={wd.id} className="hover:bg-[#F3F1EC]/50 transition-colors">
                       <td className="py-4 px-4 align-top whitespace-nowrap">
-                        <div className="font-bold text-[#1C1C28]">{wd.id}</div>
-                        <div className="text-xs text-[#6E7085] mt-0.5">
+                        <div className="font-bold text-[#1C1917]">{wd.id}</div>
+                        <div className="text-xs text-[#78716C] mt-0.5">
                           {formatDateTimeVN(wd.createdAt)}
                         </div>
                       </td>
                       <td className="py-4 px-4 align-top">
-                        <div className="font-extrabold text-[#1A0A0F]">
+                        <div className="font-extrabold text-[#1C1917]">
                           {guide?.user.fullName || wd.guideId}
                         </div>
-                        <div className="text-xs text-[#525266]">{guide?.user.phone}</div>
-                        <div className="text-[11px] text-[#118B93] font-semibold mt-0.5">
+                        <div className="text-xs text-[#78716C]">{guide?.user.phone}</div>
+                        <div className="text-[11px] text-[#347CCB] font-semibold mt-0.5">
                           Số dư khả dụng còn lại: {formatMoney(wallet.availableBalance)}
                         </div>
                       </td>
                       <td className="py-4 px-4 align-top">
-                        <div className="font-bold text-[#1C1C28]">{wd.bankName}</div>
-                        <div className="text-xs font-mono font-bold text-[#1A0A0F]">
+                        <div className="font-bold text-[#1C1917]">{wd.bankName}</div>
+                        <div className="text-xs font-mono font-bold text-[#1C1917]">
                           STK: {wd.bankAccountNumber}
                         </div>
-                        <div className="text-xs text-[#525266]">{wd.bankAccountHolder}</div>
+                        <div className="text-xs text-[#78716C]">{wd.bankAccountHolder}</div>
                       </td>
-                      <td className="py-4 px-4 align-top text-right font-extrabold text-base text-[#1A0A0F] whitespace-nowrap">
+                      <td className="py-4 px-4 align-top text-right font-extrabold text-base text-[#1C1917] whitespace-nowrap">
                         {formatMoney(wd.amount)}
                       </td>
                       <td className="py-4 px-4 align-top">
                         {wd.status === 'PENDING' && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#FFF5E5] text-[#9A5B06] border border-[#F8D39A]">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
                             <Clock className="w-3.5 h-3.5" /> Chờ giải ngân
                           </span>
                         )}
                         {wd.status === 'APPROVED' && (
                           <div>
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#E6F7F0] text-[#146C43] border border-[#B2E5D0]">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                               <CheckCircle2 className="w-3.5 h-3.5" /> Đã chuyển khoản
                             </span>
                             {wd.transactionRef && (
-                              <div className="text-xs font-mono font-bold text-[#146C43] mt-1">
+                              <div className="text-xs font-mono font-bold text-emerald-700 mt-1">
                                 UNC: {wd.transactionRef}
                               </div>
                             )}
@@ -221,11 +224,11 @@ export const PayoutsPage: React.FC = () => {
                         )}
                         {wd.status === 'REJECTED' && (
                           <div>
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#FDECEC] text-[#A62626] border border-[#F5B5B5]">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
                               <XCircle className="w-3.5 h-3.5" /> Đã từ chối (Hoàn ví)
                             </span>
                             {wd.adminNote && (
-                              <div className="text-xs text-[#A62626] mt-1">{wd.adminNote}</div>
+                              <div className="text-xs text-rose-700 mt-1">{wd.adminNote}</div>
                             )}
                           </div>
                         )}
@@ -250,7 +253,7 @@ export const PayoutsPage: React.FC = () => {
                             </Button>
                           </div>
                         ) : (
-                          <span className="text-xs text-[#6E7085]">
+                          <span className="text-xs text-[#78716C]">
                             Đã xử lý {wd.processedAt ? formatDateTimeVN(wd.processedAt) : ''}
                           </span>
                         )}
@@ -276,26 +279,26 @@ export const PayoutsPage: React.FC = () => {
           }
         >
           <form onSubmit={handleConfirmProcess} className="space-y-4">
-            <div className="bg-[#FDF7F9] border border-[#E8CED5] rounded-[10px] p-4 text-xs space-y-1">
+            <div className="bg-[#F3F1EC] border border-[#E7E5E4] rounded-xl p-4 text-xs space-y-1">
               <div className="flex justify-between">
-                <span className="text-[#525266]">Hướng dẫn viên:</span>
-                <span className="font-bold text-[#1A0A0F]">
+                <span className="text-[#78716C]">Hướng dẫn viên:</span>
+                <span className="font-bold text-[#1C1917]">
                   {getGuideById(selectedRequest.guideId)?.user.fullName}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#525266]">Ngân hàng thụ hưởng:</span>
-                <span className="font-bold text-[#1C1C28]">{selectedRequest.bankName}</span>
+                <span className="text-[#78716C]">Ngân hàng thụ hưởng:</span>
+                <span className="font-bold text-[#1C1917]">{selectedRequest.bankName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#525266]">Số tài khoản:</span>
-                <span className="font-mono font-bold text-[#118B93]">
+                <span className="text-[#78716C]">Số tài khoản:</span>
+                <span className="font-mono font-bold text-[#347CCB]">
                   {selectedRequest.bankAccountNumber} ({selectedRequest.bankAccountHolder})
                 </span>
               </div>
-              <div className="flex justify-between pt-1.5 border-t border-[#E8CED5] text-sm">
-                <span className="font-bold text-[#1A0A0F]">Số tiền giải ngân:</span>
-                <span className="font-extrabold text-[#146C43]">
+              <div className="flex justify-between pt-1.5 border-t border-[#E7E5E4] text-sm">
+                <span className="font-bold text-[#1C1917]">Số tiền giải ngân:</span>
+                <span className="font-extrabold text-emerald-700">
                   {formatMoney(selectedRequest.amount)}
                 </span>
               </div>
@@ -312,7 +315,7 @@ export const PayoutsPage: React.FC = () => {
             )}
 
             <div>
-              <label className="block text-xs font-bold text-[#1C1C28] mb-1.5">
+              <label className="block text-xs font-bold text-[#1C1917] mb-1.5">
                 {actionMode === 'APPROVE'
                   ? 'Ghi chú đối soát (Hiển thị trên sao kê HDV)'
                   : 'Lý do từ chối (Bắt buộc — Tiền sẽ hoàn lại ví HDV) *'}
@@ -326,12 +329,12 @@ export const PayoutsPage: React.FC = () => {
                     ? 'Nhập ghi chú chuyển khoản...'
                     : 'VD: Tên chủ tài khoản không khớp với họ tên trên CCCD KYC...'
                 }
-                className="w-full px-3.5 py-2.5 rounded-[10px] border border-[#D4C0C6] text-sm text-[#1C1C28] focus:outline-none focus:ring-2 focus:ring-[#1EC1CB]"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E5E4] text-sm text-[#1C1917] focus:outline-none focus:ring-2 focus:ring-[#347CCB]"
               />
             </div>
 
             {formError && (
-              <div className="p-3 rounded-[10px] bg-[#FDECEC] border border-[#F5B5B5] text-xs font-semibold text-[#A62626] flex items-center gap-1.5">
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700 flex items-center gap-1.5">
                 <AlertCircle className="w-4 h-4 shrink-0" /> {formError}
               </div>
             )}

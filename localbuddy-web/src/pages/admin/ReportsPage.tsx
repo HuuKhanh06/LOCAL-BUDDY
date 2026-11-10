@@ -1,4 +1,8 @@
+// pages/admin/ReportsPage.tsx (UC.28: Báo cáo & Thống kê; QĐ-09: Hàng đợi đối soát; Giám sát booking)
+// Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
+
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   BarChart3,
   TrendingUp,
@@ -9,24 +13,52 @@ import {
   Award,
   MapPin,
   Download,
+  Clock,
+  Search,
+  ShieldCheck,
+  RefreshCw,
 } from 'lucide-react';
 import { useBookingContext } from '../../context/BookingContext';
 import { formatMoney } from '../../utils/money';
+import { formatDate } from '../../utils/time';
 import { Button } from '../../components/ui/Button';
+import { StatusBadge, PaymentBadge } from '../../components/common/StatusBadge';
 import { useToast } from '../../components/ui/Toast';
 
 export const ReportsPage: React.FC = () => {
-  const { bookings, allGuides, cancellations, disputes, feeRate, getUserById } =
-    useBookingContext();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentTab = (searchParams.get('tab') as 'overview' | 'reconcile' | 'monitoring') || 'overview';
+
+  const {
+    bookings,
+    allGuides,
+    cancellations,
+    disputes,
+    getUserById,
+    adminReconcilePayment,
+  } = useBookingContext();
   const { showToast } = useToast();
+
   const [isLoading, setIsLoading] = useState(true);
   const [periodFilter, setPeriodFilter] = useState<'ALL' | 'THIS_MONTH' | 'LAST_7_DAYS'>('ALL');
   const [referenceNow] = useState<number>(() => Date.now());
 
+  // Search & Filter for Monitoring Tab
+  const [monitorSearch, setMonitorSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+
+  // Reconcile dialog / note state
+  const [reconcileModalBookingId, setReconcileModalBookingId] = useState<string | null>(null);
+  const [reconcileNote, setReconcileNote] = useState<string>('Đã kiểm tra đối soát cổng thanh toán');
+
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 200);
+    const timer = setTimeout(() => setIsLoading(false), 150);
     return () => clearTimeout(timer);
   }, []);
+
+  const setTab = (tab: 'overview' | 'reconcile' | 'monitoring') => {
+    setSearchParams({ tab });
+  };
 
   const filteredBookings = bookings.filter((b) => {
     if (periodFilter === 'ALL') return true;
@@ -78,7 +110,7 @@ export const ReportsPage: React.FC = () => {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    const dateStamp = '2026-11-08';
+    const dateStamp = new Date().toISOString().split('T')[0];
     link.href = url;
     link.setAttribute(
       'download',
@@ -107,13 +139,13 @@ export const ReportsPage: React.FC = () => {
   const cancelledBookings = filteredBookings.filter((b) => b.bookingStatus === 'CANCELLED');
   const disputedBookings = filteredBookings.filter((b) => b.bookingStatus === 'DISPUTED');
 
-  // GMV from completed + confirmed bookings
+  // GMV from completed + pipeline
   const totalGmvCompleted = completedPaidBookings.reduce((sum, b) => sum + b.totalAmount, 0);
   const totalGmvPipeline = filteredBookings
     .filter((b) => b.bookingStatus !== 'CANCELLED')
     .reduce((sum, b) => sum + b.totalAmount, 0);
 
-  // Platform Fee Revenue from completed bookings + retained cancellation/dispute fees
+  // Platform Fee Revenue
   const feeFromCompleted = completedPaidBookings.reduce(
     (sum, b) => sum + Math.round(b.totalAmount * b.feeRate),
     0
@@ -140,306 +172,621 @@ export const ReportsPage: React.FC = () => {
     })
     .sort((a, b) => b.completedCount - a.completedCount);
 
+  // QĐ-09: Hàng đợi đối soát (đơn COMPLETED nhưng chưa thanh toán 70% hoặc đang chờ đối soát)
+  const pendingReconcileBookings = bookings.filter(
+    (b) =>
+      b.bookingStatus === 'COMPLETED' &&
+      (b.paymentStatus === 'WAITING_RECONCILE' ||
+        b.paymentStatus === 'WAITING_FINAL' ||
+        b.paymentStatus === 'DEPOSITED')
+  );
+
+  // Giám sát Booking tab list
+  const monitoredBookings = bookings.filter((b) => {
+    const matchStatus = statusFilter === 'ALL' || b.bookingStatus === statusFilter;
+    const q = monitorSearch.trim().toLowerCase();
+    const tourist = getUserById(b.touristId);
+    const guide = getUserById(b.guideId);
+    const matchSearch =
+      !q ||
+      b.id.toLowerCase().includes(q) ||
+      tourist?.fullName.toLowerCase().includes(q) ||
+      guide?.fullName.toLowerCase().includes(q);
+    return matchStatus && matchSearch;
+  });
+
+  const handleConfirmReconcile = (bookingId: string) => {
+    const res = adminReconcilePayment(bookingId, reconcileNote);
+    if (res.ok) {
+      showToast(res.message, 'success');
+      setReconcileModalBookingId(null);
+    } else {
+      showToast(res.message, 'error');
+    }
+  };
+
+  const handleQueryGateway = (bookingId: string) => {
+    showToast(`Đã tra cứu cổng thanh toán cho đơn ${bookingId}: Phiên giao dịch hợp lệ.`, 'info');
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-32 bg-white rounded-[12px] border border-[#E8CED5]" />
-        <div className="h-96 bg-white rounded-[12px] border border-[#E8CED5]" />
+        <div className="h-32 bg-white rounded-2xl border border-[#E7E5E4]" />
+        <div className="h-96 bg-white rounded-2xl border border-[#E7E5E4]" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 py-2">
+      {/* Header & Tabs */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E7E5E4] pb-5">
         <div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#118B93] bg-[#E6F9FA] px-3 py-1 rounded-full mb-2">
-            <BarChart3 className="w-3.5 h-3.5" /> Báo cáo Thống kê Vận hành • UC.28
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#347CCB] bg-sky-50 border border-sky-200 px-3 py-1 rounded-full">
+            Admin Portal • UC.28 & QĐ-09
           </span>
-          <h1 className="text-2xl font-extrabold text-[#1A0A0F]">
-            Thống kê Doanh thu GMV & Hiệu suất Đà Nẵng
+          <h1 className="text-[24px] sm:text-[28px] font-black text-[#1C1917] mt-2">
+            Báo cáo, Đối soát & Giám sát Nền tảng
           </h1>
-          <p className="text-sm text-[#525266] mt-0.5">
-            Tổng hợp giá trị giao dịch (GMV), doanh thu phí nền tảng ({Math.round(feeRate * 100)}%), tỷ lệ hoàn thành và bảng xếp hạng Hướng dẫn viên.
-          </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-          <div className="inline-flex bg-white border border-[#E8CED5] rounded-[12px] p-1">
-            {[
-              { id: 'ALL' as const, label: 'Tất cả' },
-              { id: 'THIS_MONTH' as const, label: '30 ngày qua' },
-              { id: 'LAST_7_DAYS' as const, label: '7 ngày qua' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setPeriodFilter(tab.id)}
-                className={`px-3 py-1.5 rounded-[8px] text-xs font-bold transition-all cursor-pointer ${
-                  periodFilter === tab.id
-                    ? 'bg-[#1EC1CB] text-[#1C1C28]'
-                    : 'text-[#525266] hover:text-[#1A0A0F]'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <Button
-            variant="primary"
-            size="sm"
-            icon={<Download className="w-4 h-4" />}
-            onClick={handleExportCsv}
+        {/* 3 Tabs Điều hướng */}
+        <div className="flex items-center gap-1.5 bg-[#F3F1EC] p-1.5 rounded-2xl border border-[#E7E5E4]">
+          <button
+            type="button"
+            onClick={() => setTab('overview')}
+            className={`px-4 py-2 rounded-xl text-[13px] font-bold transition-all cursor-pointer ${
+              currentTab === 'overview'
+                ? 'bg-white text-[#1C1917] shadow-xs'
+                : 'text-[#78716C] hover:text-[#1C1917]'
+            }`}
           >
-            Xuất báo cáo đối soát (.CSV)
-          </Button>
+            📊 Doanh thu (UC.28)
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab('reconcile')}
+            className={`px-4 py-2 rounded-xl text-[13px] font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              currentTab === 'reconcile'
+                ? 'bg-white text-[#1C1917] shadow-xs'
+                : 'text-[#78716C] hover:text-[#1C1917]'
+            }`}
+          >
+            <span>⚖️ Hàng đợi đối soát</span>
+            {pendingReconcileBookings.length > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full bg-[#EB5B38] text-white text-[10px] font-extrabold">
+                {pendingReconcileBookings.length}
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab('monitoring')}
+            className={`px-4 py-2 rounded-xl text-[13px] font-bold transition-all cursor-pointer ${
+              currentTab === 'monitoring'
+                ? 'bg-white text-[#1C1917] shadow-xs'
+                : 'text-[#78716C] hover:text-[#1C1917]'
+            }`}
+          >
+            📋 Giám sát Booking ({bookings.length})
+          </button>
         </div>
       </div>
 
-      {/* 4 KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-[#1C1C28] text-white rounded-[12px] p-5 shadow-md">
-          <div className="flex items-center justify-between text-xs text-[#F6E6EA]/75 font-semibold uppercase">
-            <span>Tổng GMV Đã tất toán</span>
-            <TrendingUp className="w-4 h-4 text-[#1EC1CB]" />
+      {/* TAB 1: BÁO CÁO DOANH THU & KPI */}
+      {currentTab === 'overview' && (
+        <div className="space-y-6">
+          {/* Lọc thời gian & Xuất CSV */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-[#E7E5E4] shadow-xs">
+            <div className="flex items-center gap-2">
+              <span className="text-[12px] font-bold text-[#78716C]">Thời gian báo cáo:</span>
+              {(['ALL', 'THIS_MONTH', 'LAST_7_DAYS'] as const).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPeriodFilter(p)}
+                  className={`px-3 py-1.5 rounded-xl text-[12px] font-bold transition-all cursor-pointer border ${
+                    periodFilter === p
+                      ? 'bg-[#272A2D] text-white border-[#272A2D]'
+                      : 'bg-[#F3F1EC] text-[#1C1917] border-[#E7E5E4] hover:border-[#272A2D]'
+                  }`}
+                >
+                  {p === 'ALL' ? 'Toàn bộ' : p === 'THIS_MONTH' ? '30 ngày qua' : '7 ngày qua'}
+                </button>
+              ))}
+            </div>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleExportCsv}
+              className="inline-flex items-center gap-1.5 font-bold"
+            >
+              <Download className="w-4 h-4" />
+              <span>Xuất Báo Cáo CSV (UC.28)</span>
+            </Button>
           </div>
-          <div className="text-2xl font-extrabold text-[#1EC1CB] mt-2">
-            {formatMoney(totalGmvCompleted)}
+
+          {/* 4 KPI Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-[#272A2D] text-white rounded-2xl p-5 shadow-md">
+              <div className="flex items-center justify-between text-xs text-white/80 font-semibold uppercase">
+                <span>Tổng GMV Đã tất toán</span>
+                <TrendingUp className="w-4 h-4 text-[#EB5B38]" />
+              </div>
+              <div className="text-2xl font-black text-white mt-2">
+                {formatMoney(totalGmvCompleted)}
+              </div>
+              <div className="text-xs text-white/70 mt-1.5">
+                Tổng GMV luồng booking: <strong>{formatMoney(totalGmvPipeline)}</strong>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-[#E7E5E4] p-5 shadow-xs">
+              <div className="flex items-center justify-between text-xs text-[#78716C] font-bold uppercase">
+                <span>Doanh thu Phí sàn (F)</span>
+                <Award className="w-4 h-4 text-emerald-600" />
+              </div>
+              <div className="text-2xl font-black text-emerald-700 mt-2">
+                {formatMoney(totalPlatformRevenue)}
+              </div>
+              <div className="text-xs text-[#78716C] mt-1.5">
+                Hoàn tất ({formatMoney(feeFromCompleted)}) + Phí phạt ({formatMoney(feeFromCancellations)})
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-[#E7E5E4] p-5 shadow-xs">
+              <div className="flex items-center justify-between text-xs text-[#78716C] font-bold uppercase">
+                <span>Đơn Hoàn tất / Đang chạy</span>
+                <CheckCircle2 className="w-4 h-4 text-[#347CCB]" />
+              </div>
+              <div className="text-2xl font-black text-[#1C1917] mt-2">
+                {completedPaidBookings.length} hoàn tất • {activeConfirmedBookings.length} đang chạy
+              </div>
+              <div className="text-xs text-[#78716C] mt-1.5">
+                Tổng số đơn: <strong>{bookings.length} đơn</strong>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-[#E7E5E4] p-5 shadow-xs">
+              <div className="flex items-center justify-between text-xs text-[#78716C] font-bold uppercase">
+                <span>Đơn Hủy & Tranh chấp</span>
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
+              </div>
+              <div className="text-2xl font-black text-red-700 mt-2">
+                {cancelledBookings.length} hủy • {disputedBookings.length} tranh chấp
+              </div>
+              <div className="text-xs text-[#78716C] mt-1.5">
+                Hồ sơ khiếu nại: <strong>{disputes.length} hồ sơ</strong>
+              </div>
+            </div>
           </div>
-          <div className="text-xs text-[#F6E6EA]/70 mt-1.5">
-            Tổng GMV bao gồm đơn đang chạy: <strong>{formatMoney(totalGmvPipeline)}</strong>
+
+          {/* Phân bổ trạng thái & Top Guides */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="bg-white rounded-2xl border border-[#E7E5E4] p-6 shadow-xs space-y-4">
+              <h2 className="text-base font-bold text-[#1C1917]">
+                Phân bổ trạng thái ({bookings.length} đơn)
+              </h2>
+
+              <div className="space-y-3 text-xs">
+                {[
+                  {
+                    label: 'Hoàn thành & Tất toán (COMPLETED)',
+                    count: completedPaidBookings.length,
+                    color: 'bg-emerald-600',
+                  },
+                  {
+                    label: 'Đã xác nhận / Đang tour (CONFIRMED)',
+                    count: bookings.filter((b) => b.bookingStatus === 'CONFIRMED').length,
+                    color: 'bg-[#347CCB]',
+                  },
+                  {
+                    label: 'Chờ duyệt / Giữ cọc 15p',
+                    count: bookings.filter(
+                      (b) => b.bookingStatus === 'PENDING' || b.bookingStatus === 'WAITING_PAYMENT'
+                    ).length,
+                    color: 'bg-amber-500',
+                  },
+                  {
+                    label: 'Đang tranh chấp (DISPUTED)',
+                    count: disputedBookings.length,
+                    color: 'bg-red-600',
+                  },
+                  {
+                    label: 'Đã hủy (CANCELLED)',
+                    count: cancelledBookings.length,
+                    color: 'bg-[#78716C]',
+                  },
+                ].map((item, idx) => {
+                  const pct = bookings.length > 0 ? Math.round((item.count / bookings.length) * 100) : 0;
+                  return (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex justify-between font-bold text-[#1C1917]">
+                        <span>{item.label}</span>
+                        <span>
+                          {item.count} ({pct}%)
+                        </span>
+                      </div>
+                      <div className="w-full h-2.5 bg-[#F3F1EC] rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${item.color} rounded-full transition-all`}
+                          style={{ width: `${Math.max(pct, item.count > 0 ? 8 : 0)}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Top Guides */}
+            <div className="lg:col-span-2 bg-white rounded-2xl border border-[#E7E5E4] p-6 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-bold text-[#1C1917]">
+                  Thổ địa tiêu biểu Đà Nẵng
+                </h2>
+                <span className="text-xs font-semibold text-[#78716C]">
+                  {allGuides.length} HDV
+                </span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-[#F3F1EC] border-b border-[#E7E5E4] text-[11px] font-bold uppercase tracking-wider text-[#78716C]">
+                      <th className="py-3 px-3">Hạng / Hướng dẫn viên</th>
+                      <th className="py-3 px-3">Khu vực</th>
+                      <th className="py-3 px-3 text-right">Đơn giá/giờ</th>
+                      <th className="py-3 px-3 text-center">Đánh giá</th>
+                      <th className="py-3 px-3 text-right">Hoàn tất</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E7E5E4] text-sm">
+                    {guideStats.map((item, idx) => (
+                      <tr key={item.user.id} className="hover:bg-[#F3F1EC]/60">
+                        <td className="py-3.5 px-3">
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-6 h-6 rounded-full bg-[#272A2D] text-white text-xs font-bold flex items-center justify-center">
+                              #{idx + 1}
+                            </span>
+                            <img
+                              src={item.profile.avatarUrl}
+                              alt={item.user.fullName}
+                              className="w-9 h-9 rounded-full object-cover border border-[#E7E5E4]"
+                            />
+                            <div>
+                              <div className="font-bold text-[#1C1917]">{item.user.fullName}</div>
+                              <div className="text-[11px] text-[#78716C]">
+                                KYC: {item.profile.kycStatus}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-3 text-xs text-[#78716C]">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5 text-[#347CCB] shrink-0" />
+                            <span className="truncate max-w-[160px]">
+                              {item.profile.areas.slice(0, 2).join(', ')}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-3 text-right font-bold text-[#1C1917]">
+                          {formatMoney(item.profile.hourlyRate)}
+                        </td>
+                        <td className="py-3.5 px-3 text-center">
+                          <span className="inline-flex items-center gap-1 font-bold text-[#1C1917] text-xs">
+                            <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                            {item.profile.avgRating > 0 ? item.profile.avgRating.toFixed(1) : 'Mới'}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-3 text-right font-bold text-emerald-700">
+                          {item.completedCount} chuyến
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Cancellation Audit Log */}
+          <div className="bg-white rounded-2xl border border-[#E7E5E4] p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-bold text-[#1C1917] flex items-center gap-2">
+                <XCircle className="w-5 h-5 text-red-600" /> Nhật ký đối soát Hủy đơn & Phạt cọc theo ΔT (`CANCELLATION_RECORD`)
+              </h2>
+              <span className="text-xs font-bold text-[#78716C]">{cancellations.length} bản ghi</span>
+            </div>
+
+            {cancellations.length === 0 ? (
+              <p className="text-[13px] text-[#78716C] py-2">Chưa có đơn nào bị hủy.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-[#F3F1EC] border-b border-[#E7E5E4] text-[11px] font-bold uppercase tracking-wider text-[#78716C]">
+                      <th className="py-3 px-3">Mã Hủy / Đơn</th>
+                      <th className="py-3 px-3">Phân loại</th>
+                      <th className="py-3 px-3">ΔT & Mức phạt</th>
+                      <th className="py-3 px-3 text-right">Hoàn khách</th>
+                      <th className="py-3 px-3 text-right">Phí sàn giữ</th>
+                      <th className="py-3 px-3 text-right">Bồi thường HDV</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E7E5E4] text-xs">
+                    {cancellations.map((c) => (
+                      <tr key={c.id} className="hover:bg-[#F3F1EC]/60">
+                        <td className="py-3 px-3 font-bold text-[#1C1917]">
+                          {c.id} • Đơn {c.bookingId}
+                        </td>
+                        <td className="py-3 px-3">
+                          <div className="font-bold text-[#1C1917]">{c.cancellationType}</div>
+                          <div className="text-[#78716C] line-clamp-1">{c.reason}</div>
+                        </td>
+                        <td className="py-3 px-3 font-semibold">
+                          ΔT = {c.deltaHours}h • Phạt {Math.round(c.penaltyRate * 100)}% cọc
+                        </td>
+                        <td className="py-3 px-3 text-right font-bold text-[#347CCB]">
+                          {formatMoney(c.refundToTourist)}
+                        </td>
+                        <td className="py-3 px-3 text-right font-bold text-[#1C1917]">
+                          {formatMoney(c.platformFeeRetained)}
+                        </td>
+                        <td className="py-3 px-3 text-right font-bold text-emerald-700">
+                          {formatMoney(c.paidToGuide)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
+      )}
 
-        <div className="bg-white rounded-[12px] border border-[#E8CED5] p-5 shadow-xs">
-          <div className="flex items-center justify-between text-xs text-[#525266] font-bold uppercase">
-            <span>Doanh thu Phí nền tảng (F)</span>
-            <Award className="w-4 h-4 text-[#1B8A5A]" />
-          </div>
-          <div className="text-2xl font-extrabold text-[#146C43] mt-2">
-            {formatMoney(totalPlatformRevenue)}
-          </div>
-          <div className="text-xs text-[#525266] mt-1.5">
-            Từ đơn hoàn tất ({formatMoney(feeFromCompleted)}) + Phí phạt hủy ({formatMoney(feeFromCancellations)})
-          </div>
-        </div>
-
-        <div className="bg-white rounded-[12px] border border-[#E8CED5] p-5 shadow-xs">
-          <div className="flex items-center justify-between text-xs text-[#525266] font-bold uppercase">
-            <span>Đơn Hoàn thành / Đang chạy</span>
-            <CheckCircle2 className="w-4 h-4 text-[#118B93]" />
-          </div>
-          <div className="text-2xl font-extrabold text-[#1A0A0F] mt-2">
-            {completedPaidBookings.length} hoàn tất • {activeConfirmedBookings.length} đang chạy
-          </div>
-          <div className="text-xs text-[#525266] mt-1.5">
-            Tổng số đơn trên hệ thống: <strong>{bookings.length} đơn</strong>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-[12px] border border-[#E8CED5] p-5 shadow-xs">
-          <div className="flex items-center justify-between text-xs text-[#525266] font-bold uppercase">
-            <span>Đơn Hủy & Tranh chấp</span>
-            <AlertTriangle className="w-4 h-4 text-[#D9820B]" />
-          </div>
-          <div className="text-2xl font-extrabold text-[#A62626] mt-2">
-            {cancelledBookings.length} hủy • {disputedBookings.length} tranh chấp
-          </div>
-          <div className="text-xs text-[#525266] mt-1.5">
-            Tổng hồ sơ khiếu nại đã ghi nhận: <strong>{disputes.length} hồ sơ</strong>
-          </div>
-        </div>
-      </div>
-
-      {/* Status Breakdown Bar + Top Guides Table */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Status Breakdown */}
-        <div className="bg-white rounded-[12px] border border-[#E8CED5] p-6 shadow-xs space-y-4">
-          <h2 className="text-base font-extrabold text-[#1A0A0F]">
-            Phân bổ trạng thái Đơn đặt lịch ({bookings.length} đơn)
-          </h2>
-
-          <div className="space-y-3 text-xs">
-            {[
-              {
-                label: 'Đã hoàn thành & Tất toán (COMPLETED)',
-                count: completedPaidBookings.length,
-                color: 'bg-[#1B8A5A]',
-              },
-              {
-                label: 'Đã xác nhận / Đang phục vụ (CONFIRMED)',
-                count: bookings.filter((b) => b.bookingStatus === 'CONFIRMED').length,
-                color: 'bg-[#1EC1CB]',
-              },
-              {
-                label: 'Chờ HDV duyệt / Chờ đặt cọc 15p',
-                count: bookings.filter(
-                  (b) => b.bookingStatus === 'PENDING' || b.bookingStatus === 'WAITING_PAYMENT'
-                ).length,
-                color: 'bg-[#D9820B]',
-              },
-              {
-                label: 'Đang tranh chấp đóng băng (DISPUTED)',
-                count: disputedBookings.length,
-                color: 'bg-[#C93B3B]',
-              },
-              {
-                label: 'Đã hủy (CANCELLED)',
-                count: cancelledBookings.length,
-                color: 'bg-[#6E7085]',
-              },
-            ].map((item, idx) => {
-              const pct = bookings.length > 0 ? Math.round((item.count / bookings.length) * 100) : 0;
-              return (
-                <div key={idx} className="space-y-1">
-                  <div className="flex justify-between font-bold text-[#1C1C28]">
-                    <span>{item.label}</span>
-                    <span>
-                      {item.count} đơn ({pct}%)
-                    </span>
-                  </div>
-                  <div className="w-full h-2.5 bg-[#F4F5F8] rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${item.color} rounded-full transition-all`}
-                      style={{ width: `${Math.max(pct, item.count > 0 ? 8 : 0)}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="pt-3 border-t border-[#E8CED5] text-xs text-[#525266] space-y-1">
-            <div className="font-bold text-[#1A0A0F]">Điểm nóng du lịch Đà Nẵng:</div>
+      {/* TAB 2: HÀNG ĐỢI ĐỐI SOÁT & CHƯA TRẢ 70% (QĐ-09) */}
+      {currentTab === 'reconcile' && (
+        <div className="space-y-6">
+          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-[13px] text-amber-950 space-y-1">
+            <strong className="block font-bold">
+              ⚖️ Quy tắc vận hành QĐ-09: Hàng đợi đối soát & Chưa trả 70%
+            </strong>
             <p>
-              Phố cổ Hội An, Bán đảo Sơn Trà, Cầu Rồng và Bà Nà Hills chiếm hơn 82% tổng số giờ đặt lịch theo giờ trên LocalBuddy.
+              Đặc tả không có hạn chót trả 70%: Hệ thống nhắc thông báo sau 24h và 72h. Quản trị viên sử dụng hàng đợi này để tra soát lại giao dịch qua cổng (`provider.queryTransaction`) hoặc xác nhận đối soát thủ công kèm ghi chú kiểm toán. Tuyệt đối không tự động hủy hoặc phạt cọc của du khách.
             </p>
           </div>
-        </div>
 
-        {/* Top Guides Table */}
-        <div className="lg:col-span-2 bg-white rounded-[12px] border border-[#E8CED5] p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-extrabold text-[#1A0A0F]">
-              Bảng xếp hạng Hướng dẫn viên tiêu biểu tại Đà Nẵng
+          <div className="bg-white rounded-2xl border border-[#E7E5E4] p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-bold text-[#1C1917]">
+                Đơn cần đối soát & Chưa quyết toán 100% ({pendingReconcileBookings.length} đơn)
+              </h2>
+            </div>
+
+            {pendingReconcileBookings.length === 0 ? (
+              <div className="p-8 text-center text-[#78716C] bg-[#F3F1EC] rounded-2xl space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
+                <p className="font-bold text-[#1C1917]">Hàng đợi đối soát trống</p>
+                <p className="text-xs">Hiện tại không có đơn nào đang chờ đối soát hoặc treo 70%.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#F3F1EC] border-b border-[#E7E5E4] font-bold uppercase tracking-wider text-[#78716C]">
+                      <th className="py-3 px-3">Mã Đơn / Ngày</th>
+                      <th className="py-3 px-3">Du Khách</th>
+                      <th className="py-3 px-3">Thổ Địa</th>
+                      <th className="py-3 px-3 text-right">Tổng G</th>
+                      <th className="py-3 px-3 text-right">Cọc D (30%)</th>
+                      <th className="py-3 px-3 text-right">Còn Lại B (70%)</th>
+                      <th className="py-3 px-3">Trạng thái</th>
+                      <th className="py-3 px-3 text-right">Thao tác Admin (QĐ-09)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E7E5E4]">
+                    {pendingReconcileBookings.map((b) => {
+                      const tourist = getUserById(b.touristId);
+                      const guide = getUserById(b.guideId);
+                      return (
+                        <tr key={b.id} className="hover:bg-[#F3F1EC]/60">
+                          <td className="py-3.5 px-3">
+                            <strong className="block text-[#1C1917]">{b.id}</strong>
+                            <span className="text-[#78716C]">{formatDate(b.date)} ({b.hours}h)</span>
+                          </td>
+                          <td className="py-3.5 px-3">
+                            <span className="font-bold text-[#1C1917]">{tourist?.fullName}</span>
+                            <span className="block text-[#78716C]">{tourist?.phone}</span>
+                          </td>
+                          <td className="py-3.5 px-3">
+                            <span className="font-bold text-[#1C1917]">{guide?.fullName}</span>
+                            <span className="block text-[#78716C]">{guide?.phone}</span>
+                          </td>
+                          <td className="py-3.5 px-3 text-right font-bold text-[#1C1917]">
+                            {formatMoney(b.totalAmount)}
+                          </td>
+                          <td className="py-3.5 px-3 text-right font-bold text-emerald-700">
+                            {formatMoney(b.depositAmount)}
+                          </td>
+                          <td className="py-3.5 px-3 text-right font-bold text-amber-700">
+                            {formatMoney(b.remainingAmount)}
+                          </td>
+                          <td className="py-3.5 px-3">
+                            <PaymentBadge status={b.paymentStatus} />
+                          </td>
+                          <td className="py-3.5 px-3 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleQueryGateway(b.id)}
+                                className="px-2.5 py-1.5 rounded-xl bg-[#F3F1EC] hover:bg-[#E7E5E4] text-[#1C1917] font-semibold transition-colors cursor-pointer"
+                              >
+                                Tra cứu cổng
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setReconcileModalBookingId(b.id)}
+                                className="px-2.5 py-1.5 rounded-xl bg-[#EB5B38] hover:bg-[#d64f2e] text-white font-bold transition-colors cursor-pointer"
+                              >
+                                Xác nhận đối soát
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: GIÁM SÁT BOOKING THỜI GIAN THỰC */}
+      {currentTab === 'monitoring' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-2xl border border-[#E7E5E4] p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-2 w-full sm:w-80 bg-[#F3F1EC] px-3.5 py-2 rounded-xl border border-[#E7E5E4]">
+              <Search className="w-4 h-4 text-[#78716C] shrink-0" />
+              <input
+                type="text"
+                placeholder="Tìm mã đơn, tên khách, tên HDV..."
+                value={monitorSearch}
+                onChange={(e) => setMonitorSearch(e.target.value)}
+                className="bg-transparent text-xs text-[#1C1917] w-full focus:outline-none"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
+              <span className="text-[12px] font-bold text-[#78716C] shrink-0">Trạng thái:</span>
+              {(['ALL', 'PENDING', 'WAITING_PAYMENT', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'DISPUTED'] as const).map(
+                (st) => (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => setStatusFilter(st)}
+                    className={`px-3 py-1.5 rounded-xl text-[11px] font-bold shrink-0 transition-all cursor-pointer border ${
+                      statusFilter === st
+                        ? 'bg-[#272A2D] text-white border-[#272A2D]'
+                        : 'bg-[#F3F1EC] text-[#1C1917] border-[#E7E5E4] hover:border-[#272A2D]'
+                    }`}
+                  >
+                    {st === 'ALL' ? 'Tất cả' : st}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-[#E7E5E4] p-6 shadow-xs space-y-4">
+            <h2 className="text-base font-bold text-[#1C1917]">
+              Danh sách Đơn đặt lịch toàn hệ thống ({monitoredBookings.length} đơn)
             </h2>
-            <span className="text-xs font-semibold text-[#525266]">
-              Tổng số: {allGuides.length} HDV
-            </span>
-          </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[#FDF7F9] border-b border-[#E8CED5] text-[11px] font-bold uppercase tracking-wider text-[#525266]">
-                  <th className="py-3 px-3">Hạng / Hướng dẫn viên</th>
-                  <th className="py-3 px-3">Khu vực chính</th>
-                  <th className="py-3 px-3 text-right">Đơn giá / giờ</th>
-                  <th className="py-3 px-3 text-center">Đánh giá</th>
-                  <th className="py-3 px-3 text-right">Số chuyến hoàn tất</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E8CED5] text-sm">
-                {guideStats.map((item, idx) => (
-                  <tr key={item.user.id} className="hover:bg-[#FDF7F9]/60">
-                    <td className="py-3.5 px-3">
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-6 h-6 rounded-full bg-[#F6E6EA] text-[#1A0A0F] text-xs font-extrabold flex items-center justify-center">
-                          #{idx + 1}
-                        </span>
-                        <img
-                          src={item.profile.avatarUrl}
-                          alt={item.user.fullName}
-                          className="w-9 h-9 rounded-full object-cover border border-[#E8CED5]"
-                        />
-                        <div>
-                          <div className="font-extrabold text-[#1A0A0F]">{item.user.fullName}</div>
-                          <div className="text-[11px] text-[#525266]">
-                            KYC: {item.profile.kycStatus}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-3 text-xs text-[#525266]">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-[#118B93] shrink-0" />
-                        <span className="truncate max-w-[160px]">
-                          {item.profile.areas.slice(0, 2).join(', ')}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-3 text-right font-bold text-[#1C1C28]">
-                      {formatMoney(item.profile.hourlyRate)}
-                    </td>
-                    <td className="py-3.5 px-3 text-center">
-                      <span className="inline-flex items-center gap-1 font-bold text-[#1A0A0F] text-xs">
-                        <Star className="w-3.5 h-3.5 fill-[#D9820B] text-[#D9820B]" />
-                        {item.profile.avgRating > 0 ? item.profile.avgRating.toFixed(1) : 'Mới'} (
-                        {item.profile.totalReviews})
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-3 text-right font-extrabold text-[#146C43]">
-                      {item.completedCount} chuyến
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {monitoredBookings.length === 0 ? (
+              <p className="text-[13px] text-[#78716C] py-4 text-center">
+                Không tìm thấy đơn đặt lịch nào khớp bộ lọc.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#F3F1EC] border-b border-[#E7E5E4] font-bold uppercase tracking-wider text-[#78716C]">
+                      <th className="py-3 px-3">Mã Đơn</th>
+                      <th className="py-3 px-3">Thời gian & Địa điểm</th>
+                      <th className="py-3 px-3">Du Khách</th>
+                      <th className="py-3 px-3">Thổ Địa</th>
+                      <th className="py-3 px-3 text-right">Tổng tiền</th>
+                      <th className="py-3 px-3">Đơn</th>
+                      <th className="py-3 px-3">Thanh toán</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E7E5E4]">
+                    {monitoredBookings.map((b) => {
+                      const tourist = getUserById(b.touristId);
+                      const guide = getUserById(b.guideId);
+                      return (
+                        <tr key={b.id} className="hover:bg-[#F3F1EC]/60">
+                          <td className="py-3.5 px-3 font-bold text-[#1C1917]">
+                            {b.id}
+                          </td>
+                          <td className="py-3.5 px-3">
+                            <span className="font-semibold block text-[#1C1917]">
+                              {formatDate(b.date)} ({b.startTime} – {b.endTime})
+                            </span>
+                            <span className="text-[#78716C] line-clamp-1">{b.meetingLocation}</span>
+                          </td>
+                          <td className="py-3.5 px-3">
+                            <span className="font-bold text-[#1C1917]">{tourist?.fullName}</span>
+                          </td>
+                          <td className="py-3.5 px-3">
+                            <span className="font-bold text-[#1C1917]">{guide?.fullName}</span>
+                          </td>
+                          <td className="py-3.5 px-3 text-right font-bold text-[#1C1917]">
+                            {formatMoney(b.totalAmount)}
+                          </td>
+                          <td className="py-3.5 px-3">
+                            <StatusBadge status={b.bookingStatus} />
+                          </td>
+                          <td className="py-3.5 px-3">
+                            <PaymentBadge status={b.paymentStatus} />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Cancellation Audit Log */}
-      <div className="bg-white rounded-[12px] border border-[#E8CED5] p-6 shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-extrabold text-[#1A0A0F] flex items-center gap-2">
-            <XCircle className="w-5 h-5 text-[#C93B3B]" /> Nhật ký đối soát Hủy đơn & Phạt cọc theo ΔT (`CANCELLATION_RECORD`)
-          </h2>
-          <span className="text-xs font-bold text-[#525266]">{cancellations.length} bản ghi</span>
+      {/* Modal Xác nhận Đối soát thủ công (QĐ-09) */}
+      {reconcileModalBookingId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E7E5E4]">
+            <h3 className="text-lg font-bold text-[#1C1917]">
+              Xác nhận đối soát đơn {reconcileModalBookingId} (QĐ-09)
+            </h3>
+            <p className="text-xs text-[#78716C]">
+              Thao tác này xác nhận khoản tất toán 70% đã hoàn tất, chuyển trạng thái thanh toán sang <strong>PAID</strong> và tự động cộng doanh thu (G − F) vào Ví Thổ địa.
+            </p>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#1C1917]">
+                Ghi chú kiểm toán / Tra soát cổng *:
+              </label>
+              <textarea
+                value={reconcileNote}
+                onChange={(e) => setReconcileNote(e.target.value)}
+                rows={3}
+                className="w-full p-3 rounded-xl border border-[#E7E5E4] text-xs text-[#1C1917] focus:outline-none"
+              />
+            </div>
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E7E5E4]">
+              <button
+                type="button"
+                onClick={() => setReconcileModalBookingId(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#F3F1EC] text-[#1C1917]"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                type="button"
+                onClick={() => handleConfirmReconcile(reconcileModalBookingId)}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-[#EB5B38] text-white hover:bg-[#d64f2e]"
+              >
+                Xác nhận hoàn tất đối soát
+              </button>
+            </div>
+          </div>
         </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-[#FDF7F9] border-b border-[#E8CED5] text-[11px] font-bold uppercase tracking-wider text-[#525266]">
-                <th className="py-3 px-3">Mã Hủy / Đơn</th>
-                <th className="py-3 px-3">Phân loại hủy</th>
-                <th className="py-3 px-3">Độ trễ ΔT & Mức phạt</th>
-                <th className="py-3 px-3 text-right">Hoàn khách</th>
-                <th className="py-3 px-3 text-right">Phí sàn giữ</th>
-                <th className="py-3 px-3 text-right">Bồi thường HDV</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#E8CED5] text-xs">
-              {cancellations.map((c) => (
-                <tr key={c.id} className="hover:bg-[#FDF7F9]/60">
-                  <td className="py-3 px-3 font-bold text-[#1C1C28]">
-                    {c.id} • Đơn {c.bookingId}
-                  </td>
-                  <td className="py-3 px-3">
-                    <div className="font-bold text-[#1A0A0F]">{c.cancellationType}</div>
-                    <div className="text-[#525266] line-clamp-1">{c.reason}</div>
-                  </td>
-                  <td className="py-3 px-3 font-semibold">
-                    ΔT = {c.deltaHours}h • Phạt {Math.round(c.penaltyRate * 100)}% cọc
-                  </td>
-                  <td className="py-3 px-3 text-right font-bold text-[#118B93]">
-                    {formatMoney(c.refundToTourist)}
-                  </td>
-                  <td className="py-3 px-3 text-right font-bold text-[#1A0A0F]">
-                    {formatMoney(c.platformFeeRetained)}
-                  </td>
-                  <td className="py-3 px-3 text-right font-bold text-[#146C43]">
-                    {formatMoney(c.paidToGuide)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

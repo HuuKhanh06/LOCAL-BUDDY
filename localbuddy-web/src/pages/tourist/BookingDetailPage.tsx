@@ -102,15 +102,11 @@ export const BookingDetailPage: React.FC = () => {
     DISPUTE_CATEGORY_PRESETS[0]
   );
   const [disputeDescription, setDisputeDescription] = useState<string>('');
-  const [disputeEvidenceUrl, setDisputeEvidenceUrl] = useState<string>(
-    'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&auto=format&fit=crop&q=80'
-  );
+  const [disputeEvidenceUrl, setDisputeEvidenceUrl] = useState<string>('');
 
   // Review modal state (chỉ Du khách đánh giá Thổ địa, không đánh giá hai chiều)
   const [reviewStars, setReviewStars] = useState<number>(5);
-  const [reviewComment, setReviewComment] = useState<string>(
-    'Thổ địa rất nhiệt tình, đúng giờ và am hiểu sâu sắc văn hóa ẩm thực Đà Nẵng!'
-  );
+  const [reviewComment, setReviewComment] = useState<string>('');
 
   if (!booking) {
     return (

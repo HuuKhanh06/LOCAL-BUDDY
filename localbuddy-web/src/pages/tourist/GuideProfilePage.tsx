@@ -324,20 +324,9 @@ export const GuideProfilePage: React.FC = () => {
             </div>
 
             {guideReviews.length === 0 ? (
-              <div className="space-y-3">
-                <p className="text-[13px] text-[#78716C]">
-                  Chưa có đánh giá cho tài khoản này. Dưới đây là các đánh giá tiêu biểu từ hệ thống:
-                </p>
-                <div className="p-4 bg-[#F3F1EC] rounded-2xl space-y-1.5 text-[13px]">
-                  <div className="flex items-center justify-between">
-                    <strong className="text-[#1C1917]">Hoàng Mai (Hà Nội)</strong>
-                    <span className="text-amber-500 font-bold">★★★★★</span>
-                  </div>
-                  <p className="text-[#57534E]">
-                    Thổ địa dẫn tour rất chu đáo, giải thích cặn kẽ về sự tích Cầu Rồng và đưa đến các quán ăn ngon chuẩn vị người Đà Nẵng!
-                  </p>
-                </div>
-              </div>
+              <p className="text-[13px] text-[#78716C] py-2">
+                Chưa có đánh giá nào cho Thổ địa này.
+              </p>
             ) : (
               <div className="divide-y divide-[#E7E5E4]">
                 {guideReviews.map((rev) => {

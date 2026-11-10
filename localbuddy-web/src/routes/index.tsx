@@ -195,6 +195,9 @@ export const AppRoutes: React.FC = () => {
           <Route path="/dang-nhap" element={<LoginPage />} />
           <Route path="/login" element={<Navigate to="/dang-nhap" replace />} />
           <Route path="/quen-mat-khau" element={<ForgotPasswordPage />} />
+          <Route path="/forgot-password" element={<Navigate to="/quen-mat-khau" replace />} />
+          <Route path="/verify-email" element={<Navigate to="/dang-nhap?verified=1" replace />} />
+          <Route path="/xac-minh-email" element={<Navigate to="/dang-nhap?verified=1" replace />} />
           <Route path="/guides" element={<GuideSearchPage />} />
           <Route path="/guides/:id" element={<GuideProfilePage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
@@ -258,6 +261,8 @@ export const AppRoutes: React.FC = () => {
           <Route path="/admin/tai-khoan" element={<AccountsPage />} />
           <Route path="/admin/rut-tien" element={<PayoutsPage />} />
           <Route path="/admin/bao-cao" element={<ReportsPage />} />
+          <Route path="/admin/doi-soat" element={<Navigate to="/admin/bao-cao?tab=reconcile" replace />} />
+          <Route path="/admin/giam-sat" element={<Navigate to="/admin/bao-cao?tab=monitoring" replace />} />
           <Route path="/admin/phi-san" element={<FeeConfigPage />} />
         </Route>
 

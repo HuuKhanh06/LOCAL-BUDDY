@@ -1,3 +1,6 @@
+// pages/admin/DisputesPage.tsx (UC.27: Phân xử Tranh chấp & BR-12)
+// Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
+
 import React, { useState, useEffect } from 'react';
 import {
   Scale,
@@ -80,8 +83,8 @@ export const DisputesPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-28 bg-white rounded-[12px] border border-[#E8CED5]" />
-        <div className="h-96 bg-white rounded-[12px] border border-[#E8CED5]" />
+        <div className="h-28 bg-white rounded-2xl border border-[#E7E5E4]" />
+        <div className="h-96 bg-white rounded-2xl border border-[#E7E5E4]" />
       </div>
     );
   }
@@ -91,22 +94,22 @@ export const DisputesPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#A62626] bg-[#FDECEC] px-3 py-1 rounded-full mb-2">
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-700 bg-rose-50 border border-rose-200 px-3 py-1 rounded-full mb-2">
             <Scale className="w-3.5 h-3.5" /> Phân xử Khiếu nại & Tranh chấp • UC.27 & BR-12
           </span>
-          <h1 className="text-2xl font-extrabold text-[#1A0A0F]">
+          <h1 className="text-2xl font-extrabold text-[#1C1917]">
             Trung tâm Xử lý Khiếu nại & Bảo vệ Giao dịch
           </h1>
-          <p className="text-sm text-[#525266] mt-0.5">
+          <p className="text-sm text-[#78716C] mt-0.5">
             Thẩm định bằng chứng từ Du khách và Hướng dẫn viên, đưa ra phán quyết hoàn cọc hoặc bồi thường ví HDV.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 rounded-[10px] bg-[#FDECEC] border border-[#F5B5B5] text-xs font-bold text-[#A62626]">
+          <span className="px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-bold text-rose-700">
             Chờ phân xử: {openDisputes.length}
           </span>
-          <span className="px-3 py-1.5 rounded-[10px] bg-[#E6F7F0] border border-[#B2E5D0] text-xs font-bold text-[#146C43]">
+          <span className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-700">
             Đã giải quyết: {resolvedDisputes.length}
           </span>
         </div>
@@ -125,10 +128,10 @@ export const DisputesPage: React.FC = () => {
             key={tab.key}
             type="button"
             onClick={() => setFilterStatus(tab.key)}
-            className={`px-4 py-2 rounded-[10px] text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               filterStatus === tab.key
-                ? 'bg-[#1EC1CB] text-[#1C1C28] shadow-xs'
-                : 'bg-white text-[#525266] hover:bg-[#F6E6EA]/60 border border-[#E8CED5]'
+                ? 'bg-[#EB5B38] text-white shadow-xs'
+                : 'bg-white text-[#78716C] hover:bg-[#F3F1EC] border border-[#E7E5E4]'
             }`}
           >
             {tab.label}
@@ -139,12 +142,12 @@ export const DisputesPage: React.FC = () => {
       {/* Disputes List */}
       <div className="space-y-4">
         {filteredDisputes.length === 0 ? (
-          <div className="bg-white rounded-[12px] border border-[#E8CED5] p-12 text-center">
-            <Scale className="w-10 h-10 text-[#6E7085] mx-auto mb-3" />
-            <h3 className="text-base font-bold text-[#1A0A0F]">
+          <div className="bg-white rounded-2xl border border-[#E7E5E4] p-12 text-center">
+            <Scale className="w-10 h-10 text-[#78716C] mx-auto mb-3" />
+            <h3 className="text-base font-bold text-[#1C1917]">
               Không có hồ sơ khiếu nại nào trong mục này
             </h3>
-            <p className="text-sm text-[#525266] mt-1">
+            <p className="text-sm text-[#78716C] mt-1">
               Mọi giao dịch đặt lịch tại Đà Nẵng đang diễn ra ổn định.
             </p>
           </div>
@@ -158,91 +161,91 @@ export const DisputesPage: React.FC = () => {
             return (
               <div
                 key={disp.id}
-                className="bg-white rounded-[12px] border border-[#E8CED5] p-6 shadow-xs space-y-4"
+                className="bg-white rounded-2xl border border-[#E7E5E4] p-6 shadow-xs space-y-4"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E8CED5] pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E7E5E4] pb-4">
                   <div className="flex flex-wrap items-center gap-2.5">
-                    <span className="font-mono font-extrabold text-sm px-2.5 py-1 rounded bg-[#1A0A0F] text-[#F6E6EA]">
+                    <span className="font-mono font-extrabold text-sm px-2.5 py-1 rounded bg-[#272A2D] text-[#E6E4DC]">
                       {disp.id}
                     </span>
-                    <span className="font-bold text-sm text-[#1C1C28]">
+                    <span className="font-bold text-sm text-[#1C1917]">
                       Đơn đặt lịch: {disp.bookingId}
                     </span>
                     {disp.status !== 'RESOLVED' ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#FDECEC] text-[#A62626] border border-[#F5B5B5]">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
                         <AlertTriangle className="w-3.5 h-3.5" /> Đang đóng băng chờ phân xử
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#E6F7F0] text-[#146C43] border border-[#B2E5D0]">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                         <CheckCircle2 className="w-3.5 h-3.5" /> Đã phán quyết:{' '}
                         {disp.decision === 'GUIDE_FAULT' ? 'Lỗi do HDV (Hoàn cọc 100%)' : 'Lỗi do Khách (Tịch thu cọc)'}
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-[#6E7085] flex items-center gap-1">
+                  <div className="text-xs text-[#78716C] flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" /> Gửi lúc: {formatDateTimeVN(disp.createdAt)}
                   </div>
                 </div>
 
                 {/* Parties & Financial Info */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#FDF7F9] rounded-[10px] p-4 border border-[#E8CED5] text-xs">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#F3F1EC] rounded-xl p-4 border border-[#E7E5E4] text-xs">
                   <div>
-                    <div className="text-[#525266] font-semibold">Người gửi khiếu nại:</div>
-                    <div className="font-extrabold text-sm text-[#1A0A0F] mt-0.5">
+                    <div className="text-[#78716C] font-semibold">Người gửi khiếu nại:</div>
+                    <div className="font-extrabold text-sm text-[#1C1917] mt-0.5">
                       {reporter?.fullName || disp.reporterId} (
                       {disp.reporterRole === 'tourist' ? 'Du khách' : 'Hướng dẫn viên'})
                     </div>
-                    <div className="text-[#A62626] font-bold mt-1">
+                    <div className="text-rose-700 font-bold mt-1">
                       Nhóm lý do: {disp.reasonCategory}
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-[#525266] font-semibold">Các bên trong giao dịch:</div>
-                    <div className="mt-0.5">
+                    <div className="text-[#78716C] font-semibold">Các bên trong giao dịch:</div>
+                    <div className="mt-0.5 text-[#1C1917]">
                       Du khách: <strong>{tourist?.fullName || booking?.touristId}</strong>
                     </div>
-                    <div className="mt-0.5">
+                    <div className="mt-0.5 text-[#1C1917]">
                       HDV: <strong>{guide?.user.fullName || booking?.guideId}</strong>
                     </div>
                     {booking && (
-                      <div className="text-[#6E7085] mt-0.5">
+                      <div className="text-[#78716C] mt-0.5">
                         Ngày đi: {formatDateVN(booking.date)} ({booking.startTime} - {booking.endTime})
                       </div>
                     )}
                   </div>
 
                   <div>
-                    <div className="text-[#525266] font-semibold">Giá trị đơn & Tiền cọc đang giữ:</div>
+                    <div className="text-[#78716C] font-semibold">Giá trị đơn & Tiền cọc đang giữ:</div>
                     {booking ? (
                       <>
-                        <div className="mt-0.5">
+                        <div className="mt-0.5 text-[#1C1917]">
                           Tổng giá trị đơn (G): <strong>{formatMoney(booking.totalAmount)}</strong>
                         </div>
-                        <div className="text-sm font-extrabold text-[#118B93] mt-0.5">
+                        <div className="text-sm font-extrabold text-[#347CCB] mt-0.5">
                           Cọc 30% (D): {formatMoney(booking.depositAmount)} (Phí sàn{' '}
                           {Math.round(booking.feeRate * 100)}%)
                         </div>
                       </>
                     ) : (
-                      <div className="text-[#6E7085]">Không tìm thấy đơn</div>
+                      <div className="text-[#78716C]">Không tìm thấy đơn</div>
                     )}
                   </div>
                 </div>
 
                 {/* Description & Evidence */}
                 <div className="space-y-2">
-                  <div className="text-xs font-bold uppercase tracking-wider text-[#525266]">
+                  <div className="text-xs font-bold uppercase tracking-wider text-[#78716C]">
                     Nội dung tường trình khiếu nại:
                   </div>
-                  <p className="text-sm text-[#1C1C28] bg-[#F4F5F8] p-3.5 rounded-[10px] border border-[#E2E4EC] leading-relaxed">
+                  <p className="text-sm text-[#1C1917] bg-[#F3F1EC] p-3.5 rounded-xl border border-[#E7E5E4] leading-relaxed">
                     "{disp.description}"
                   </p>
                 </div>
 
                 {disp.evidenceUrls.length > 0 && (
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-xs font-bold text-[#525266] flex items-center gap-1">
+                    <span className="text-xs font-bold text-[#78716C] flex items-center gap-1">
                       <FileText className="w-3.5 h-3.5" /> Bằng chứng đính kèm:
                     </span>
                     {disp.evidenceUrls.map((url, idx) => (
@@ -251,7 +254,7 @@ export const DisputesPage: React.FC = () => {
                         href={url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#E6F9FA] text-[#118B93] text-xs font-bold hover:underline"
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-sky-50 border border-sky-200 text-[#347CCB] text-xs font-bold hover:underline"
                       >
                         Xem ảnh bằng chứng #{idx + 1} ↗
                       </a>
@@ -261,12 +264,12 @@ export const DisputesPage: React.FC = () => {
 
                 {/* Resolved Outcome Box */}
                 {disp.status === 'RESOLVED' && (
-                  <div className="bg-[#E6F7F0] border border-[#B2E5D0] rounded-[10px] p-4 text-xs space-y-1">
-                    <div className="font-extrabold text-[#146C43] text-sm">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-xs space-y-1">
+                    <div className="font-extrabold text-emerald-700 text-sm">
                       Kết luận của Admin ({disp.resolvedAt ? formatDateTimeVN(disp.resolvedAt) : ''}):
                     </div>
-                    <p className="text-[#1C1C28] font-medium">{disp.resolutionNote}</p>
-                    <div className="flex flex-wrap gap-4 pt-1 font-bold text-[#146C43]">
+                    <p className="text-[#1C1917] font-medium">{disp.resolutionNote}</p>
+                    <div className="flex flex-wrap gap-4 pt-1 font-bold text-emerald-700">
                       <span>Hoàn trả khách: {formatMoney(disp.refundAmount || 0)}</span>
                       <span>•</span>
                       <span>Bồi thường ví HDV: {formatMoney(disp.guidePayoutAmount || 0)}</span>
@@ -311,19 +314,19 @@ export const DisputesPage: React.FC = () => {
 
             return (
               <form onSubmit={handleConfirmRuling} className="space-y-5">
-                <div className="bg-[#FDF7F9] border border-[#E8CED5] rounded-[10px] p-4 text-xs space-y-1.5">
-                  <div className="font-bold text-[#1A0A0F] text-sm">
+                <div className="bg-[#F3F1EC] border border-[#E7E5E4] rounded-xl p-4 text-xs space-y-1.5">
+                  <div className="font-bold text-[#1C1917] text-sm">
                     Tóm tắt khiếu nại ({selectedDispute.reasonCategory}):
                   </div>
-                  <p className="text-[#1C1C28]">"{selectedDispute.description}"</p>
-                  <div className="pt-1 font-bold text-[#118B93]">
+                  <p className="text-[#1C1917]">"{selectedDispute.description}"</p>
+                  <div className="pt-1 font-bold text-[#347CCB]">
                     Tiền cọc 30% đang đóng băng: {formatMoney(deposit)} (Không thu 70% cuối)
                   </div>
                 </div>
 
                 {/* 2 Ruling Cards */}
                 <div className="space-y-2">
-                  <label className="block text-xs font-extrabold uppercase tracking-wider text-[#1C1C28]">
+                  <label className="block text-xs font-extrabold uppercase tracking-wider text-[#1C1917]">
                     Chọn phán quyết của Admin (BR-12, UC.27) *
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -332,22 +335,22 @@ export const DisputesPage: React.FC = () => {
                       type="button"
                       disabled={selectedDispute.status === 'RESOLVED'}
                       onClick={() => setDecision('GUIDE_FAULT')}
-                      className={`text-left p-4 rounded-[12px] border-2 transition-all cursor-pointer ${
+                      className={`text-left p-4 rounded-xl border-2 transition-all cursor-pointer ${
                         decision === 'GUIDE_FAULT'
-                          ? 'border-[#1EC1CB] bg-[#E6F9FA]/50 shadow-xs'
-                          : 'border-[#E8CED5] bg-white hover:bg-[#FDF7F9]'
+                          ? 'border-[#347CCB] bg-sky-50 shadow-xs'
+                          : 'border-[#E7E5E4] bg-white hover:bg-[#F3F1EC]'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="font-extrabold text-sm text-[#1A0A0F] flex items-center gap-1.5">
-                          <UserCheck className="w-4 h-4 text-[#146C43]" />
+                        <span className="font-extrabold text-sm text-[#1C1917] flex items-center gap-1.5">
+                          <UserCheck className="w-4 h-4 text-emerald-700" />
                           Phương án 1: Lỗi thuộc về HDV
                         </span>
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#E6F7F0] text-[#146C43]">
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
                           GUIDE_FAULT
                         </span>
                       </div>
-                      <ul className="text-xs text-[#525266] space-y-1 list-disc pl-4">
+                      <ul className="text-xs text-[#78716C] space-y-1 list-disc pl-4">
                         <li>
                           Hoàn trả <strong>100% tiền cọc ({formatMoney(deposit)})</strong> cho Du khách
                         </li>
@@ -363,22 +366,22 @@ export const DisputesPage: React.FC = () => {
                       type="button"
                       disabled={selectedDispute.status === 'RESOLVED'}
                       onClick={() => setDecision('TOURIST_FAULT')}
-                      className={`text-left p-4 rounded-[12px] border-2 transition-all cursor-pointer ${
+                      className={`text-left p-4 rounded-xl border-2 transition-all cursor-pointer ${
                         decision === 'TOURIST_FAULT'
-                          ? 'border-[#1EC1CB] bg-[#E6F9FA]/50 shadow-xs'
-                          : 'border-[#E8CED5] bg-white hover:bg-[#FDF7F9]'
+                          ? 'border-[#EB5B38] bg-rose-50 shadow-xs'
+                          : 'border-[#E7E5E4] bg-white hover:bg-[#F3F1EC]'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="font-extrabold text-sm text-[#1A0A0F] flex items-center gap-1.5">
-                          <UserX className="w-4 h-4 text-[#C93B3B]" />
+                        <span className="font-extrabold text-sm text-[#1C1917] flex items-center gap-1.5">
+                          <UserX className="w-4 h-4 text-rose-700" />
                           Phương án 2: Lỗi thuộc về Du khách
                         </span>
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#FDECEC] text-[#A62626]">
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200">
                           TOURIST_FAULT
                         </span>
                       </div>
-                      <ul className="text-xs text-[#525266] space-y-1 list-disc pl-4">
+                      <ul className="text-xs text-[#78716C] space-y-1 list-disc pl-4">
                         <li>Tịch thu 100% tiền cọc (Hoàn khách: <strong>0 ₫</strong>)</li>
                         <li>
                           Khấu trừ phí sàn {Math.round(feeRate * 100)}%: <strong>{formatMoney(platformFeeOnForfeit)}</strong>
@@ -393,7 +396,7 @@ export const DisputesPage: React.FC = () => {
 
                 {/* Mandatory Resolution Note */}
                 <div>
-                  <label className="block text-xs font-bold text-[#1C1C28] mb-1.5">
+                  <label className="block text-xs font-bold text-[#1C1917] mb-1.5">
                     Biên bản kết luận phân xử (`DISPUTE.ketQuaXuLy` — Bắt buộc) *
                   </label>
                   <textarea
@@ -405,16 +408,16 @@ export const DisputesPage: React.FC = () => {
                       if (noteError) setNoteError('');
                     }}
                     placeholder="Ghi rõ căn cứ bằng chứng GPS/tin nhắn và lý do đưa ra phán quyết tài chính..."
-                    className="w-full px-3.5 py-2.5 rounded-[10px] border border-[#D4C0C6] text-sm text-[#1C1C28] focus:outline-none focus:ring-2 focus:ring-[#1EC1CB] disabled:bg-[#F4F5F8]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E5E4] text-sm text-[#1C1917] focus:outline-none focus:ring-2 focus:ring-[#347CCB] disabled:bg-[#F3F1EC]"
                   />
                   {noteError && (
-                    <p className="mt-1.5 text-xs font-semibold text-[#C93B3B] flex items-center gap-1">
+                    <p className="mt-1.5 text-xs font-semibold text-rose-700 flex items-center gap-1">
                       <ShieldAlert className="w-3.5 h-3.5" /> {noteError}
                     </p>
                   )}
                 </div>
 
-                <div className="flex justify-end gap-2 pt-2 border-t border-[#E8CED5]">
+                <div className="flex justify-end gap-2 pt-2 border-t border-[#E7E5E4]">
                   <Button
                     type="button"
                     variant="outline"

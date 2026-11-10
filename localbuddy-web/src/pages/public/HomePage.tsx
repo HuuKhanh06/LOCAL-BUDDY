@@ -136,36 +136,6 @@ const EXPERIENCES = [
   },
 ];
 
-const REAL_REVIEWS = [
-  {
-    id: 'rev-1',
-    author: 'Hoàng Mai',
-    origin: 'Hà Nội',
-    date: 'Tháng 10/2026',
-    stars: 5,
-    text: 'Anh Khanh dẫn cả gia đình mình ăn hải sản Bé Mặn và khám phá chợ đêm Sơn Trà cực kỳ nhiệt tình. Giá theo giờ rất minh bạch, tuyệt đối không có cảnh dẫn khách vào điểm mua sắm để lấy hoa hồng!',
-    guideName: 'Nguyễn Hữu Khanh',
-  },
-  {
-    id: 'rev-2',
-    author: 'Michael Tan',
-    origin: 'Singapore',
-    date: 'Tháng 9/2026',
-    stars: 5,
-    text: 'Booking a local buddy for 4 hours in Da Nang was the best decision. Khanh speaks fluent English, took us to hidden coffee shops in Hai Chau and helped us rent good motorbikes safely.',
-    guideName: 'Nguyễn Hữu Khanh',
-  },
-  {
-    id: 'rev-3',
-    author: 'Trần Thu Trang',
-    origin: 'TP. Hồ Chí Minh',
-    date: 'Tháng 8/2026',
-    stars: 5,
-    text: 'Rất yên tâm vì được giữ cọc 30% qua nền tảng, chỉ thanh toán 70% còn lại khi đã xong chuyến đi. Thổ địa thân thiện, chụp ảnh có tâm và am hiểu từng con ngõ Đà Nẵng.',
-    guideName: 'Nguyễn Hữu Khanh',
-  },
-];
-
 const FAQ_ITEMS = [
   {
     q: 'Vì sao tôi chỉ cần đặt cọc 30% khi đặt lịch Thổ địa?',
@@ -191,7 +161,7 @@ const FAQ_ITEMS = [
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const { verifiedGuides, slots } = useBookingContext();
+  const { verifiedGuides, slots, reviews, getUserById, getGuideById } = useBookingContext();
 
   // Search state đầy đủ theo Mục [9]: Đà Nẵng cố định + ngày + giờ + số giờ + ngôn ngữ
   const [selectedArea, setSelectedArea] = useState('');
@@ -377,7 +347,7 @@ export const HomePage: React.FC = () => {
           { num: '100% KYC', label: 'CCCD & Thẻ HDV xác thực' },
           { num: 'Cọc 30%', label: 'Giữ chỗ nguyên tử 15 phút' },
           { num: 'Hoàn 100%', label: 'Hủy trước 48 giờ miễn phí' },
-          { num: '★ 4.9 / 5', label: '100% Đánh giá thực tế' },
+          { num: '0 Phí ẩn', label: 'Đơn giá theo giờ minh bạch' },
         ].map((item) => (
           <div
             key={item.num}
@@ -665,45 +635,51 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 8. ĐÁNH GIÁ THỰC TẾ TỪ DU KHÁCH (Mục [9]: đánh giá thật) */}
-      <section className="space-y-4">
-        <div className="text-center max-w-xl mx-auto space-y-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#EB5B38]">
-            Đánh giá xác thực
-          </span>
-          <h2 className="text-[22px] sm:text-[26px] font-black text-[#1C1917] tracking-tight">
-            Cảm nhận của du khách sau chuyến đi
-          </h2>
-        </div>
+      {/* 8. ĐÁNH GIÁ THỰC TẾ TỪ DU KHÁCH (Chỉ hiển thị khi có đánh giá thật trong CSDL) */}
+      {reviews.length > 0 && (
+        <section className="space-y-4">
+          <div className="text-center max-w-xl mx-auto space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#EB5B38]">
+              Đánh giá xác thực
+            </span>
+            <h2 className="text-[22px] sm:text-[26px] font-black text-[#1C1917] tracking-tight">
+              Cảm nhận của du khách sau chuyến đi
+            </h2>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {REAL_REVIEWS.map((rev) => (
-            <div
-              key={rev.id}
-              className="bg-white border border-[#E7E5E4] rounded-[22px] p-6 space-y-3 flex flex-col justify-between shadow-xs"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center gap-1 text-amber-500 text-sm">
-                  {'★'.repeat(rev.stars)}
-                </div>
-                <p className="text-[13px] text-[#57534E] leading-relaxed italic">
-                  “{rev.text}”
-                </p>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {reviews.slice(0, 3).map((rev) => {
+              const tourist = getUserById(rev.touristId);
+              const guide = getGuideById(rev.guideId);
+              return (
+                <div
+                  key={rev.id}
+                  className="bg-white border border-[#E7E5E4] rounded-[22px] p-6 space-y-3 flex flex-col justify-between shadow-xs"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-1 text-amber-500 text-sm">
+                      {'★'.repeat(rev.stars)}
+                    </div>
+                    <p className="text-[13px] text-[#57534E] leading-relaxed italic">
+                      “{rev.comment}”
+                    </p>
+                  </div>
 
-              <div className="pt-3 border-t border-[#E7E5E4] flex items-center justify-between text-[12px]">
-                <div>
-                  <strong className="block text-[#1C1917]">{rev.author}</strong>
-                  <span className="text-[#78716C]">{rev.origin} • {rev.date}</span>
+                  <div className="pt-3 border-t border-[#E7E5E4] flex items-center justify-between text-[12px]">
+                    <div>
+                      <strong className="block text-[#1C1917]">{tourist?.fullName || 'Du khách'}</strong>
+                      <span className="text-[#78716C]">{rev.createdAt.split('T')[0]}</span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded bg-[#F3F1EC] text-[11px] font-semibold text-[#57534E]">
+                      Thổ địa: {guide?.user.fullName || 'Đà Nẵng'}
+                    </span>
+                  </div>
                 </div>
-                <span className="px-2 py-0.5 rounded bg-[#F3F1EC] text-[11px] font-semibold text-[#57534E]">
-                  Thổ địa: {rev.guideName}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* 9. CTA TRỞ THÀNH GUIDE (Mục [9]: CTA trở thành Guide) */}
       <section className="rounded-[26px] bg-[#272A2D] text-white p-8 sm:p-12 relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
