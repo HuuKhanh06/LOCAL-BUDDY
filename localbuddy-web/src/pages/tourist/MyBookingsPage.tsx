@@ -11,51 +11,76 @@ import { Button } from '../../components/ui/Button';
 
 export const MyBookingsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { bookings, getGuideById } = useBookingContext();
+  const { bookings, currentUser, getGuideById } = useBookingContext();
   const [activeTab, setActiveTab] = useState<string>('all');
   const [viewStatus, setViewStatus] = useState<'ready' | 'loading' | 'error'>('ready');
 
+  // Phân quyền dữ liệu: Du khách chỉ thấy các đơn do chính mình đặt (b.touristId === currentUser.id)
+  const userBookings = useMemo(() => {
+    if (!currentUser) return [];
+    if (currentUser.role === 'tourist') {
+      return bookings.filter((b) => b.touristId === currentUser.id);
+    }
+    if (currentUser.role === 'guide') {
+      return bookings.filter((b) => b.guideId === currentUser.id);
+    }
+    return bookings; // Admin có quyền giám sát toàn bộ
+  }, [bookings, currentUser]);
+
   const tabs = [
-    { id: 'all', label: 'Tất cả đơn', badge: bookings.length },
+    { id: 'all', label: 'Tất cả đơn', badge: userBookings.length },
     {
       id: 'PENDING',
       label: 'Chờ HDV phản hồi',
-      badge: bookings.filter((b) => b.bookingStatus === 'PENDING').length || undefined,
+      badge: userBookings.filter((b) => b.bookingStatus === 'PENDING').length || undefined,
     },
     {
       id: 'WAITING_PAYMENT',
       label: 'Chờ đặt cọc 30%',
-      badge: bookings.filter((b) => b.bookingStatus === 'WAITING_PAYMENT').length || undefined,
+      badge: userBookings.filter((b) => b.bookingStatus === 'WAITING_PAYMENT').length || undefined,
     },
     {
       id: 'CONFIRMED',
       label: 'Đã xác nhận lịch',
-      badge: bookings.filter((b) => b.bookingStatus === 'CONFIRMED').length || undefined,
+      badge: userBookings.filter((b) => b.bookingStatus === 'CONFIRMED').length || undefined,
     },
     {
       id: 'COMPLETED',
       label: 'Đã hoàn thành',
-      badge: bookings.filter((b) => b.bookingStatus === 'COMPLETED').length || undefined,
+      badge: userBookings.filter((b) => b.bookingStatus === 'COMPLETED').length || undefined,
     },
     {
       id: 'CANCELLED_DISPUTED',
       label: 'Đã hủy / Khiếu nại',
       badge:
-        bookings.filter(
+        userBookings.filter(
           (b) => b.bookingStatus === 'CANCELLED' || b.bookingStatus === 'DISPUTED'
         ).length || undefined,
     },
   ];
 
   const filteredBookings = useMemo(() => {
-    if (activeTab === 'all') return bookings;
+    if (activeTab === 'all') return userBookings;
     if (activeTab === 'CANCELLED_DISPUTED') {
-      return bookings.filter(
+      return userBookings.filter(
         (b) => b.bookingStatus === 'CANCELLED' || b.bookingStatus === 'DISPUTED'
       );
     }
-    return bookings.filter((b) => b.bookingStatus === activeTab);
-  }, [bookings, activeTab]);
+    return userBookings.filter((b) => b.bookingStatus === activeTab);
+  }, [userBookings, activeTab]);
+
+  if (!currentUser) {
+    return (
+      <div className="py-12 max-w-xl mx-auto px-4 text-center">
+        <EmptyState
+          title="Vui lòng đăng nhập tài khoản Du khách"
+          description="Đăng nhập để xem và quản lý danh sách các chuyến đi do chính bạn đặt tại Đà Nẵng."
+          actionText="Đăng nhập ngay"
+          onAction={() => navigate('/login')}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 py-2">

@@ -21,7 +21,7 @@ import {
 export const BalancePaymentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getBookingById, getGuideById, payFinal } = useBookingContext();
+  const { currentUser, getBookingById, getGuideById, payFinal } = useBookingContext();
   const { showToast } = useToast();
 
   const booking = getBookingById(id || '');
@@ -67,6 +67,22 @@ export const BalancePaymentPage: React.FC = () => {
       <div className="py-10 max-w-xl mx-auto">
         <ErrorState
           message="Không tìm thấy đơn đặt lịch cần tất toán 70%."
+          onRetry={() => navigate('/don-cua-toi')}
+        />
+      </div>
+    );
+  }
+
+  const isAuthorized =
+    !currentUser ||
+    currentUser.role === 'admin' ||
+    (currentUser.role === 'tourist' && booking.touristId === currentUser.id);
+
+  if (!isAuthorized) {
+    return (
+      <div className="py-10 max-w-xl mx-auto">
+        <ErrorState
+          message="Bạn không có quyền thực hiện tất toán cho đơn đặt lịch của người khác."
           onRetry={() => navigate('/don-cua-toi')}
         />
       </div>

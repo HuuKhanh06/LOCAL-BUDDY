@@ -23,7 +23,7 @@ import {
 export const DepositPaymentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getBookingById, getGuideById, payDeposit, expireDeposit } =
+  const { currentUser, getBookingById, getGuideById, payDeposit, expireDeposit } =
     useBookingContext();
   const { showToast } = useToast();
 
@@ -70,6 +70,22 @@ export const DepositPaymentPage: React.FC = () => {
       <div className="py-10 max-w-xl mx-auto">
         <ErrorState
           message="Không tìm thấy đơn đặt lịch cần thanh toán cọc."
+          onRetry={() => navigate('/don-cua-toi')}
+        />
+      </div>
+    );
+  }
+
+  const isAuthorized =
+    !currentUser ||
+    currentUser.role === 'admin' ||
+    (currentUser.role === 'tourist' && booking.touristId === currentUser.id);
+
+  if (!isAuthorized) {
+    return (
+      <div className="py-10 max-w-xl mx-auto">
+        <ErrorState
+          message="Bạn không có quyền thực hiện thanh toán cọc cho đơn đặt lịch của người khác."
           onRetry={() => navigate('/don-cua-toi')}
         />
       </div>

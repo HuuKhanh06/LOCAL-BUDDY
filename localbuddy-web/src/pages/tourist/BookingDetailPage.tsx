@@ -47,6 +47,7 @@ export const BookingDetailPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const {
+    currentUser,
     getBookingById,
     getGuideById,
     getUserById,
@@ -113,6 +114,23 @@ export const BookingDetailPage: React.FC = () => {
       <div className="py-10 max-w-xl mx-auto">
         <ErrorState
           message="Không tìm thấy mã đơn đặt lịch này."
+          onRetry={() => navigate('/don-cua-toi')}
+        />
+      </div>
+    );
+  }
+
+  const isAuthorized =
+    !currentUser ||
+    currentUser.role === 'admin' ||
+    (currentUser.role === 'tourist' && booking.touristId === currentUser.id) ||
+    (currentUser.role === 'guide' && booking.guideId === currentUser.id);
+
+  if (!isAuthorized) {
+    return (
+      <div className="py-10 max-w-xl mx-auto">
+        <ErrorState
+          message="Bạn không có quyền truy cập đơn đặt lịch này. Mỗi du khách chỉ có thể quản lý các chuyến đi do chính mình đặt."
           onRetry={() => navigate('/don-cua-toi')}
         />
       </div>
