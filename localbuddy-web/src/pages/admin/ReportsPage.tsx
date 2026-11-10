@@ -1,7 +1,7 @@
 // pages/admin/ReportsPage.tsx (UC.28: Báo cáo & Thống kê; QĐ-09: Hàng đợi đối soát; Giám sát booking)
 // Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   TrendingUp,
@@ -141,12 +141,39 @@ export const ReportsPage: React.FC = () => {
     .filter((b) => b.bookingStatus !== 'CANCELLED')
     .reduce((sum, b) => sum + b.totalAmount, 0);
 
+  // Danh sách hủy đơn chuẩn hóa (kết hợp CANCELLATION_RECORD và các đơn CANCELLED)
+  const effectiveCancellations = useMemo(() => {
+    const list = [...cancellations];
+    const existingBookingIds = new Set(list.map((c) => c.bookingId));
+    for (const b of filteredBookings) {
+      if (b.bookingStatus === 'CANCELLED' && !existingBookingIds.has(b.id)) {
+        const penaltyRate = b.depositAmount > 0 ? (b.penalty || 0) / b.depositAmount : 0;
+        const platformFee = Math.max(0, (b.penalty || 0) - (b.guideCompensation || 0));
+        list.push({
+          id: `CAN-${b.id}`,
+          bookingId: b.id,
+          cancelledByUserId: b.touristId,
+          cancellationType: b.cancellationType || 'TOURIST_CANCEL',
+          reason: b.cancelReason || 'Du khách hủy đơn',
+          cancelledAt: b.cancelledAt || b.createdAt,
+          deltaHours: b.deltaHours || 0,
+          penaltyRate,
+          refundToTourist: b.refund || 0,
+          platformFeeRetained: platformFee,
+          paidToGuide: b.guideCompensation || 0,
+        });
+        existingBookingIds.add(b.id);
+      }
+    }
+    return list;
+  }, [cancellations, filteredBookings]);
+
   // Platform Fee Revenue
   const feeFromCompleted = completedPaidBookings.reduce(
     (sum, b) => sum + Math.round(b.totalAmount * b.feeRate),
     0
   );
-  const feeFromCancellations = cancellations.reduce(
+  const feeFromCancellations = effectiveCancellations.reduce(
     (sum, c) => sum + (c.platformFeeRetained || 0),
     0
   );
@@ -494,10 +521,10 @@ export const ReportsPage: React.FC = () => {
               <h2 className="text-base font-bold text-[#1C1917] flex items-center gap-2">
                 <XCircle className="w-5 h-5 text-red-600" /> Nhật ký đối soát Hủy đơn & Phạt cọc theo ΔT (`CANCELLATION_RECORD`)
               </h2>
-              <span className="text-xs font-bold text-[#78716C]">{cancellations.length} bản ghi</span>
+              <span className="text-xs font-bold text-[#78716C]">{effectiveCancellations.length} bản ghi</span>
             </div>
 
-            {cancellations.length === 0 ? (
+            {effectiveCancellations.length === 0 ? (
               <p className="text-[13px] text-[#78716C] py-2">Chưa có đơn nào bị hủy.</p>
             ) : (
               <div className="overflow-x-auto">
@@ -513,7 +540,7 @@ export const ReportsPage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#E7E5E4] text-xs">
-                    {cancellations.map((c) => (
+                    {effectiveCancellations.map((c) => (
                       <tr key={c.id} className="hover:bg-[#F3F1EC]/60">
                         <td className="py-3 px-3 font-bold text-[#1C1917]">
                           {c.id} • Đơn {c.bookingId}

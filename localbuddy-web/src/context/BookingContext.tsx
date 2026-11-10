@@ -361,6 +361,33 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       next.withdrawals = incoming.withdrawals;
     }
 
+    // Tự động bảo toàn CANCELLATION_RECORD cho các đơn CANCELLED để tính toán đầy đủ Doanh thu phí sàn
+    const existingCancelIds = new Set((next.cancellations || []).map((c) => c.bookingId));
+    const missingCancellations: CancellationRecord[] = [];
+    for (const b of next.bookings || []) {
+      if (b.bookingStatus === 'CANCELLED' && !existingCancelIds.has(b.id)) {
+        const penaltyRate = b.depositAmount > 0 ? (b.penalty || 0) / b.depositAmount : 0;
+        const platformFee = Math.max(0, (b.penalty || 0) - (b.guideCompensation || 0));
+        missingCancellations.push({
+          id: `CAN-${b.id}`,
+          bookingId: b.id,
+          cancelledByUserId: b.touristId,
+          cancellationType: b.cancellationType || 'TOURIST_CANCEL',
+          reason: b.cancelReason || 'Du khách hủy đơn',
+          cancelledAt: b.cancelledAt || b.createdAt,
+          deltaHours: b.deltaHours || 0,
+          penaltyRate,
+          refundToTourist: b.refund || 0,
+          platformFeeRetained: platformFee,
+          paidToGuide: b.guideCompensation || 0,
+        });
+        existingCancelIds.add(b.id);
+      }
+    }
+    if (missingCancellations.length > 0) {
+      next.cancellations = [...(next.cancellations || []), ...missingCancellations];
+    }
+
     return next;
   };
 
@@ -1497,7 +1524,10 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         },
       ]);
 
+      const nextCancellations = [cancelRec, ...prev.cancellations];
+
       syncToCloud({
+        cancellations: nextCancellations,
         bookings: nextBookings,
         slots: nextSlots,
         notifications: nextNotifs,
@@ -1507,7 +1537,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       return {
         ...prev,
-        cancellations: [cancelRec, ...prev.cancellations],
+        cancellations: nextCancellations,
         wallets: nextWallets,
         walletTransactions: nextWalletTxs,
         bookings: nextBookings,
@@ -1610,7 +1640,10 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         },
       ]);
 
+      const nextCancellations = [cancelRec, ...prev.cancellations];
+
       syncToCloud({
+        cancellations: nextCancellations,
         users: nextUsers,
         bookings: nextBookings,
         slots: nextSlots,
@@ -1619,7 +1652,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       return {
         ...prev,
-        cancellations: [cancelRec, ...prev.cancellations],
+        cancellations: nextCancellations,
         users: nextUsers,
         bookings: nextBookings,
         slots: nextSlots,
