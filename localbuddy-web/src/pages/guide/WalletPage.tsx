@@ -38,7 +38,7 @@ export const WalletPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'ledger' | 'withdrawals' | 'simulator'>('ledger');
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
 
-  const guideId = currentUser?.role === 'guide' ? currentUser.id : 'guide-1';
+  const guideId = currentUser?.role === 'guide' ? currentUser.id : 'u-guide-1';
   const guideData = getGuideById(guideId);
   const wallet = getWalletByGuideId(guideId);
 

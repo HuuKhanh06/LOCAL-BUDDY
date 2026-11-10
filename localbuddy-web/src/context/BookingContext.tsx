@@ -360,6 +360,12 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (incoming.withdrawals !== undefined) {
       next.withdrawals = incoming.withdrawals;
     }
+    if (incoming.feeRate !== undefined) {
+      next.feeRate = incoming.feeRate;
+    }
+    if (incoming.feeHistory !== undefined) {
+      next.feeHistory = incoming.feeHistory;
+    }
 
     // Tự động bảo toàn CANCELLATION_RECORD cho các đơn CANCELLED để tính toán đầy đủ Doanh thu phí sàn
     const existingCancelIds = new Set((next.cancellations || []).map((c) => c.bookingId));
@@ -704,9 +710,8 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!params.fullName.trim() || !params.phone.trim()) {
       return { ok: false, message: 'Họ tên và số điện thoại không được để trống.' };
     }
-    setState((prev) => ({
-      ...prev,
-      users: prev.users.map((u) =>
+    setState((prev) => {
+      const nextUsers = prev.users.map((u) =>
         u.id === params.userId
           ? {
               ...u,
@@ -717,8 +722,13 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               avatarUrl: params.avatarUrl || u.avatarUrl,
             }
           : u
-      ),
-    }));
+      );
+      syncToCloud({ users: nextUsers });
+      return {
+        ...prev,
+        users: nextUsers,
+      };
+    });
     return { ok: true, message: 'Đã cập nhật thông tin cá nhân thành công!' };
   };
 
@@ -740,11 +750,15 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       updatedByAdminId: currentUser?.id || 'u-admin-1',
       updatedAt: new Date().toISOString(),
     };
-    setState((prev) => ({
-      ...prev,
-      feeRate: rounded,
-      feeHistory: [item, ...prev.feeHistory],
-    }));
+    setState((prev) => {
+      const nextFeeHistory = [item, ...prev.feeHistory];
+      syncToCloud({ feeRate: rounded, feeHistory: nextFeeHistory } as any);
+      return {
+        ...prev,
+        feeRate: rounded,
+        feeHistory: nextFeeHistory,
+      };
+    });
     return {
       ok: true,
       message: `Đã lưu cấu hình phí sàn ${(rounded * 100).toFixed(0)}%. Các đơn đặt lịch cũ vẫn giữ nguyên tỷ lệ phí lúc tạo đơn.`,
@@ -793,10 +807,9 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       isRead: false,
       createdAt: new Date().toISOString(),
     };
-    setState((prev) => ({
-      ...prev,
-      messages: [...prev.messages, newMsg],
-      notifications: pushNotification(prev.notifications, {
+    setState((prev) => {
+      const nextMsgs = [...prev.messages, newMsg];
+      const nextNotifs = pushNotification(prev.notifications, {
         userId: receiverId,
         title: `Tin nhắn mới từ ${senderName}`,
         content: content.trim().slice(0, 90),
@@ -806,8 +819,14 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           prev.users.find((u) => u.id === receiverId)?.role === 'guide'
             ? '/guide/tin-nhan'
             : '/tin-nhan',
-      }),
-    }));
+      });
+      syncToCloud({ messages: nextMsgs, notifications: nextNotifs });
+      return {
+        ...prev,
+        messages: nextMsgs,
+        notifications: nextNotifs,
+      };
+    });
     return { ok: true, message: 'Đã gửi tin nhắn.' };
   };
 
@@ -1269,30 +1288,29 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       paidToGuide: 0,
     };
 
-    setState((prev) => ({
-      ...prev,
-      cancellations: [cancelRec, ...prev.cancellations],
-      bookings: prev.bookings.map((b) =>
+    setState((prev) => {
+      const nextCancellations = [cancelRec, ...prev.cancellations];
+      const nextBookings = prev.bookings.map((b) =>
         b.id === bookingId
           ? {
               ...b,
-              bookingStatus: 'CANCELLED',
-              paymentStatus: 'UNPAID',
+              bookingStatus: 'CANCELLED' as const,
+              paymentStatus: 'UNPAID' as const,
               cancelledAt: new Date().toISOString(),
               cancelReason: reason,
-              cancellationType: 'SYSTEM_TIMEOUT',
+              cancellationType: 'SYSTEM_TIMEOUT' as const,
             }
           : b
-      ),
-      slots: prev.slots.map((s) =>
+      );
+      const nextSlots = prev.slots.map((s) =>
         s.bookingId === bookingId ||
         (s.guideId === target.guideId &&
           s.date === target.date &&
           s.startTime === target.startTime)
-          ? { ...s, status: 'AVAILABLE', bookingId: undefined, holdExpiresAt: undefined }
+          ? { ...s, status: 'AVAILABLE' as const, bookingId: undefined, holdExpiresAt: undefined }
           : s
-      ),
-      notifications: pushNotifications(prev.notifications, [
+      );
+      const nextNotifs = pushNotifications(prev.notifications, [
         {
           userId: target.touristId,
           title: `Đơn ${bookingId} đã tự động hủy do hết 15 phút giữ chỗ`,
@@ -1317,8 +1335,23 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           bookingId,
           actionUrl: '/admin/bao-cao?tab=monitoring',
         },
-      ]),
-    }));
+      ]);
+
+      syncToCloud({
+        cancellations: nextCancellations,
+        bookings: nextBookings,
+        slots: nextSlots,
+        notifications: nextNotifs,
+      });
+
+      return {
+        ...prev,
+        cancellations: nextCancellations,
+        bookings: nextBookings,
+        slots: nextSlots,
+        notifications: nextNotifs,
+      };
+    });
   };
 
   /**
@@ -1330,21 +1363,20 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const reason =
       'Quá thời hạn 24 giờ nhưng Hướng dẫn viên không phản hồi yêu cầu đặt lịch (Tự động hủy theo BR-03).';
-    setState((prev) => ({
-      ...prev,
-      bookings: prev.bookings.map((b) =>
+    setState((prev) => {
+      const nextBookings = prev.bookings.map((b) =>
         b.id === bookingId
           ? {
               ...b,
-              bookingStatus: 'CANCELLED',
-              paymentStatus: 'UNPAID',
+              bookingStatus: 'CANCELLED' as const,
+              paymentStatus: 'UNPAID' as const,
               cancelledAt: new Date().toISOString(),
               cancelReason: reason,
-              cancellationType: 'SYSTEM_TIMEOUT',
+              cancellationType: 'SYSTEM_TIMEOUT' as const,
             }
           : b
-      ),
-      notifications: pushNotifications(prev.notifications, [
+      );
+      const nextNotifs = pushNotifications(prev.notifications, [
         {
           userId: target.touristId,
           title: `Đơn ${bookingId} đã hết hạn chờ phản hồi 24 giờ`,
@@ -1369,8 +1401,19 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           bookingId,
           actionUrl: '/admin/bao-cao?tab=monitoring',
         },
-      ]),
-    }));
+      ]);
+
+      syncToCloud({
+        bookings: nextBookings,
+        notifications: nextNotifs,
+      });
+
+      return {
+        ...prev,
+        bookings: nextBookings,
+        notifications: nextNotifs,
+      };
+    });
   };
 
   // ── 5. HỦY ĐƠN THEO ΔT (UC.24, UC.25, BR-06, BR-07) ─────────
@@ -2465,18 +2508,26 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         };
       });
 
+      const nextNotifs = pushNotification(prev.notifications, {
+        userId: b.guideId,
+        title: `Bạn nhận được đánh giá ${safeStars} ★ từ đơn ${bookingId}`,
+        content: `"${comment.trim().slice(0, 80)}"`,
+        type: 'BOOKING',
+        bookingId,
+        actionUrl: '/guide/ho-so',
+      });
+
+      syncToCloud({
+        reviews: nextReviews,
+        guideProfiles: nextProfiles,
+        notifications: nextNotifs,
+      });
+
       return {
         ...prev,
         reviews: nextReviews,
         guideProfiles: nextProfiles,
-        notifications: pushNotification(prev.notifications, {
-          userId: b.guideId,
-          title: `Bạn nhận được đánh giá ${safeStars} ★ từ đơn ${bookingId}`,
-          content: `"${comment.trim().slice(0, 80)}"`,
-          type: 'BOOKING',
-          bookingId,
-          actionUrl: '/guide/ho-so',
-        }),
+        notifications: nextNotifs,
       };
     });
 
@@ -2520,9 +2571,8 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
 
     const nowIso = new Date().toISOString();
-    setState((prev) => ({
-      ...prev,
-      reviews: prev.reviews.map((r) =>
+    setState((prev) => {
+      const nextReviews = prev.reviews.map((r) =>
         r.bookingId === bookingId
           ? {
               ...r,
@@ -2531,16 +2581,27 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               repliedAt: nowIso,
             }
           : r
-      ),
-      notifications: pushNotification(prev.notifications, {
+      );
+      const nextNotifs = pushNotification(prev.notifications, {
         userId: b.touristId,
         title: `Hướng dẫn viên đã phản hồi đánh giá đơn ${bookingId} (${safeRating} ★)`,
         content: `"${replyComment.trim().slice(0, 90)}"`,
         type: 'BOOKING',
         bookingId,
         actionUrl: `/don/${bookingId}`,
-      }),
-    }));
+      });
+
+      syncToCloud({
+        reviews: nextReviews,
+        notifications: nextNotifs,
+      });
+
+      return {
+        ...prev,
+        reviews: nextReviews,
+        notifications: nextNotifs,
+      };
+    });
 
     return {
       ok: true,
@@ -2559,14 +2620,18 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       };
     }
 
-    setState((prev) => ({
-      ...prev,
-      slots: prev.slots.map((s) =>
+    setState((prev) => {
+      const nextSlots = prev.slots.map((s) =>
         s.id === slotId
-          ? { ...s, status: s.status === 'AVAILABLE' ? 'BUSY' : 'AVAILABLE' }
+          ? { ...s, status: s.status === 'AVAILABLE' ? ('BUSY' as const) : ('AVAILABLE' as const) }
           : s
-      ),
-    }));
+      );
+      syncToCloud({ slots: nextSlots });
+      return {
+        ...prev,
+        slots: nextSlots,
+      };
+    });
     return { ok: true, message: 'Đã cập nhật trạng thái khung giờ.' };
   };
 
@@ -2614,10 +2679,14 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       status: 'AVAILABLE',
     };
 
-    setState((prev) => ({
-      ...prev,
-      slots: [...prev.slots, newSlot],
-    }));
+    setState((prev) => {
+      const nextSlots = [...prev.slots, newSlot];
+      syncToCloud({ slots: nextSlots });
+      return {
+        ...prev,
+        slots: nextSlots,
+      };
+    });
     return {
       ok: true,
       message: `Đã thêm khung giờ rảnh ${params.startTime} – ${params.endTime} ngày ${params.date}!`,
@@ -2657,9 +2726,8 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       };
     }
 
-    setState((prev) => ({
-      ...prev,
-      slots: prev.slots.map((s) =>
+    setState((prev) => {
+      const nextSlots = prev.slots.map((s) =>
         s.id === params.slotId
           ? {
               ...s,
@@ -2668,8 +2736,13 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               endTime: params.endTime,
             }
           : s
-      ),
-    }));
+      );
+      syncToCloud({ slots: nextSlots });
+      return {
+        ...prev,
+        slots: nextSlots,
+      };
+    });
 
     return {
       ok: true,
@@ -2686,10 +2759,14 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         message: 'Chỉ có thể xóa các khung giờ đang Trống (AVAILABLE) và chưa gắn với đơn đặt lịch.',
       };
     }
-    setState((prev) => ({
-      ...prev,
-      slots: prev.slots.filter((s) => s.id !== slotId),
-    }));
+    setState((prev) => {
+      const nextSlots = prev.slots.filter((s) => s.id !== slotId);
+      syncToCloud({ slots: nextSlots });
+      return {
+        ...prev,
+        slots: nextSlots,
+      };
+    });
     return { ok: true, message: 'Đã xóa khung giờ rảnh.' };
   };
 
@@ -2716,9 +2793,8 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       };
     }
 
-    setState((prev) => ({
-      ...prev,
-      guideProfiles: prev.guideProfiles.map((gp) =>
+    setState((prev) => {
+      const nextProfiles = prev.guideProfiles.map((gp) =>
         gp.userId === guideId
           ? {
               ...gp,
@@ -2743,8 +2819,13 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
                   : gp.bankAccountHolder,
             }
           : gp
-      ),
-    }));
+      );
+      syncToCloud({ guideProfiles: nextProfiles });
+      return {
+        ...prev,
+        guideProfiles: nextProfiles,
+      };
+    });
 
     return {
       ok: true,
@@ -2784,27 +2865,38 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     setState((prev) => {
       const filtered = prev.kycRecords.filter((k) => k.guideId !== params.guideId);
+      const nextKyc = [newRecord, ...filtered];
+      const nextProfiles = prev.guideProfiles.map((gp) =>
+        gp.userId === params.guideId
+          ? {
+              ...gp,
+              kycStatus: 'PENDING' as const,
+              bankName: params.bankName.trim(),
+              bankAccountNumber: params.bankAccountNumber.trim(),
+              bankAccountHolder: params.bankAccountHolder.trim().toUpperCase(),
+            }
+          : gp
+      );
+      const adminUser = prev.users.find((u) => u.role === 'admin');
+      const nextNotifs = pushNotification(prev.notifications, {
+        userId: adminUser?.id || 'u-admin-1',
+        title: `Hồ sơ KYC mới từ HDV cần thẩm định`,
+        content: `HDV đã gửi hồ sơ CCCD số ${params.idNumber}. Vui lòng kiểm tra và phê duyệt (UC.10).`,
+        type: 'KYC',
+        actionUrl: '/admin/kyc',
+      });
+
+      syncToCloud({
+        kycRecords: nextKyc,
+        guideProfiles: nextProfiles,
+        notifications: nextNotifs,
+      });
+
       return {
         ...prev,
-        kycRecords: [newRecord, ...filtered],
-        guideProfiles: prev.guideProfiles.map((gp) =>
-          gp.userId === params.guideId
-            ? {
-                ...gp,
-                kycStatus: 'PENDING',
-                bankName: params.bankName.trim(),
-                bankAccountNumber: params.bankAccountNumber.trim(),
-                bankAccountHolder: params.bankAccountHolder.trim().toUpperCase(),
-              }
-            : gp
-        ),
-        notifications: pushNotification(prev.notifications, {
-          userId: 'u-admin-1',
-          title: `Hồ sơ KYC mới từ HDV cần thẩm định`,
-          content: `HDV đã gửi hồ sơ CCCD số ${params.idNumber}. Vui lòng kiểm tra và phê duyệt (UC.10).`,
-          type: 'KYC',
-          actionUrl: '/admin/kyc',
-        }),
+        kycRecords: nextKyc,
+        guideProfiles: nextProfiles,
+        notifications: nextNotifs,
       };
     });
 
@@ -2859,22 +2951,35 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       createdAt: new Date().toISOString(),
     };
 
-    setState((prev) => ({
-      ...prev,
-      wallets: prev.wallets.map((w) =>
+    setState((prev) => {
+      const nextWallets = prev.wallets.map((w) =>
         w.guideId === guideId
           ? { ...w, availableBalance: w.availableBalance - Math.round(amount) }
           : w
-      ),
-      withdrawals: [newReq, ...prev.withdrawals],
-      notifications: pushNotification(prev.notifications, {
-        userId: 'u-admin-1',
+      );
+      const nextWithdrawals = [newReq, ...prev.withdrawals];
+      const adminUser = prev.users.find((u) => u.role === 'admin');
+      const nextNotifs = pushNotification(prev.notifications, {
+        userId: adminUser?.id || 'u-admin-1',
         title: `Yêu cầu rút tiền mới ${newReq.id} (${formatMoney(amount)})`,
         content: `HDV yêu cầu rút ${formatMoney(amount)} về ${bankName} (${bankAccountNumber}).`,
         type: 'WALLET',
         actionUrl: '/admin/rut-tien',
-      }),
-    }));
+      });
+
+      syncToCloud({
+        wallets: nextWallets,
+        withdrawals: nextWithdrawals,
+        notifications: nextNotifs,
+      });
+
+      return {
+        ...prev,
+        wallets: nextWallets,
+        withdrawals: nextWithdrawals,
+        notifications: nextNotifs,
+      };
+    });
 
     return {
       ok: true,
@@ -2909,32 +3014,44 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         createdAt: new Date().toISOString(),
       };
 
+      const nextWithdrawals = prev.withdrawals.map((w) =>
+        w.id === id
+          ? {
+              ...w,
+              status: 'APPROVED' as const,
+              transactionRef: refCode,
+              adminNote: adminNote || 'Đã chuyển khoản ngân hàng 24/7 thành công.',
+              processedAt: new Date().toISOString(),
+            }
+          : w
+      );
+      const nextWallets = prev.wallets.map((w) =>
+        w.guideId === target.guideId
+          ? { ...w, totalWithdrawn: w.totalWithdrawn + target.amount }
+          : w
+      );
+      const nextTxs = [newTx, ...prev.walletTransactions];
+      const nextNotifs = pushNotification(prev.notifications, {
+        userId: target.guideId,
+        title: `Lệnh rút tiền ${id} (${formatMoney(target.amount)}) đã chuyển khoản!`,
+        content: `Admin đã chuyển khoản vào ${target.bankName} (${target.bankAccountNumber}). Mã tham chiếu: ${refCode}.`,
+        type: 'WALLET',
+        actionUrl: '/guide/vi',
+      });
+
+      syncToCloud({
+        withdrawals: nextWithdrawals,
+        wallets: nextWallets,
+        walletTransactions: nextTxs,
+        notifications: nextNotifs,
+      });
+
       return {
         ...prev,
-        withdrawals: prev.withdrawals.map((w) =>
-          w.id === id
-            ? {
-                ...w,
-                status: 'APPROVED',
-                transactionRef: refCode,
-                adminNote: adminNote || 'Đã chuyển khoản ngân hàng 24/7 thành công.',
-                processedAt: new Date().toISOString(),
-              }
-            : w
-        ),
-        wallets: prev.wallets.map((w) =>
-          w.guideId === target.guideId
-            ? { ...w, totalWithdrawn: w.totalWithdrawn + target.amount }
-            : w
-        ),
-        walletTransactions: [newTx, ...prev.walletTransactions],
-        notifications: pushNotification(prev.notifications, {
-          userId: target.guideId,
-          title: `Lệnh rút tiền ${id} (${formatMoney(target.amount)}) đã chuyển khoản!`,
-          content: `Admin đã chuyển khoản vào ${target.bankName} (${target.bankAccountNumber}). Mã tham chiếu: ${refCode}.`,
-          type: 'WALLET',
-          actionUrl: '/guide/vi',
-        }),
+        withdrawals: nextWithdrawals,
+        wallets: nextWallets,
+        walletTransactions: nextTxs,
+        notifications: nextNotifs,
       };
     });
   };
@@ -2947,24 +3064,23 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       adminNote?.trim() ||
       'Sai thông tin tên chủ tài khoản ngân hàng — đã hoàn trả số dư về ví khả dụng.';
 
-    setState((prev) => ({
-      ...prev,
-      withdrawals: prev.withdrawals.map((w) =>
+    setState((prev) => {
+      const nextWithdrawals = prev.withdrawals.map((w) =>
         w.id === id
           ? {
               ...w,
-              status: 'REJECTED',
+              status: 'REJECTED' as const,
               adminNote: note,
               processedAt: new Date().toISOString(),
             }
           : w
-      ),
-      wallets: prev.wallets.map((w) =>
+      );
+      const nextWallets = prev.wallets.map((w) =>
         w.guideId === target.guideId
           ? { ...w, availableBalance: w.availableBalance + target.amount }
           : w
-      ),
-      notifications: pushNotification(prev.notifications, {
+      );
+      const nextNotifs = pushNotification(prev.notifications, {
         userId: target.guideId,
         title: `Lệnh rút tiền ${id} bị từ chối — Đã hoàn tiền về ví`,
         content: `Lý do: "${note}". Số tiền ${formatMoney(
@@ -2972,29 +3088,50 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         )} đã được cộng trả lại vào số dư khả dụng.`,
         type: 'WALLET',
         actionUrl: '/guide/vi',
-      }),
-    }));
+      });
+
+      syncToCloud({
+        withdrawals: nextWithdrawals,
+        wallets: nextWallets,
+        notifications: nextNotifs,
+      });
+
+      return {
+        ...prev,
+        withdrawals: nextWithdrawals,
+        wallets: nextWallets,
+        notifications: nextNotifs,
+      };
+    });
   };
 
   // ── 12. QUẢN TRỊ ADMIN: TÀI KHOẢN & DUYỆT KYC (UC.06, UC.10) ──
   const toggleUserLock = (userId: string) => {
-    setState((prev) => ({
-      ...prev,
-      users: prev.users.map((u) =>
+    setState((prev) => {
+      const nextUsers = prev.users.map((u) =>
         u.id === userId ? { ...u, isLocked: !u.isLocked } : u
-      ),
-    }));
+      );
+      syncToCloud({ users: nextUsers });
+      return {
+        ...prev,
+        users: nextUsers,
+      };
+    });
   };
 
   const revokeGuideVerification = (userId: string) => {
-    setState((prev) => ({
-      ...prev,
-      guideProfiles: prev.guideProfiles.map((gp) =>
+    setState((prev) => {
+      const nextProfiles = prev.guideProfiles.map((gp) =>
         gp.userId === userId
-          ? { ...gp, isVerified: false, kycStatus: 'REJECTED' }
+          ? { ...gp, isVerified: false, kycStatus: 'REJECTED' as const }
           : gp
-      ),
-    }));
+      );
+      syncToCloud({ guideProfiles: nextProfiles });
+      return {
+        ...prev,
+        guideProfiles: nextProfiles,
+      };
+    });
   };
 
   const addVerifiedGuide = (userId: string) => {

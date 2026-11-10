@@ -44,7 +44,7 @@ export const KycSubmissionPage: React.FC = () => {
     }
   };
 
-  const guideId = currentUser?.role === 'guide' ? currentUser.id : 'guide-1';
+  const guideId = currentUser?.role === 'guide' ? currentUser.id : 'u-guide-1';
   const guideData = getGuideById(guideId);
   const existingRecord = kycRecords.find((r) => r.guideId === guideId);
 
