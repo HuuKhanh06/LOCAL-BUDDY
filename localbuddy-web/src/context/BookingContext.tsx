@@ -913,7 +913,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         content: `Du khách ${touristName} vừa gửi yêu cầu đặt Thổ địa ${guideName} (${params.date}, ${params.startTime}–${params.endTime}) • ${params.guestCount} khách. Chờ HDV phản hồi 24h.`,
         type: 'BOOKING',
         bookingId: newId,
-        actionUrl: '/admin/bao-cao?tab=monitoring',
+        actionUrl: '/admin/giam-sat',
       },
       // 3. Cho Du khách (Tourist)
       {
@@ -1012,7 +1012,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           content: `Khung giờ đang HOLD 15 phút chờ du khách đặt cọc 30% (${formatMoney(target.depositAmount)}).`,
           type: 'BOOKING',
           bookingId,
-          actionUrl: '/admin/bao-cao?tab=monitoring',
+          actionUrl: '/admin/giam-sat',
         },
       ]);
 
@@ -1083,7 +1083,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           content: `Lý do: "${rejectReason}". Đơn đã chuyển sang trạng thái CANCELLED.`,
           type: 'BOOKING',
           bookingId,
-          actionUrl: '/admin/bao-cao?tab=monitoring',
+          actionUrl: '/admin/giam-sat',
         },
       ]);
 
@@ -1233,7 +1233,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           content: `Du khách vừa thanh toán cọc ${formatMoney(target.depositAmount)} qua ${gateway}. Đơn chuyển sang CONFIRMED.`,
           type: 'PAYMENT',
           bookingId,
-          actionUrl: '/admin/bao-cao?tab=monitoring',
+          actionUrl: '/admin/giam-sat',
         },
         {
           userId: target.touristId,
@@ -1333,7 +1333,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           content: reason,
           type: 'BOOKING',
           bookingId,
-          actionUrl: '/admin/bao-cao?tab=monitoring',
+          actionUrl: '/admin/giam-sat',
         },
       ]);
 
@@ -1399,7 +1399,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           content: reason,
           type: 'BOOKING',
           bookingId,
-          actionUrl: '/admin/bao-cao?tab=monitoring',
+          actionUrl: '/admin/giam-sat',
         },
       ]);
 
@@ -1563,7 +1563,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           content: `Khách hủy đơn. Hoàn khách: ${formatMoney(split.refundToTourist)}, bồi thường HDV: ${formatMoney(split.guideCompensation)}.`,
           type: 'BOOKING',
           bookingId,
-          actionUrl: '/admin/bao-cao?tab=monitoring',
+          actionUrl: '/admin/giam-sat',
         },
       ]);
 
@@ -1679,7 +1679,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           content: `HDV hủy đơn đã CONFIRMED. Hoàn 100% cọc cho khách. HDV bị tính +1 vi phạm.`,
           type: 'BOOKING',
           bookingId,
-          actionUrl: '/admin/bao-cao?tab=monitoring',
+          actionUrl: '/admin/giam-sat',
         },
       ]);
 
@@ -1752,7 +1752,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           content: `HDV đã gửi yêu cầu xác nhận hoàn tất đơn ${bookingId}. Đang đếm ngược 24h phản hồi từ du khách.`,
           type: 'BOOKING',
           bookingId,
-          actionUrl: '/admin/bao-cao?tab=monitoring',
+          actionUrl: '/admin/giam-sat',
         },
       ]);
 
@@ -1825,7 +1825,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           content: `Đơn ${bookingId} đã chuyển sang COMPLETED (WAITING_FINAL).`,
           type: 'BOOKING',
           bookingId,
-          actionUrl: '/admin/bao-cao?tab=monitoring',
+          actionUrl: '/admin/giam-sat',
         },
       ]);
 
@@ -1944,7 +1944,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             content: `Khách chọn trả ${formatMoney(target.remainingAmount)} tiền mặt trực tiếp cho HDV. Trạng thái WAITING_RECONCILE.`,
             type: 'PAYMENT',
             bookingId,
-            actionUrl: '/admin/bao-cao?tab=reconcile',
+            actionUrl: '/admin/doi-soat',
           },
         ]);
 
@@ -2048,7 +2048,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           content: `Khách đã thanh toán 70% Online (${formatMoney(target.remainingAmount)}). Sàn thu phí ${formatMoney(fee)}.`,
           type: 'PAYMENT',
           bookingId,
-          actionUrl: '/admin/bao-cao?tab=monitoring',
+          actionUrl: '/admin/giam-sat',
         },
       ]);
 
@@ -2168,7 +2168,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           content: `HDV đã xác nhận thu đủ tiền mặt. Đơn chuyển PAID, ví cộng +${formatMoney(addition)}.`,
           type: 'PAYMENT',
           bookingId,
-          actionUrl: '/admin/bao-cao?tab=reconcile',
+          actionUrl: '/admin/doi-soat',
         },
       ]);
 

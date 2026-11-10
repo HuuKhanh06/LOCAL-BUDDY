@@ -386,6 +386,7 @@ export interface DashboardNavLink {
   icon: string;
   badge?: number;
   sub?: string;
+  isActive?: (pathname: string, search: string) => boolean;
 }
 
 export const DashboardSidebarContent: React.FC<{
@@ -427,7 +428,9 @@ export const DashboardSidebarContent: React.FC<{
 
         <nav className="space-y-1">
           {links.map((link) => {
-            const isActive = location.pathname === link.to;
+            const isActive = link.isActive
+              ? link.isActive(location.pathname, location.search)
+              : location.pathname === link.to;
             return (
               <Link
                 key={link.to}

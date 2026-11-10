@@ -2,7 +2,7 @@
 // Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import {
   TrendingUp,
   CheckCircle2,
@@ -22,8 +22,21 @@ import { StatusBadge, PaymentBadge } from '../../components/common/StatusBadge';
 import { useToast } from '../../components/ui/Toast';
 
 export const ReportsPage: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const currentTab = (searchParams.get('tab') as 'overview' | 'reconcile' | 'monitoring') || 'overview';
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const pathTab =
+    location.pathname === '/admin/giam-sat'
+      ? 'monitoring'
+      : location.pathname === '/admin/doi-soat'
+      ? 'reconcile'
+      : undefined;
+
+  const currentTab =
+    (searchParams.get('tab') as 'overview' | 'reconcile' | 'monitoring') ||
+    pathTab ||
+    'overview';
 
   const {
     bookings,
@@ -53,7 +66,13 @@ export const ReportsPage: React.FC = () => {
   }, []);
 
   const setTab = (tab: 'overview' | 'reconcile' | 'monitoring') => {
-    setSearchParams({ tab });
+    if (tab === 'monitoring') {
+      navigate('/admin/giam-sat');
+    } else if (tab === 'reconcile') {
+      navigate('/admin/doi-soat');
+    } else {
+      navigate('/admin/bao-cao');
+    }
   };
 
   const filteredBookings = bookings.filter((b) => {

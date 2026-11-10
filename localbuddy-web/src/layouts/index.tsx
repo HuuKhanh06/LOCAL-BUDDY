@@ -274,12 +274,29 @@ export const AdminLayout: React.FC = () => {
 
   const adminLinks: DashboardNavLink[] = [
     { to: '/admin/thong-bao', label: 'Thông báo', icon: '🔔', badge: unreadAdminNotifs },
-    { to: '/admin/giam-sat', label: 'Giám sát đơn', icon: '📋', badge: pendingBookingsCount },
+    {
+      to: '/admin/giam-sat',
+      label: 'Giám sát đơn',
+      icon: '📋',
+      badge: pendingBookingsCount,
+      isActive: (pathname, search) =>
+        pathname === '/admin/giam-sat' ||
+        (pathname === '/admin/bao-cao' && new URLSearchParams(search).get('tab') === 'monitoring'),
+    },
     { to: '/admin/kyc', label: 'Duyệt KYC', icon: '🪪', badge: pendingKycCount },
     { to: '/admin/tranh-chap', label: 'Tranh chấp', icon: '⚖️', badge: openDisputesCount },
     { to: '/admin/rut-tien', label: 'Rút tiền', icon: '💰', badge: pendingWithdrawalsCount },
     { to: '/admin/tai-khoan', label: 'Tài khoản', icon: '👥' },
-    { to: '/admin/bao-cao', label: 'Doanh thu', icon: '📊' },
+    {
+      to: '/admin/bao-cao',
+      label: 'Doanh thu',
+      icon: '📊',
+      isActive: (pathname, search) =>
+        (pathname === '/admin/bao-cao' &&
+          new URLSearchParams(search).get('tab') !== 'monitoring' &&
+          new URLSearchParams(search).get('tab') !== 'reconcile') ||
+        pathname === '/admin/doanh-thu',
+    },
     { to: '/admin/phi-san', label: 'Phí sàn', icon: '⚙️' },
   ];
 
