@@ -39,6 +39,9 @@ jobs:
 
       - name: Build production bundle
         run: npm run build
+        env:
+          VITE_SUPABASE_URL: https://yeiqsxetbqfjnamxtsww.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_EIyjOlRMqpbMh4O6JRKYZQ_GN1n8VGx
 
       - name: Create 404.html fallback for React Router SPA
         run: cp dist/index.html dist/404.html

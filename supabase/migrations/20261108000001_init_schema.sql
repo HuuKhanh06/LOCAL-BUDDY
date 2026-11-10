@@ -22,20 +22,22 @@ BEGIN
     END IF;
 END $$;
 
-CREATE SCHEMA IF NOT EXISTS auth;
-CREATE TABLE IF NOT EXISTS auth.users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email TEXT UNIQUE,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE OR REPLACE FUNCTION auth.uid()
-RETURNS UUID
-LANGUAGE sql
-STABLE
-AS $$
-    SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::UUID;
-$$;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'auth') THEN
+        CREATE SCHEMA auth;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'auth' AND table_name = 'users') THEN
+        CREATE TABLE auth.users (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            email TEXT UNIQUE,
+            created_at TIMESTAMPTZ DEFAULT NOW()
+        );
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_proc JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid WHERE pg_namespace.nspname = 'auth' AND pg_proc.proname = 'uid') THEN
+        EXECUTE 'CREATE FUNCTION auth.uid() RETURNS UUID LANGUAGE sql STABLE AS $fn$ SELECT NULLIF(current_setting(''request.jwt.claim.sub'', true), '''')::UUID; $fn$;';
+    END IF;
+END $$;
 
 -- =============================================================================
 -- 1. NHÓM BẢNG NGƯỜI DÙNG & PHÂN QUYỀN (TAIKHOAN, TOURIST, LOCALGUIDE, ADMIN)

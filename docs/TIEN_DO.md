@@ -15,6 +15,7 @@
 - [x] **GĐ11: Nghiệm thu toàn diện & Xác thực chất lượng** (Build production sạch 100%, 0 vi phạm phạm vi, bảo mật ẩn tuyệt đối phí sàn với Tourist).
 - [x] **GĐ12: Giao diện sáng ấm & Bố cục Withlocals toàn diện** (Bỏ hoàn toàn nền xám tối, đồng bộ sang nền kem #FEEDDC, logo 2 gương mặt cười liên kết, thanh tìm kiếm nổi vàng hổ phách, thẻ 'QUE FAIRE À...', khối tour ẩm thực đánh số 1-5, viền thẻ ấm #EAD7C2, chuẩn hóa Anh-Việt và lọc sạch mã thừa).
 - [x] **GĐ13: Hệ thống thông báo đa vai trò (Admin · HDV · Du khách)** (Bổ sung pushNotifications thời gian thực khi khách đặt lịch, cọc 30%, hủy, hoàn tất, khiếu nại; thêm route /admin/thong-bao, gắn badge số thông báo chưa đọc vào sidebar Admin và HDV; nâng cấp NotificationsPage chuẩn Withlocals).
+- [x] **GĐ14: Chuyển đổi Supabase Cloud** (Liên kết dự án `yeiqsxetbqfjnamxtsww` tại Singapore, đẩy 100% migrations và seed data thực tế, cấu hình VITE_SUPABASE_URL và VITE_SUPABASE_ANON_KEY cho GitHub Pages).
 
 ---
 
