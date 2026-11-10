@@ -134,9 +134,10 @@ INSERT INTO public.ngon_ngu (ma_ngon_ngu, ten_ngon_ngu, ma_ngon_ngu_iso) VALUES
     (2, 'Tiếng Anh', 'en'),
     (3, 'Tiếng Hàn', 'ko'),
     (4, 'Tiếng Nhật', 'ja'),
-    (5, 'Tiếng Trung', 'zh');
+    (5, 'Tiếng Trung', 'zh'),
+    (6, 'Tiếng Pháp', 'fr');
 
-SELECT setval('public.ngon_ngu_ma_ngon_ngu_seq', 5, true);
+SELECT setval('public.ngon_ngu_ma_ngon_ngu_seq', 6, true);
 
 INSERT INTO public.khu_vuc (ma_khu_vuc, ten_khu_vuc, mo_ta, anh_khu_vuc) VALUES
     (1, 'Cầu Rồng & Sông Hàn', 'Trung tâm quận Hải Châu, Cầu Tình Yêu, Cá Chép Hóa Rồng, Chợ Hàn', 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&auto=format&fit=crop&q=80'),
