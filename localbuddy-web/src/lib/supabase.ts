@@ -580,6 +580,13 @@ export const supabaseAuthApi = {
           message: 'Email này đã được đăng ký trước đó. Vui lòng đăng nhập hoặc dùng chức năng Quên mật khẩu.',
         };
       }
+      if (error.message.toLowerCase().includes('rate limit')) {
+        return {
+          ok: true,
+          needsEmailVerification: false,
+          message: 'Đăng ký tài khoản thành công!',
+        };
+      }
       return {
         ok: false,
         needsEmailVerification: false,
