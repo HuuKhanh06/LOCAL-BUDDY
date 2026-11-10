@@ -1,4 +1,5 @@
-// layouts/index.tsx – Hệ thống Layout tối giản 1 tông nền sáng (#FAF9F6 / #FFFFFF), rất ít chữ.
+// layouts/index.tsx – Hệ thống Layout chuẩn 4 phân hệ (Public, Tourist, Guide, Admin)
+// Bảng màu chuẩn: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
@@ -10,63 +11,46 @@ import {
   DashboardNavLink,
 } from '../components/layout/Header';
 import { useBookingContext } from '../context/BookingContext';
-import { useToast } from '../components/ui/Toast';
 import { formatMoney } from '../utils/money';
 
 const CommercialFooter: React.FC = () => {
-  const { resetAllDataToDefault } = useBookingContext();
-  const { showToast } = useToast();
-
   return (
-    <footer className="bg-[#FAF9F6] text-[#57534E] border-t border-[#E7E5E4] mt-16">
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <footer className="bg-[var(--lb-surface)] text-[var(--lb-muted)] border-t border-[var(--lb-border)] mt-16 py-8">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[#1C1917] text-white flex items-center justify-center font-black text-[13px]">
+          <div className="w-8 h-8 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] flex items-center justify-center font-black text-[13px]">
             LB
           </div>
           <div>
-            <span className="text-[15px] font-bold text-[#1C1917] block">
+            <span className="text-[15px] font-bold text-[var(--lb-text)] block">
               LocalBuddy Đà Nẵng
             </span>
-            <span className="text-[12px] text-[#78716C]">
-              Hướng dẫn viên bản địa theo giờ • Cọc 30% • Hoàn 100% trước 48h
+            <span className="text-[12px] text-[var(--lb-muted)]">
+              Đặt Hướng dẫn viên bản địa theo giờ • Cọc 30% • Hoàn 100% trước 48h
             </span>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-5 text-[13px] font-medium text-[#57534E]">
-          <Link to="/guides?area=Bán+đảo+Sơn+Trà" className="hover:text-[#1C1917]">
-            Sơn Trà
+        <div className="flex flex-wrap items-center gap-4 text-[13px] font-medium text-[var(--lb-muted)]">
+          <Link to="/how-it-works" className="hover:text-[var(--lb-text)]">
+            Cách hoạt động
           </Link>
-          <Link to="/guides?area=Ngũ+Hành+Sơn" className="hover:text-[#1C1917]">
-            Ngũ Hành Sơn
+          <Link to="/become-a-guide" className="hover:text-[var(--lb-text)]">
+            Trở thành Guide
           </Link>
-          <Link to="/guides?area=Bà+Nà+Hills" className="hover:text-[#1C1917]">
-            Bà Nà Hills
+          <Link to="/cancellation-policy" className="hover:text-[var(--lb-text)]">
+            Chính sách hủy
           </Link>
-          <Link to="/guides?area=Phố+cổ+Hội+An" className="hover:text-[#1C1917]">
-            Hội An
+          <Link to="/safety" className="hover:text-[var(--lb-text)]">
+            An toàn
           </Link>
-          <Link to="/guide/don-den" className="hover:text-[#1C1917]">
-            HDV
+          <Link to="/faq" className="hover:text-[var(--lb-text)]">
+            Hỏi đáp
           </Link>
-          <Link to="/admin/kyc" className="hover:text-[#1C1917]">
-            Admin
-          </Link>
-          <Link to="/design-system" className="hover:text-[#1C1917]">
-            UI Kit
-          </Link>
-          <button
-            type="button"
-            onClick={() => {
-              resetAllDataToDefault();
-              showToast('Đã khôi phục dữ liệu mẫu!', 'success');
-            }}
-            className="px-3 py-1 rounded-full bg-[#F3F1EC] hover:bg-[#E7E5E4] text-[12px] text-[#1C1917] font-semibold cursor-pointer"
-          >
-            🔄 Đặt lại dữ liệu
-          </button>
         </div>
+      </div>
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 mt-6 pt-4 border-t border-[var(--lb-border)]/50 text-center text-[11px] text-[var(--lb-muted)]">
+        Dự án học phần Phân tích & Thiết kế Hệ thống Nâng cao — dữ liệu minh hoạ.
       </div>
     </footer>
   );
@@ -74,7 +58,7 @@ const CommercialFooter: React.FC = () => {
 
 export const PublicLayout: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF9F6] text-[#1C1917] pb-16 lg:pb-0">
+    <div className="min-h-screen flex flex-col bg-[var(--lb-bg)] text-[var(--lb-text)] pb-16 lg:pb-0">
       <Header role="tourist" />
       <main className="flex-1 max-w-[1320px] w-full mx-auto px-4 sm:px-6 py-6">
         <Outlet />
@@ -87,7 +71,7 @@ export const PublicLayout: React.FC = () => {
 
 export const TouristLayout: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF9F6] text-[#1C1917] pb-16 lg:pb-0">
+    <div className="min-h-screen flex flex-col bg-[var(--lb-bg)] text-[var(--lb-text)] pb-16 lg:pb-0">
       <Header role="tourist" />
       <main className="flex-1 max-w-[1320px] w-full mx-auto px-4 sm:px-6 py-6">
         <Outlet />
@@ -98,7 +82,7 @@ export const TouristLayout: React.FC = () => {
   );
 };
 
-// ---------- Dashboard Shell nền sáng đồng nhất ----------
+// ---------- Dashboard Shell ----------
 const DashboardShell: React.FC<{
   portalTitle: string;
   headerTitle: string;
@@ -136,17 +120,17 @@ const DashboardShell: React.FC<{
   const displayName = currentUser?.fullName || defaultUserName;
 
   return (
-    <div className="min-h-screen flex bg-[#FAF9F6] text-[#1C1917]">
-      <aside className="hidden lg:block w-[240px] shrink-0 min-h-screen sticky top-0 h-screen">
+    <div className="min-h-screen flex bg-[var(--lb-bg)] text-[var(--lb-text)]">
+      <aside className="hidden lg:block w-[240px] shrink-0 min-h-screen sticky top-0 h-screen border-r border-[var(--lb-border)]">
         <DashboardSidebarContent portalTitle={portalTitle} links={links} />
       </aside>
 
       {drawerOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-50 flex bg-[#1C1917]/30 backdrop-blur-xs"
+          className="lg:hidden fixed inset-0 z-50 flex bg-[var(--lb-bg-deep)]/75 backdrop-blur-xs"
           onClick={() => setDrawerOpen(false)}
         >
-          <div className="h-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="h-full shadow-xl bg-[var(--lb-surface)]" onClick={(e) => e.stopPropagation()}>
             <DashboardSidebarContent
               portalTitle={portalTitle}
               links={links}
@@ -157,17 +141,17 @@ const DashboardShell: React.FC<{
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 h-16 bg-[#FAF9F6]/90 backdrop-blur-md text-[#1C1917] border-b border-[#E7E5E4] px-4 sm:px-6 flex items-center justify-between gap-3">
+        <header className="sticky top-0 z-30 h-16 bg-[var(--lb-surface)]/95 backdrop-blur-md text-[var(--lb-text)] border-b border-[var(--lb-border)] px-4 sm:px-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
               aria-label="Menu"
-              className="lg:hidden p-2 rounded-full bg-white border border-[#E7E5E4] text-[#1C1917] cursor-pointer shrink-0"
+              className="lg:hidden p-2 rounded-full bg-[var(--lb-surface-2)] border border-[var(--lb-border)] text-[var(--lb-text)] cursor-pointer shrink-0"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <h2 className="text-[15px] sm:text-[16px] font-bold text-[#1C1917] truncate">
+            <h2 className="text-[15px] sm:text-[16px] font-bold text-[var(--lb-text)] truncate">
               {headerTitle}
             </h2>
           </div>
@@ -175,16 +159,16 @@ const DashboardShell: React.FC<{
           <div className="flex items-center gap-2.5 shrink-0">
             <form
               onSubmit={handleSearch}
-              className="hidden sm:flex items-center bg-white border border-[#E7E5E4] rounded-full px-3.5 h-9 w-48 md:w-60"
+              className="hidden sm:flex items-center bg-[var(--lb-surface-2)] border border-[var(--lb-border)] rounded-full px-3.5 h-9 w-48 md:w-60"
             >
-              <Search className="w-3.5 h-3.5 text-[#78716C] mr-2 shrink-0" />
+              <Search className="w-3.5 h-3.5 text-[var(--lb-muted)] mr-2 shrink-0" />
               <input
                 type="text"
                 value={quickSearch}
                 onChange={(e) => setQuickSearch(e.target.value)}
                 placeholder={searchPlaceholder}
                 aria-label={searchPlaceholder}
-                className="bg-transparent text-xs text-[#1C1917] placeholder:text-[#A8A29E] w-full focus:outline-none"
+                className="bg-transparent text-xs text-[var(--lb-text)] placeholder:text-[var(--lb-muted)] w-full focus:outline-none"
               />
             </form>
 
@@ -192,17 +176,17 @@ const DashboardShell: React.FC<{
               type="button"
               onClick={() => navigate(notifLink)}
               aria-label="Thông báo"
-              className="relative p-2 rounded-full bg-white border border-[#E7E5E4] text-[#1C1917] cursor-pointer"
+              className="relative p-2 rounded-full bg-[var(--lb-surface-2)] border border-[var(--lb-border)] text-[var(--lb-text)] cursor-pointer"
             >
               <Bell className="w-4 h-4" />
               {unreadNotifs > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-[#1C1917] text-white text-[10px] font-bold flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] text-[10px] font-bold flex items-center justify-center">
                   {unreadNotifs}
                 </span>
               )}
             </button>
 
-            <div className="flex items-center gap-2 bg-white border border-[#E7E5E4] pl-1 pr-3 py-1 rounded-full">
+            <div className="flex items-center gap-2 bg-[var(--lb-surface-2)] border border-[var(--lb-border)] pl-1 pr-3 py-1 rounded-full">
               <img
                 src={
                   currentUser?.avatarUrl ||
@@ -212,10 +196,10 @@ const DashboardShell: React.FC<{
                 className="w-7 h-7 rounded-full object-cover"
               />
               <div className="hidden md:block text-left">
-                <span className="block text-[12px] font-bold text-[#1C1917] leading-tight max-w-[120px] truncate">
+                <span className="block text-[12px] font-bold text-[var(--lb-text)] leading-tight max-w-[120px] truncate">
                   {displayName}
                 </span>
-                <span className="block text-[10px] text-[#78716C] font-medium">
+                <span className="block text-[10px] text-[var(--lb-muted)] font-medium">
                   {roleBadgeText}
                 </span>
               </div>
@@ -233,14 +217,11 @@ const DashboardShell: React.FC<{
 
 export const GuideLayout: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, bookings, messages, walletBalance } = useBookingContext();
+  const { currentUser, bookings, walletBalance } = useBookingContext();
 
   const guideId = currentUser?.role === 'guide' ? currentUser.id : 'u-guide-1';
   const pendingCount = bookings.filter(
     (b) => b.guideId === guideId && b.bookingStatus === 'PENDING'
-  ).length;
-  const unreadChat = messages.filter(
-    (m) => !m.isRead && m.receiverId === guideId
   ).length;
 
   const guideLinks: DashboardNavLink[] = [
@@ -250,7 +231,6 @@ export const GuideLayout: React.FC = () => {
     { to: '/guide/vi', label: 'Ví & Rút tiền', icon: '💰', sub: formatMoney(walletBalance) },
     { to: '/guide/ho-so', label: 'Hồ sơ & Giá', icon: '👤' },
     { to: '/guide/kyc', label: 'Định danh KYC', icon: '🪪' },
-    { to: '/guide/tin-nhan', label: 'Tin nhắn', icon: '💬', badge: unreadChat },
     { to: '/guide/thong-bao', label: 'Thông báo', icon: '📣' },
   ];
 

@@ -1,9 +1,9 @@
-// pages/tourist/LoginPage.tsx (UC.02: Đăng nhập đa vai trò với Supabase Auth)
-// Thiết kế tối giản 1 tông nền sáng (#FAF9F6 / #FFFFFF), rất ít chữ.
-// Giữ đúng 2 tài khoản hệ thống (1 HDV, 1 Admin), người dùng mới bấm Đăng ký.
+// pages/tourist/LoginPage.tsx (UC.03: Đăng nhập hệ thống)
+// Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useBookingContext } from '../../context/BookingContext';
@@ -15,6 +15,7 @@ export const LoginPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { login, allUsers } = useBookingContext();
   const { showToast } = useToast();
+  const { t } = useTranslation();
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -50,143 +51,86 @@ export const LoginPage: React.FC = () => {
     setErrorMsg('');
 
     if (!identifier.trim() || !password.trim()) {
-      setErrorMsg('Vui lòng nhập đầy đủ Email/Số điện thoại và Mật khẩu.');
+      setErrorMsg(t('msg_invalid_login'));
       return;
     }
 
     setIsLoading(true);
     try {
-      const isLocalDemoAccount = allUsers.some(
+      const isLocalAccount = allUsers.some(
         (u) =>
           u.email.toLowerCase() === identifier.trim().toLowerCase() ||
           u.phone === identifier.trim()
       );
 
-      if (isSupabaseConfigured && identifier.includes('@') && !isLocalDemoAccount) {
+      if (isSupabaseConfigured && identifier.includes('@') && !isLocalAccount) {
         const cloudRes = await supabaseAuthApi.signIn(identifier, password);
         if (!cloudRes.ok) {
-          setErrorMsg(cloudRes.message);
+          setErrorMsg(t('msg_invalid_login'));
           return;
         }
       }
 
       const res = login(identifier, password);
       if (!res.ok) {
-        setErrorMsg(res.message);
+        setErrorMsg(t('msg_invalid_login'));
         return;
       }
 
-      showToast(res.message, 'success');
+      showToast('Đăng nhập thành công', 'success');
       navigateByRole(identifier);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const quickFillAndLogin = (email: string) => {
-    setErrorMsg('');
-    setIdentifier(email);
-    setPassword('123456');
-    const res = login(email, '123456');
-    if (!res.ok) {
-      setErrorMsg(res.message);
-      return;
-    }
-    showToast(res.message, 'success');
-    navigateByRole(email);
-  };
-
   return (
-    <div className="max-w-md mx-auto py-10 px-4">
-      <div className="bg-white border border-[#E7E5E4] rounded-[24px] p-6 sm:p-8 shadow-xs space-y-6">
+    <div className="max-w-md mx-auto py-12 px-4">
+      <div className="bg-[var(--lb-surface)] border border-[var(--lb-border)] rounded-[24px] p-6 sm:p-8 shadow-xl space-y-6">
         <div className="text-center">
-          <div className="w-11 h-11 rounded-full bg-[#1C1917] text-white font-black text-[15px] flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-black text-[16px] flex items-center justify-center mx-auto mb-3">
             LB
           </div>
-          <h1 className="text-[22px] font-black tracking-tight text-[#1C1917]">
-            Đăng nhập
+          <h1 className="text-[22px] font-bold text-[var(--lb-text)]">
+            Đăng nhập hệ thống
           </h1>
-          <p className="text-[13px] text-[#78716C] mt-1">
+          <p className="text-[13px] text-[var(--lb-muted)] mt-1">
             LocalBuddy Đà Nẵng
           </p>
         </div>
 
         {isSessionExpired && (
-          <div className="p-3 rounded-[12px] bg-[#FEF3C7] border border-[#FDE68A] text-[12px] text-[#92400E] font-medium">
+          <div className="p-3 rounded-[12px] bg-[var(--lb-surface-2)] border border-[var(--lb-warning)] text-[12px] text-[var(--lb-warning)] font-medium">
             Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.
           </div>
         )}
         {isEmailVerified && (
-          <div className="p-3 rounded-[12px] bg-[#DCFCE7] border border-[#BBF7D0] text-[12px] text-[#166534] font-medium">
+          <div className="p-3 rounded-[12px] bg-[var(--lb-surface-2)] border border-[var(--lb-success)] text-[12px] text-[var(--lb-success)] font-medium">
             Xác minh email thành công! Hãy đăng nhập ngay.
           </div>
         )}
         {isResetSuccess && (
-          <div className="p-3 rounded-[12px] bg-[#DCFCE7] border border-[#BBF7D0] text-[12px] text-[#166534] font-medium">
+          <div className="p-3 rounded-[12px] bg-[var(--lb-surface-2)] border border-[var(--lb-success)] text-[12px] text-[var(--lb-success)] font-medium">
             Đã đổi mật khẩu mới thành công.
           </div>
         )}
 
-        {/* 2 Tài khoản hệ thống sẵn sàng */}
-        <div className="bg-[#FAF9F6] border border-[#E7E5E4] rounded-[16px] p-3.5 space-y-2">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-[#78716C]">
-            Tài khoản mẫu có sẵn
-          </div>
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between bg-white px-3 py-2 rounded-[12px] border border-[#E7E5E4]">
-              <div className="min-w-0 pr-2">
-                <div className="text-[12px] font-bold text-[#1C1917] truncate">
-                  🧭 HDV: Nguyễn Hữu Khanh
-                </div>
-                <div className="text-[11px] text-[#78716C] truncate">
-                  khanh.nguyen.dn@gmail.com
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => quickFillAndLogin('khanh.nguyen.dn@gmail.com')}
-                className="shrink-0 px-3 py-1 rounded-full bg-[#1C1917] text-white text-[11px] font-semibold hover:bg-[#292524] cursor-pointer"
-              >
-                Vào HDV
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between bg-white px-3 py-2 rounded-[12px] border border-[#E7E5E4]">
-              <div className="min-w-0 pr-2">
-                <div className="text-[12px] font-bold text-[#1C1917] truncate">
-                  ⚖️ Admin: Lê Văn Hoàng
-                </div>
-                <div className="text-[11px] text-[#78716C] truncate">
-                  admin@localbuddy.vn
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => quickFillAndLogin('admin@localbuddy.vn')}
-                className="shrink-0 px-3 py-1 rounded-full bg-[#F3F1EC] text-[#1C1917] hover:bg-[#E7E5E4] text-[11px] font-semibold cursor-pointer border border-[#E7E5E4]"
-              >
-                Vào Admin
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <form onSubmit={(e) => void handleLogin(e)} className="space-y-3.5">
+        <form onSubmit={(e) => void handleLogin(e)} className="space-y-4">
           <Input
             label="Email hoặc Số điện thoại"
-            placeholder="dukhach@gmail.com hoặc 0905..."
+            placeholder="ten@gmail.com hoặc 0905..."
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
           />
 
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label htmlFor="login-password" className="text-[13px] font-medium text-[#1C1917]">
+              <label htmlFor="login-password" className="text-[13px] font-medium text-[var(--lb-text)]">
                 Mật khẩu
               </label>
               <Link
                 to="/quen-mat-khau"
-                className="text-[12px] text-[#78716C] hover:text-[#1C1917]"
+                className="text-[12px] text-[var(--lb-blue-text)] hover:underline"
               >
                 Quên mật khẩu?
               </Link>
@@ -201,7 +145,7 @@ export const LoginPage: React.FC = () => {
           </div>
 
           {errorMsg && (
-            <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] rounded-[12px] text-[12px] font-medium">
+            <div className="p-3 bg-[var(--lb-surface-2)] border border-[var(--lb-error)] text-[var(--lb-error)] rounded-[12px] text-[12px] font-medium">
               {errorMsg}
             </div>
           )}
@@ -211,13 +155,13 @@ export const LoginPage: React.FC = () => {
           </Button>
         </form>
 
-        <div className="text-center text-[13px] text-[#78716C] border-t border-[#E7E5E4] pt-4">
+        <div className="text-center text-[13px] text-[var(--lb-muted)] border-t border-[var(--lb-border)] pt-4">
           Chưa có tài khoản?{' '}
           <Link
             to="/dang-ky"
-            className="font-bold text-[#1C1917] hover:underline"
+            className="font-bold text-[var(--lb-blue-text)] hover:underline"
           >
-            Đăng ký ngay
+            Đăng ký tài khoản mới
           </Link>
         </div>
       </div>

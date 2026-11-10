@@ -1,6 +1,9 @@
-// pages/tourist/RegisterPage.tsx (UC.01: Đăng ký tài khoản Du khách hoặc Hướng dẫn viên)
+// pages/tourist/RegisterPage.tsx (UC.01 & UC.02: Đăng ký tài khoản Tourist / Guide)
+// Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Tabs } from '../../components/ui/Tabs';
@@ -13,6 +16,7 @@ export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { registerAccount } = useBookingContext();
+  const { t } = useTranslation();
 
   const [roleTab, setRoleTab] = useState<'tourist' | 'guide'>('tourist');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,12 +52,12 @@ export const RegisterPage: React.FC = () => {
     setVerifySentMessage('');
 
     if (!fullName.trim() || !email.trim() || !phone.trim() || !password) {
-      setErrorMsg('Vui lòng điền đầy đủ Họ tên, Email, Số điện thoại và Mật khẩu.');
+      setErrorMsg('Vui lòng điền đầy đủ thông tin bắt buộc.');
       return;
     }
 
     if (!/^0\d{9,10}$/.test(phone.trim())) {
-      setErrorMsg('Số điện thoại không hợp lệ (gồm 10–11 chữ số, bắt đầu bằng số 0).');
+      setErrorMsg('Số điện thoại không hợp lệ (10–11 chữ số bắt đầu bằng 0).');
       return;
     }
 
@@ -70,9 +74,7 @@ export const RegisterPage: React.FC = () => {
     if (roleTab === 'guide') {
       const rateNum = Number(hourlyRate);
       if (Number.isNaN(rateNum) || rateNum < 80000 || rateNum > 500000) {
-        setErrorMsg(
-          'Theo quy tắc BR-02, đơn giá theo giờ của HDV phải nằm trong khoảng 80.000 ₫ – 500.000 ₫.'
-        );
+        setErrorMsg(t('msg_invalid_hourly_rate'));
         return;
       }
     }
@@ -126,28 +128,30 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto py-8 px-4">
-      <div className="bg-white border border-[#E7E5E4] rounded-[24px] p-6 sm:p-8 shadow-xs">
-        <h1 className="text-[22px] font-black tracking-tight text-[#1C1917] text-center">
-          Đăng ký tài khoản
-        </h1>
-        <p className="text-[13px] text-[#78716C] text-center mt-1 mb-6">
-          Chọn vai trò của bạn để bắt đầu trên LocalBuddy Đà Nẵng
-        </p>
+    <div className="max-w-xl mx-auto py-10 px-4">
+      <div className="bg-[var(--lb-surface)] border border-[var(--lb-border)] rounded-[24px] p-6 sm:p-8 shadow-xl space-y-6">
+        <div className="text-center">
+          <h1 className="text-[22px] font-bold text-[var(--lb-text)]">
+            Đăng ký tài khoản LocalBuddy
+          </h1>
+          <p className="text-[13px] text-[var(--lb-muted)] mt-1">
+            Chọn vai trò để bắt đầu hành trình tại Đà Nẵng
+          </p>
+        </div>
 
         <Tabs
           tabs={[
-            { id: 'tourist', label: 'Du khách' },
-            { id: 'guide', label: 'Hướng dẫn viên bản địa' },
+            { id: 'tourist', label: '🧳 Du khách' },
+            { id: 'guide', label: '🧭 Hướng dẫn viên' },
           ]}
           activeTab={roleTab}
           onChange={(id) => setRoleTab(id as 'tourist' | 'guide')}
-          className="mb-6 justify-center"
+          className="mb-4 justify-center"
         />
 
         {roleTab === 'guide' && (
-          <div className="mb-5 p-3.5 bg-[#FEF3C7] border border-[#FDE68A] rounded-[14px] text-[12px] text-[#92400E]">
-            <strong>Quy định KYC:</strong> Sau khi tạo tài khoản HDV, bạn sẽ được chuyển tới trang nộp hồ sơ CCCD & Chứng chỉ để Admin thẩm định trước khi mở lịch đón khách.
+          <div className="p-3.5 bg-[var(--lb-surface-2)] border border-[var(--lb-warning)] rounded-[14px] text-[12px] text-[var(--lb-warning)]">
+            <strong>Quy định KYC:</strong> Sau khi tạo tài khoản Guide, bạn cần nộp ảnh CCCD hoặc Thẻ sinh viên để Admin thẩm định trước khi mở nhận booking.
           </div>
         )}
 
@@ -171,7 +175,7 @@ export const RegisterPage: React.FC = () => {
             <Input
               label="Địa chỉ Email *"
               type="email"
-              placeholder="tenban@gmail.com"
+              placeholder="ten@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -199,7 +203,7 @@ export const RegisterPage: React.FC = () => {
           {roleTab === 'guide' && (
             <div className="space-y-3 pt-1">
               <div>
-                <label className="text-[12px] font-bold text-[#1C1917] block mb-1.5">
+                <label className="text-[12px] font-bold text-[var(--lb-text)] block mb-1.5">
                   Khu vực dẫn khách tại Đà Nẵng:
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -212,8 +216,8 @@ export const RegisterPage: React.FC = () => {
                         onClick={() => toggleItem(selectedAreas, area, setSelectedAreas)}
                         className={`px-3 py-1 rounded-full text-[11px] font-semibold border transition-colors cursor-pointer ${
                           active
-                            ? 'bg-[#1C1917] text-white border-[#1C1917]'
-                            : 'bg-[#FAF9F6] text-[#78716C] border-[#E7E5E4]'
+                            ? 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] border-[var(--lb-accent)]'
+                            : 'bg-[var(--lb-surface-2)] text-[var(--lb-muted)] border-[var(--lb-border)] hover:text-[var(--lb-text)]'
                         }`}
                       >
                         {active ? '✓ ' : '+ '}
@@ -225,7 +229,7 @@ export const RegisterPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-[12px] font-bold text-[#1C1917] block mb-1.5">
+                <label className="text-[12px] font-bold text-[var(--lb-text)] block mb-1.5">
                   Ngôn ngữ giao tiếp:
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -238,8 +242,8 @@ export const RegisterPage: React.FC = () => {
                         onClick={() => toggleItem(selectedLangs, lang, setSelectedLangs)}
                         className={`px-3 py-1 rounded-full text-[11px] font-semibold border transition-colors cursor-pointer ${
                           active
-                            ? 'bg-[#1C1917] text-white border-[#1C1917]'
-                            : 'bg-[#FAF9F6] text-[#78716C] border-[#E7E5E4]'
+                            ? 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] border-[var(--lb-accent)]'
+                            : 'bg-[var(--lb-surface-2)] text-[var(--lb-muted)] border-[var(--lb-border)] hover:text-[var(--lb-text)]'
                         }`}
                       >
                         {active ? '✓ ' : '+ '}
@@ -270,29 +274,29 @@ export const RegisterPage: React.FC = () => {
           </div>
 
           {verifySentMessage && (
-            <div className="p-3 bg-[#DCFCE7] border border-[#BBF7D0] text-[#166534] rounded-[12px] text-[12px] font-medium">
+            <div className="p-3 bg-[var(--lb-surface-2)] border border-[var(--lb-success)] text-[var(--lb-success)] rounded-[12px] text-[12px] font-medium">
               ✉️ {verifySentMessage}
             </div>
           )}
 
           {errorMsg && (
-            <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] rounded-[12px] text-[12px] font-medium">
+            <div className="p-3 bg-[var(--lb-surface-2)] border border-[var(--lb-error)] text-[var(--lb-error)] rounded-[12px] text-[12px] font-medium">
               ⚠️ {errorMsg}
             </div>
           )}
 
           <Button type="submit" variant="primary" size="lg" className="w-full" isLoading={isSubmitting}>
             {roleTab === 'guide'
-              ? 'Tạo tài khoản HDV & Nộp KYC →'
+              ? 'Tạo tài khoản Guide & Tiếp tục nộp KYC →'
               : 'Hoàn tất đăng ký Du khách'}
           </Button>
         </form>
 
-        <div className="mt-6 text-center text-[13px] text-[#78716C] border-t border-[#E7E5E4] pt-4">
+        <div className="text-center text-[13px] text-[var(--lb-muted)] border-t border-[var(--lb-border)] pt-4">
           Đã có tài khoản?{' '}
           <Link
             to="/dang-nhap"
-            className="font-bold text-[#1C1917] hover:underline"
+            className="font-bold text-[var(--lb-blue-text)] hover:underline"
           >
             Đăng nhập ngay
           </Link>

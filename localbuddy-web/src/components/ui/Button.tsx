@@ -1,10 +1,10 @@
 // components/ui/Button.tsx
-// Phong cách tối giản 1 tông nền sáng: nút chính màu than ấm (#1C1917) chữ sáng hoặc nền sáng viền mảnh, không dùng nhiều màu sặc sỡ.
+// Nút bấm theo chuẩn thiết kế [10]: Cam #EB5B38, Nền #272A2D, Bo góc 12px
 
 import React from 'react';
 import { clsx } from 'clsx';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost' | 'dark';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost' | 'dark' | 'blue';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -17,23 +17,25 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'bg-[#1C1917] text-white font-semibold hover:bg-[#292524] active:bg-[#0C0A09] shadow-2xs focus-visible:ring-[#1C1917] disabled:bg-[#E7E5E4] disabled:text-[#A8A29E]',
+    'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-bold hover:bg-[var(--lb-accent-hover)] active:scale-[0.98] shadow-sm focus-visible:ring-[var(--lb-blue)] disabled:opacity-50 disabled:cursor-not-allowed',
   secondary:
-    'bg-[#F3F1EC] text-[#1C1917] font-semibold border border-[#E7E5E4] hover:bg-[#E7E5E4]/70 focus-visible:ring-[#1C1917]',
+    'bg-[var(--lb-surface-2)] text-[var(--lb-text)] font-semibold border border-[var(--lb-border)] hover:bg-[var(--lb-surface)] active:scale-[0.98] focus-visible:ring-[var(--lb-blue)]',
   outline:
-    'bg-white text-[#1C1917] font-semibold border border-[#E7E5E4] hover:bg-[#FAF9F6] focus-visible:ring-[#1C1917]',
+    'bg-transparent text-[var(--lb-text)] font-semibold border border-[var(--lb-border)] hover:bg-[var(--lb-surface-2)] active:scale-[0.98] focus-visible:ring-[var(--lb-blue)]',
   dark:
-    'bg-[#1C1917] text-white font-semibold hover:bg-[#292524] focus-visible:ring-[#1C1917]',
+    'bg-[var(--lb-surface)] text-[var(--lb-text)] font-semibold border border-[var(--lb-border)] hover:bg-[var(--lb-surface-2)] active:scale-[0.98] focus-visible:ring-[var(--lb-blue)]',
+  blue:
+    'bg-[var(--lb-blue-solid)] text-white font-semibold hover:opacity-90 active:scale-[0.98] focus-visible:ring-[var(--lb-blue)]',
   danger:
-    'bg-[#B91C1C] text-white font-semibold hover:bg-[#991B1B] focus-visible:ring-[#B91C1C] disabled:bg-[#FECACA] disabled:text-[#B91C1C]/60',
+    'bg-[var(--lb-error)] text-white font-semibold hover:opacity-90 active:scale-[0.98] focus-visible:ring-[var(--lb-error)] disabled:opacity-50',
   ghost:
-    'bg-transparent text-[#57534E] font-medium hover:bg-[#F3F1EC] hover:text-[#1C1917] focus-visible:ring-[#1C1917]',
+    'bg-transparent text-[var(--lb-muted)] font-medium hover:bg-[var(--lb-surface-2)] hover:text-[var(--lb-text)] focus-visible:ring-[var(--lb-blue)]',
 };
 
 const sizeClasses: Record<'sm' | 'md' | 'lg', string> = {
-  sm: 'px-3.5 min-h-[36px] text-[13px] rounded-full',
-  md: 'px-5 min-h-[42px] text-[13px] rounded-full',
-  lg: 'px-6 min-h-[48px] text-[14px] rounded-full',
+  sm: 'px-3.5 min-h-[36px] text-[13px] rounded-[12px]',
+  md: 'px-5 min-h-[42px] text-[13px] rounded-[12px]',
+  lg: 'px-6 min-h-[48px] text-[14px] rounded-[12px]',
 };
 
 export const Button: React.FC<ButtonProps> = ({

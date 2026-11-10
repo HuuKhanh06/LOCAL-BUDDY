@@ -1,4 +1,6 @@
 // components/ui/Tabs.tsx
+// Tabs chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
+
 import React from 'react';
 import { clsx } from 'clsx';
 
@@ -17,7 +19,7 @@ interface TabsProps {
 
 export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange, className }) => {
   return (
-    <div className={clsx('flex border-b border-[#E4C3CC] overflow-x-auto gap-1', className)}>
+    <div className={clsx('flex border-b border-[var(--lb-border)] overflow-x-auto gap-1', className)}>
       {tabs.map((tab) => {
         const isActive = tab.id === activeTab;
         return (
@@ -26,20 +28,20 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange, className
             type="button"
             onClick={() => onChange(tab.id)}
             className={clsx(
-              'px-4 py-3 text-[14px] font-bold whitespace-nowrap border-b-2 transition-all flex items-center gap-2 cursor-pointer',
+              'px-4 py-2.5 text-[13px] font-bold whitespace-nowrap border-b-2 transition-all flex items-center gap-2 cursor-pointer',
               isActive
-                ? 'border-[#1EC1CB] text-[#1A0A0F] bg-[#F6E6EA]/50 rounded-t-[10px]'
-                : 'border-transparent text-[#52526B] hover:text-[#1A0A0F] hover:bg-[#F6E6EA]/25 rounded-t-[10px]'
+                ? 'border-[var(--lb-accent)] text-[var(--lb-text)] bg-[var(--lb-surface-2)] rounded-t-[10px]'
+                : 'border-transparent text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface)] rounded-t-[10px]'
             )}
           >
             <span>{tab.label}</span>
             {tab.badge !== undefined && (
               <span
                 className={clsx(
-                  'text-[12px] px-2 py-0.5 rounded-full font-bold tabular-nums',
+                  'text-[11px] px-2 py-0.5 rounded-full font-bold tabular-nums',
                   isActive
-                    ? 'bg-[#1EC1CB] text-[#1C1C28]' // Chữ navy trên nền cyan!
-                    : 'bg-[#F6E6EA] text-[#1A0A0F]'
+                    ? 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)]'
+                    : 'bg-[var(--lb-surface-2)] text-[var(--lb-muted)]'
                 )}
               >
                 {tab.badge}

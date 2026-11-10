@@ -1,4 +1,4 @@
-// components/ui/Modal.tsx – Modal trên Desktop/Tablet & Bottom-Sheet mượt mà trên Mobile (430px)
+// components/ui/Modal.tsx – Modal chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
 import React, { useEffect } from 'react';
 import { clsx } from 'clsx';
 
@@ -41,39 +41,38 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-[#1C1C28]/60 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-[var(--lb-bg-deep)]/75 backdrop-blur-xs"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         className={clsx(
-          'w-full bg-white rounded-t-[20px] sm:rounded-[16px] shadow-[0_20px_40px_rgba(26,10,15,0.25)] border border-[#E4C3CC] overflow-hidden flex flex-col max-h-[90vh]',
+          'w-full bg-[var(--lb-surface)] rounded-t-[20px] sm:rounded-[20px] shadow-2xl border border-[var(--lb-border)] overflow-hidden flex flex-col max-h-[90vh]',
           maxWClass
         )}
       >
-        {/* Thanh kéo bottom-sheet trên mobile */}
         <div className="sm:hidden flex justify-center pt-2.5 pb-1">
-          <div className="w-10 h-1.5 rounded-full bg-[#E4C3CC]" />
+          <div className="w-10 h-1.5 rounded-full bg-[var(--lb-border)]" />
         </div>
 
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E4C3CC] bg-[#FBF4F6]">
-          <h3 className="text-[18px] font-bold text-[#1A0A0F]">{title}</h3>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--lb-border)] bg-[var(--lb-surface-2)]">
+          <h3 className="text-[17px] font-bold text-[var(--lb-text)]">{title}</h3>
           <button
             type="button"
             onClick={onClose}
-            className="text-[#52526B] hover:text-[#1A0A0F] hover:bg-[#F6E6EA] w-9 h-9 rounded-full flex items-center justify-center text-[16px] font-bold transition-colors cursor-pointer"
+            className="text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface)] w-8 h-8 rounded-full flex items-center justify-center text-[15px] font-bold transition-colors cursor-pointer"
             aria-label="Đóng"
           >
             ✕
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto flex-1 text-[15px] text-[#1C1C28]">
+        <div className="p-6 overflow-y-auto flex-1 text-[14px] text-[var(--lb-text)]">
           {children}
         </div>
 
         {footer && (
-          <div className="flex items-center justify-end gap-3 px-6 py-4 bg-[#FBF4F6] border-t border-[#E4C3CC] flex-wrap">
+          <div className="flex items-center justify-end gap-3 px-6 py-4 bg-[var(--lb-surface-2)] border-t border-[var(--lb-border)] flex-wrap">
             {footer}
           </div>
         )}

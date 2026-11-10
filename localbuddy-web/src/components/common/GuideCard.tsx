@@ -1,5 +1,5 @@
 // components/common/GuideCard.tsx
-// Thiết kế tối giản 1 tông nền sáng (#FFFFFF / #FAF9F6), rất ít chữ, tập trung vào ảnh chân thực.
+// Thẻ Guide & Slot chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState, useEffect } from 'react';
 import { clsx } from 'clsx';
@@ -39,37 +39,37 @@ export const GuideCard: React.FC<GuideCardProps> = ({
   return (
     <article
       onClick={onClick}
-      className="group bg-white border border-[#E7E5E4] rounded-[20px] overflow-hidden hover:shadow-[0_14px_30px_rgba(28,25,23,0.07)] hover:border-[#D6D3D1] transition-all cursor-pointer flex flex-col justify-between"
+      className="group bg-[var(--lb-surface)] border border-[var(--lb-border)] rounded-[16px] overflow-hidden hover:border-[var(--lb-accent)] transition-all cursor-pointer flex flex-col justify-between"
     >
-      {/* Ảnh lớn sáng rõ */}
-      <div className="relative h-64 w-full bg-[#F3F1EC] overflow-hidden">
+      {/* Cover Media */}
+      <div className="relative h-60 w-full bg-[var(--lb-surface-2)] overflow-hidden">
         {coverUrl ? (
           <img
             src={coverUrl}
             alt={name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full bg-[#F3F1EC]" />
+          <div className="w-full h-full bg-[var(--lb-surface-2)]" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--lb-bg-deep)]/85 via-transparent to-transparent" />
 
         {isVerified && (
-          <span className="absolute top-3.5 left-3.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/95 text-[#1C1917] backdrop-blur-xs shadow-2xs">
-            ✓ KYC
+          <span className="absolute top-3.5 left-3.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[var(--lb-surface)] text-[var(--lb-text)] border border-[var(--lb-border)] backdrop-blur-xs">
+            ✓ Đã xác thực KYC
           </span>
         )}
 
-        <div className="absolute top-3.5 right-3.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/95 text-[#1C1917] text-[12px] font-bold backdrop-blur-xs shadow-2xs">
-          <span>★</span>
+        <div className="absolute top-3.5 right-3.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--lb-surface)] text-[var(--lb-text)] border border-[var(--lb-border)] text-[12px] font-bold backdrop-blur-xs">
+          <span className="text-[var(--lb-warning)]">★</span>
           <span className="tabular-nums">{avgRating > 0 ? avgRating.toFixed(1) : '5.0'}</span>
-          <span className="text-[#78716C] font-normal">({totalReviews})</span>
+          <span className="text-[var(--lb-muted)] font-normal">({totalReviews})</span>
         </div>
 
-        {/* Avatar tròn + Tên ngắn gọn ngay trên ảnh */}
+        {/* Avatar + Name on cover */}
         <div className="absolute bottom-3.5 left-4 right-4 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full border-2 border-white bg-[#FAF9F6] overflow-hidden shrink-0 shadow-md">
+          <div className="w-11 h-11 rounded-full border-2 border-[var(--lb-accent)] bg-[var(--lb-surface-2)] overflow-hidden shrink-0 shadow-md">
             {avatarUrl ? (
               <img
                 src={avatarUrl}
@@ -78,28 +78,28 @@ export const GuideCard: React.FC<GuideCardProps> = ({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center font-bold text-[#1C1917]">
+              <div className="w-full h-full flex items-center justify-center font-bold text-[var(--lb-text)]">
                 {name.charAt(0)}
               </div>
             )}
           </div>
-          <div className="min-w-0 text-white">
-            <h3 className="text-[17px] font-bold text-white truncate leading-tight">
+          <div className="min-w-0 text-[var(--lb-text)]">
+            <h3 className="text-[16px] font-bold text-[var(--lb-text)] truncate leading-tight">
               {name}
             </h3>
-            <p className="text-[12px] text-white/90 truncate">
+            <p className="text-[12px] text-[var(--lb-muted)] truncate">
               {areas[0] || 'Đà Nẵng'} • {languages.slice(0, 2).join(', ')}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Chân thẻ tối giản: chỉ hiện Đơn giá / giờ + Nút */}
-      <div className="px-4 py-3.5 bg-white flex items-center justify-between gap-2">
-        <span className="text-[15px] font-bold text-[#1C1917] tabular-nums">
+      {/* Card footer */}
+      <div className="px-4 py-3 bg-[var(--lb-surface)] flex items-center justify-between gap-2 border-t border-[var(--lb-border)]">
+        <span className="text-[15px] font-bold text-[var(--lb-text)] tabular-nums">
           {formatHourlyRate(hourlyRate)}
         </span>
-        <span className="px-3.5 py-1.5 rounded-full bg-[#F3F1EC] text-[#1C1917] text-[12px] font-semibold group-hover:bg-[#1C1917] group-hover:text-white transition-colors">
+        <span className="px-3 py-1.5 rounded-[12px] bg-[var(--lb-surface-2)] border border-[var(--lb-border)] text-[var(--lb-text)] text-[12px] font-semibold group-hover:bg-[var(--lb-accent)] group-hover:text-[var(--lb-on-accent)] transition-colors">
           Đặt lịch →
         </span>
       </div>
@@ -134,12 +134,12 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
       onClick={isAvailable ? onClick : undefined}
       className={clsx(
         'px-3.5 py-2.5 rounded-[12px] border text-[13px] font-semibold transition-all flex flex-col items-center justify-center min-h-[50px] cursor-pointer disabled:cursor-not-allowed',
-        isSelected && 'bg-[#1C1917] text-white border-[#1C1917]',
+        isSelected && 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] border-[var(--lb-accent)]',
         !isSelected &&
           isAvailable &&
-          'bg-white border-[#E7E5E4] text-[#1C1917] hover:border-[#1C1917]',
-        status === 'HOLD' && 'bg-[#FFFBEB] border-[#FDE68A] text-[#B45309]',
-        status === 'BUSY' && 'bg-[#F3F1EC] border-[#E7E5E4] text-[#A8A29E] line-through'
+          'bg-[var(--lb-surface-2)] border-[var(--lb-border)] text-[var(--lb-text)] hover:border-[var(--lb-accent)]',
+        status === 'HOLD' && 'bg-[var(--lb-surface-2)] border-[var(--lb-warning)] text-[var(--lb-warning)]',
+        status === 'BUSY' && 'bg-[var(--lb-surface)] border-[var(--lb-border)] text-[var(--lb-muted)] opacity-40 line-through'
       )}
     >
       <span className="tabular-nums">
@@ -152,7 +152,7 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
       )}
       {status === 'BUSY' && <span className="text-[10px] mt-0.5 no-underline">Đã kín</span>}
       {status === 'AVAILABLE' && (
-        <span className={clsx('text-[10px] mt-0.5', isSelected ? 'text-white/80' : 'text-[#78716C]')}>
+        <span className={clsx('text-[10px] mt-0.5', isSelected ? 'text-[var(--lb-on-accent)]' : 'text-[var(--lb-muted)]')}>
           {isSelected ? 'Đã chọn' : 'Trống'}
         </span>
       )}
@@ -192,7 +192,7 @@ export const Countdown: React.FC<{
   const secs = timeLeft % 60;
 
   return (
-    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[13px] font-semibold bg-[#F3F1EC] text-[#1C1917] border border-[#E7E5E4]">
+    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[13px] font-semibold bg-[var(--lb-surface-2)] text-[var(--lb-text)] border border-[var(--lb-border)]">
       <span>⏱</span>
       {label && <span>{label}:</span>}
       <span className="font-mono tabular-nums">
@@ -209,16 +209,16 @@ export const EmptyState: React.FC<{
   actionText?: string;
   onAction?: () => void;
 }> = ({ title, description, actionText, onAction }) => (
-  <div className="flex flex-col items-center justify-center py-12 px-6 text-center border border-[#E7E5E4] rounded-[20px] bg-white">
-    <h3 className="text-[16px] font-bold text-[#1C1917]">{title}</h3>
+  <div className="flex flex-col items-center justify-center py-12 px-6 text-center border border-[var(--lb-border)] rounded-[20px] bg-[var(--lb-surface)]">
+    <h3 className="text-[16px] font-bold text-[var(--lb-text)]">{title}</h3>
     {description && (
-      <p className="text-[13px] text-[#78716C] mt-1 max-w-sm">{description}</p>
+      <p className="text-[13px] text-[var(--lb-muted)] mt-1 max-w-sm">{description}</p>
     )}
     {actionText && onAction && (
       <button
         type="button"
         onClick={onAction}
-        className="mt-4 px-5 py-2 bg-[#1C1917] text-white rounded-full text-[13px] font-semibold hover:bg-[#292524] cursor-pointer"
+        className="mt-4 px-5 py-2 bg-[var(--lb-accent)] text-[var(--lb-on-accent)] rounded-[12px] text-[13px] font-bold hover:bg-[var(--lb-accent-hover)] cursor-pointer"
       >
         {actionText}
       </button>
@@ -235,10 +235,10 @@ export const LoadingState: React.FC<{ message?: string; rows?: number }> = ({
       {Array.from({ length: rows }).map((_, i) => (
         <div
           key={i}
-          className="bg-white border border-[#E7E5E4] rounded-[20px] p-4 space-y-3 animate-pulse"
+          className="bg-[var(--lb-surface)] border border-[var(--lb-border)] rounded-[16px] p-4 space-y-3 animate-pulse"
         >
-          <div className="h-56 bg-[#F3F1EC] rounded-[14px]" />
-          <div className="h-4 bg-[#F3F1EC] rounded w-2/3" />
+          <div className="h-56 bg-[var(--lb-surface-2)] rounded-[12px]" />
+          <div className="h-4 bg-[var(--lb-surface-2)] rounded w-2/3" />
         </div>
       ))}
     </div>
@@ -249,13 +249,13 @@ export const ErrorState: React.FC<{ message: string; onRetry?: () => void }> = (
   message,
   onRetry,
 }) => (
-  <div className="flex flex-col items-center justify-center py-10 px-6 text-center border border-[#E7E5E4] rounded-[20px] bg-white">
-    <p className="text-[14px] text-[#1C1917] mb-4">{message}</p>
+  <div className="flex flex-col items-center justify-center py-10 px-6 text-center border border-[var(--lb-border)] rounded-[20px] bg-[var(--lb-surface)]">
+    <p className="text-[14px] text-[var(--lb-text)] mb-4">{message}</p>
     {onRetry && (
       <button
         type="button"
         onClick={onRetry}
-        className="px-5 py-2 bg-[#1C1917] text-white rounded-full text-[13px] font-semibold cursor-pointer"
+        className="px-5 py-2 bg-[var(--lb-accent)] text-[var(--lb-on-accent)] rounded-[12px] text-[13px] font-bold cursor-pointer"
       >
         Thử lại
       </button>

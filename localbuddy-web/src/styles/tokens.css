@@ -1,59 +1,44 @@
 /* ============================================================
-   LOCALBUDDY ĐÀ NẴNG – MINIMALIST SINGLE LIGHT TONE PALETTE
-   1 tông nền sáng duy nhất (#FAF9F6 / #FFFFFF), tối giản, hạn chế tối đa màu sắc
+   LOCALBUDDY ĐÀ NẴNG – DESIGN SYSTEM TOKENS (BẢNG MÀU MỚI BẮT BUỘC)
+   Màu gốc: #EB5B38 (cam), #272A2D (nền chủ đạo), #E6E4DC (cát), #347CCB (xanh dương)
    ============================================================ */
 
 :root {
-  /* Single Light Tone Core */
-  --color-bg: #FAF9F6;
-  --color-bg-soft: #F3F1EC;
-  --color-surface: #FFFFFF;
-  --color-text: #1C1917;
-  --color-text-heading: #1C1917;
-  --color-text-muted: #78716C;
-  --color-border: #E7E5E4;
+  --lb-bg: #272A2D;
+  --lb-bg-deep: #1E2124;
+  --lb-surface: #2F3337;
+  --lb-surface-2: #383D42;
+  --lb-border: #454B51;
+  --lb-text: #E6E4DC;
+  --lb-muted: #A8ABA8;
+  --lb-accent: #EB5B38;
+  --lb-accent-hover: #F06F4F;
+  --lb-on-accent: #1B1D1F;
+  --lb-accent-text: #F27C5E;
+  --lb-blue: #347CCB;
+  --lb-blue-text: #6FA3E0;
+  --lb-blue-solid: #2F6FB8;
+  --lb-sand: #E6E4DC;
+  --lb-on-sand: #272A2D;
+  --lb-accent-on-sand: #B33A18;
+  --lb-blue-on-sand: #285B9A;
+  --lb-success: #4ADE80;
+  --lb-warning: #FBBF24;
+  --lb-error: #F87171;
 
-  /* Aliases for compatibility */
-  --color-burgundy: #1C1917;
-  --color-burgundy-light: #292524;
-  --color-burgundy-soft: #44403C;
+  /* Semantic shortcuts */
+  --color-bg: var(--lb-bg);
+  --color-surface: var(--lb-surface);
+  --color-surface-2: var(--lb-surface-2);
+  --color-text: var(--lb-text);
+  --color-border: var(--lb-border);
+  --color-accent: var(--lb-accent);
+  --color-blue: var(--lb-blue);
+  --color-sand: var(--lb-sand);
 
-  --color-blush: #F3F1EC;
-  --color-blush-light: #FAF9F6;
-  --color-blush-medium: #E7E5E4;
-  --color-blush-border: #E7E5E4;
-
-  --color-navy: #1C1917;
-  --color-navy-light: #292524;
-  --color-navy-muted: #78716C;
-  --color-navy-subtle: #A8A29E;
-
-  --color-cyan: #1C1917;
-  --color-cyan-hover: #292524;
-  --color-cyan-active: #0C0A09;
-  --color-cyan-soft: #F3F1EC;
-  --color-cyan-border: #D6D3D1;
-
-  /* Subtle Semantic Status Colors */
-  --color-success: #15803D;
-  --color-success-bg: #F0FDF4;
-  --color-success-border: #BBF7D0;
-
-  --color-warning: #B45309;
-  --color-warning-bg: #FFFBEB;
-  --color-warning-border: #FDE68A;
-
-  --color-error: #B91C1C;
-  --color-error-bg: #FEF2F2;
-  --color-error-border: #FECACA;
-
-  /* Radii & Shadows */
+  /* Radius */
   --radius-card: 16px;
   --radius-btn: 12px;
   --radius-modal: 20px;
   --radius-badge: 9999px;
-
-  --shadow-card: 0 2px 12px rgba(28, 25, 23, 0.04);
-  --shadow-card-hover: 0 12px 28px rgba(28, 25, 23, 0.08);
-  --shadow-modal: 0 20px 40px rgba(28, 25, 23, 0.12);
 }

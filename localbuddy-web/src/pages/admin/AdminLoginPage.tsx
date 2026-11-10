@@ -1,18 +1,21 @@
+// pages/admin/AdminLoginPage.tsx (UC.04: Đăng nhập Quản trị viên)
+// Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Shield, Lock, Mail, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
 import { useBookingContext } from '../../context/BookingContext';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useToast } from '../../components/ui/Toast';
 
 export const AdminLoginPage: React.FC = () => {
-  const { login, switchRoleQuickly } = useBookingContext();
+  const { login } = useBookingContext();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('hoang.admin@localbuddy.vn');
-  const [password, setPassword] = useState('Admin@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -25,118 +28,92 @@ export const AdminLoginPage: React.FC = () => {
 
     const res = login(email.trim(), password, 'admin');
     if (res.ok) {
-      showToast(res.message, 'success');
-      navigate('/admin/duyet-kyc');
+      showToast('Đăng nhập Quản trị viên thành công', 'success');
+      navigate('/admin/kyc');
     } else {
       setError(res.message);
       showToast(res.message, 'error');
     }
   };
 
-  const handleQuickDemoAdmin = () => {
-    const u = switchRoleQuickly('admin');
-    showToast(`Đã đăng nhập nhanh quyền Admin (${u.fullName})`, 'success');
-    navigate('/admin/duyet-kyc');
-  };
-
   return (
-    <div className="min-h-screen bg-[#1C1C28] flex flex-col justify-center items-center px-4 py-12">
-      <div className="w-full max-w-md bg-white rounded-[16px] border border-[#E8CED5] shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-[var(--lb-bg-deep)] flex flex-col justify-center items-center px-4 py-12">
+      <div className="w-full max-w-md bg-[var(--lb-surface)] rounded-[20px] border border-[var(--lb-border)] shadow-2xl overflow-hidden">
         {/* Top Banner */}
-        <div className="bg-[#1A0A0F] px-7 py-6 text-white">
+        <div className="bg-[var(--lb-surface-2)] px-7 py-6 text-[var(--lb-text)] border-b border-[var(--lb-border)]">
           <div className="flex items-center justify-between mb-3">
-            <Link to="/" className="inline-flex items-center gap-2 text-white font-extrabold text-lg">
-              <span className="w-8 h-8 rounded-[10px] bg-[#1EC1CB] text-[#1C1C28] flex items-center justify-center font-black">
+            <Link to="/" className="inline-flex items-center gap-2 text-[var(--lb-text)] font-extrabold text-lg">
+              <span className="w-8 h-8 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] flex items-center justify-center font-black">
                 LB
               </span>
-              LocalBuddy Đà Nẵng
+              LocalBuddy
             </Link>
-            <span className="px-2.5 py-1 rounded-full bg-[#1EC1CB]/20 text-[#1EC1CB] text-[11px] font-bold uppercase tracking-wider">
-              Admin Portal
+            <span className="px-2.5 py-1 rounded-full bg-[var(--lb-surface)] border border-[var(--lb-border)] text-[var(--lb-accent-text)] text-[11px] font-bold uppercase tracking-wider">
+              Admin Portal (UC.04)
             </span>
           </div>
-          <h1 className="text-xl font-extrabold text-[#F6E6EA]">
+          <h1 className="text-lg font-bold text-[var(--lb-text)]">
             Cổng Quản trị & Vận hành Nền tảng
           </h1>
-          <p className="text-xs text-[#F6E6EA]/75 mt-1">
-            Thẩm định KYC, xử lý khiếu nại tranh chấp, đối soát rút tiền và cấu hình phí dịch vụ (UC.02).
+          <p className="text-xs text-[var(--lb-muted)] mt-1">
+            Đăng nhập tài khoản Admin để thẩm định KYC, xử lý tranh chấp và quyết toán rút tiền.
           </p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-7 space-y-5">
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="p-7 space-y-4">
           {error && (
-            <div className="p-3.5 rounded-[10px] bg-[#FDECEC] border border-[#F5B5B5] text-xs font-semibold text-[#A62626] flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
+            <div className="p-3.5 bg-[var(--lb-surface-2)] border border-[var(--lb-error)] rounded-[12px] flex items-start gap-2.5 text-xs text-[var(--lb-error)]">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
-          <Input
-            label="Email Quản trị viên *"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="hoang.admin@localbuddy.vn"
-            required
-          />
-
-          <Input
-            label="Mật khẩu bảo mật *"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            required
-          />
-
-          <Button
-            type="submit"
-            variant="primary"
-            fullWidth
-            size="lg"
-            icon={<ArrowRight className="w-4 h-4" />}
-          >
-            Đăng nhập Hệ thống Quản trị
-          </Button>
-
-          {/* Quick Demo Box */}
-          <div className="pt-4 border-t border-[#E8CED5] space-y-3">
-            <div className="flex items-center justify-between text-xs text-[#525266]">
-              <span className="font-bold text-[#1A0A0F] flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5 text-[#118B93]" /> Tài khoản Admin mẫu:
-              </span>
-              <span className="font-mono">Lê Văn Hoàng (admin-1)</span>
+          <div className="space-y-1">
+            <label className="block text-xs font-bold text-[var(--lb-text)] uppercase tracking-wider">
+              Email quản trị *
+            </label>
+            <div className="relative">
+              <Mail className="w-4 h-4 text-[var(--lb-muted)] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@localbuddy.vn"
+                className="pl-10"
+                required
+              />
             </div>
-            <button
-              type="button"
-              onClick={handleQuickDemoAdmin}
-              className="w-full py-2.5 px-4 rounded-[10px] bg-[#F6E6EA] hover:bg-[#EDD3DA] text-[#1A0A0F] text-xs font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <CheckCircle2 className="w-4 h-4 text-[#146C43]" />
-              Vào thẳng Bảng điều khiển Admin (1-Click Demo)
-            </button>
           </div>
 
-          <div className="text-center pt-2">
-            <Link
-              to="/dang-nhap"
-              className="text-xs font-semibold text-[#525266] hover:text-[#1A0A0F] underline"
-            >
-              ← Quay lại trang đăng nhập Du khách & Hướng dẫn viên
+          <div className="space-y-1">
+            <label className="block text-xs font-bold text-[var(--lb-text)] uppercase tracking-wider">
+              Mật khẩu quản trị *
+            </label>
+            <div className="relative">
+              <Lock className="w-4 h-4 text-[var(--lb-muted)] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="pl-10"
+                required
+              />
+            </div>
+          </div>
+
+          <Button type="submit" variant="primary" fullWidth size="lg">
+            <span>Đăng nhập Quản trị viên</span>
+            <ArrowRight className="w-4 h-4 ml-1.5 inline" />
+          </Button>
+
+          <div className="pt-2 text-center text-xs text-[var(--lb-muted)] border-t border-[var(--lb-border)]">
+            <Link to="/" className="text-[var(--lb-blue-text)] hover:underline inline-flex items-center gap-1 font-medium">
+              ← Quay về Trang chủ LocalBuddy
             </Link>
           </div>
         </form>
-      </div>
-
-      <div className="mt-6 flex items-center gap-4 text-xs text-[#F6E6EA]/60">
-        <span className="inline-flex items-center gap-1">
-          <Lock className="w-3.5 h-3.5" /> Kết nối bảo mật SSL
-        </span>
-        <span>•</span>
-        <span className="inline-flex items-center gap-1">
-          <Mail className="w-3.5 h-3.5" /> Bộ phận Vận hành LocalBuddy Đà Nẵng
-        </span>
       </div>
     </div>
   );

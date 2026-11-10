@@ -1,45 +1,50 @@
 @import "tailwindcss";
+@import "@fontsource/be-vietnam-pro/400.css";
+@import "@fontsource/be-vietnam-pro/500.css";
+@import "@fontsource/be-vietnam-pro/600.css";
+@import "@fontsource/be-vietnam-pro/700.css";
 @import "./tokens.css";
 
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: 'Be Vietnam Pro', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
-  --color-burgundy: #1A0A0F;
-  --color-burgundy-light: #2E131C;
-  --color-blush: #F6E6EA;
-  --color-blush-light: #FBF4F6;
-  --color-blush-border: #E4C3CC;
-  --color-navy: #1C1C28;
-  --color-navy-light: #2B2B3D;
-  --color-navy-muted: #52526B;
-  --color-cyan: #1EC1CB;
-  --color-cyan-hover: #18A7B0;
-  --color-cyan-soft: #E5F8F9;
-
-  --color-success: #0F6E4B;
-  --color-success-bg: #E3F7EF;
-  --color-warning: #8C4A08;
-  --color-warning-bg: #FEF1DC;
-  --color-error: #A61B2B;
-  --color-error-bg: #FCE8EB;
+  --color-lb-bg: var(--lb-bg);
+  --color-lb-bg-deep: var(--lb-bg-deep);
+  --color-lb-surface: var(--lb-surface);
+  --color-lb-surface-2: var(--lb-surface-2);
+  --color-lb-border: var(--lb-border);
+  --color-lb-text: var(--lb-text);
+  --color-lb-muted: var(--lb-muted);
+  --color-lb-accent: var(--lb-accent);
+  --color-lb-accent-hover: var(--lb-accent-hover);
+  --color-lb-on-accent: var(--lb-on-accent);
+  --color-lb-accent-text: var(--lb-accent-text);
+  --color-lb-blue: var(--lb-blue);
+  --color-lb-blue-text: var(--lb-blue-text);
+  --color-lb-blue-solid: var(--lb-blue-solid);
+  --color-lb-sand: var(--lb-sand);
+  --color-lb-on-sand: var(--lb-on-sand);
+  --color-lb-accent-on-sand: var(--lb-accent-on-sand);
+  --color-lb-blue-on-sand: var(--lb-blue-on-sand);
+  --color-lb-success: var(--lb-success);
+  --color-lb-warning: var(--lb-warning);
+  --color-lb-error: var(--lb-error);
 }
 
 @layer base {
   html {
-    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-    background-color: var(--color-bg);
-    color: var(--color-text);
+    font-family: 'Be Vietnam Pro', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    background-color: var(--lb-bg);
+    color: var(--lb-text);
     scroll-behavior: smooth;
   }
 
   body {
     min-height: 100vh;
-    background-color: var(--color-bg);
-    color: var(--color-text);
-  }
-
-  h1, h2, h3, h4, .heading-burgundy {
-    color: var(--color-burgundy);
+    background-color: var(--lb-bg);
+    color: var(--lb-text);
+    font-size: 16px;
+    line-height: 1.5;
   }
 
   * {
@@ -47,7 +52,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-cyan);
+    outline: 2px solid var(--lb-blue);
     outline-offset: 2px;
   }
 }

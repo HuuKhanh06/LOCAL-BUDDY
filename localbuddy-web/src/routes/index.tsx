@@ -1,17 +1,13 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { PublicLayout, TouristLayout, GuideLayout, AdminLayout } from '../layouts';
 import { useBookingContext } from '../context/BookingContext';
 import { UserRole } from '../types';
-import { Button } from '../components/ui/Button';
 import { LoadingState } from '../components/common/GuideCard';
 
-// Lazy-loaded Public & Tourist Pages (Giai đoạn 6.3: Code-splitting + Skeleton fallback)
+// Lazy-loaded Public Pages
 const HomePage = lazy(() =>
   import('../pages/public/HomePage').then((m) => ({ default: m.HomePage }))
-);
-const DesignSystemPage = lazy(() =>
-  import('../pages/public/DesignSystemPage').then((m) => ({ default: m.DesignSystemPage }))
 );
 const ForbiddenPage = lazy(() =>
   import('../pages/public/ForbiddenPage').then((m) => ({ default: m.ForbiddenPage }))
@@ -57,8 +53,31 @@ const ProfileSettingsPage = lazy(() =>
     default: m.ProfileSettingsPage,
   }))
 );
-const MessagesPage = lazy(() =>
-  import('../pages/tourist/MessagesPage').then((m) => ({ default: m.MessagesPage }))
+
+// Static Public Pages
+const HowItWorksPage = lazy(() =>
+  import('../pages/public/StaticPages').then((m) => ({ default: m.HowItWorksPage }))
+);
+const BecomeGuidePage = lazy(() =>
+  import('../pages/public/StaticPages').then((m) => ({ default: m.BecomeGuidePage }))
+);
+const CancellationPolicyPage = lazy(() =>
+  import('../pages/public/StaticPages').then((m) => ({ default: m.CancellationPolicyPage }))
+);
+const SafetyPage = lazy(() =>
+  import('../pages/public/StaticPages').then((m) => ({ default: m.SafetyPage }))
+);
+const FaqPage = lazy(() =>
+  import('../pages/public/StaticPages').then((m) => ({ default: m.FaqPage }))
+);
+const TermsPage = lazy(() =>
+  import('../pages/public/StaticPages').then((m) => ({ default: m.TermsPage }))
+);
+const PrivacyPage = lazy(() =>
+  import('../pages/public/StaticPages').then((m) => ({ default: m.PrivacyPage }))
+);
+const ContactPage = lazy(() =>
+  import('../pages/public/StaticPages').then((m) => ({ default: m.ContactPage }))
 );
 
 // Lazy-loaded Guide Pages
@@ -110,7 +129,7 @@ const FeeConfigPage = lazy(() =>
 
 const RouteSkeletonFallback: React.FC = () => (
   <div className="max-w-6xl mx-auto px-4 py-8">
-    <LoadingState message="Đang tải màn hình LocalBuddy Đà Nẵng..." rows={3} />
+    <LoadingState message="Đang tải màn hình..." rows={3} />
   </div>
 );
 
@@ -121,11 +140,9 @@ const RoleGuard: React.FC<{
   allowedRoles: UserRole[];
   children: React.ReactNode;
 }> = ({ allowedRoles, children }) => {
-  const { currentUser, switchRoleQuickly } = useBookingContext();
-  const navigate = useNavigate();
+  const { currentUser } = useBookingContext();
   const location = useLocation();
 
-  // 1. Nếu chưa đăng nhập -> điều hướng sang trang đăng nhập tương ứng kèm redirect
   if (!currentUser) {
     const loginPath = allowedRoles.includes('admin')
       ? '/admin/dang-nhap'
@@ -133,49 +150,27 @@ const RoleGuard: React.FC<{
     return <Navigate to={loginPath} replace />;
   }
 
-  // 2. Nếu tài khoản đang bị khóa bởi Admin (UC.06: isLocked = true)
   if (currentUser.isLocked) {
     return (
-      <div className="min-h-screen bg-[#FBF4F6] flex items-center justify-center p-4">
-        <div className="max-w-lg w-full bg-white border-2 border-[#C93B3B] rounded-[16px] p-8 shadow-lg text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-[#FCE8EB] text-[#A61B2B] flex items-center justify-center text-3xl mx-auto font-extrabold">
+      <div className="min-h-screen bg-[var(--lb-bg)] flex items-center justify-center p-4">
+        <div className="max-w-lg w-full bg-[var(--lb-surface)] border border-[var(--lb-border)] rounded-[20px] p-8 shadow-xl text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-[var(--lb-surface-2)] text-[var(--lb-error)] flex items-center justify-center text-3xl mx-auto font-black">
             🔒
           </div>
-          <span className="inline-block px-3 py-1 rounded-full bg-[#FCE8EB] text-[#A61B2B] text-xs font-extrabold uppercase tracking-wider">
-            UC.06 • Tài khoản bị tạm khóa
+          <span className="inline-block px-3 py-1 rounded-full bg-[var(--lb-surface-2)] text-[var(--lb-error)] text-xs font-bold uppercase tracking-wider">
+            Tài khoản bị tạm khóa (UC.06)
           </span>
-          <h1 className="text-2xl font-extrabold text-[#1A0A0F]">
+          <h1 className="text-xl font-bold text-[var(--lb-text)]">
             Tài khoản {currentUser.fullName} đang bị tạm khóa
           </h1>
-          <p className="text-sm text-[#52526B] leading-relaxed">
-            Tài khoản của bạn ({currentUser.email}) đã bị Quản trị viên tạm khóa do vi phạm quy tắc cộng đồng hoặc hủy đơn sát giờ nhiều lần ({currentUser.violationCount} lần vi phạm).
+          <p className="text-xs text-[var(--lb-muted)] leading-relaxed">
+            Tài khoản của bạn ({currentUser.email}) đã bị Quản trị viên tạm khóa do có hành vi vi phạm quy tắc cộng đồng hoặc hủy đơn quá số lần quy định ({currentUser.violationCount} lần vi phạm).
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <Button
-              variant="primary"
-              onClick={() => {
-                switchRoleQuickly('tourist', 'u-tourist-1');
-                navigate('/');
-              }}
-            >
-              Chuyển sang tài khoản Du khách hợp lệ
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                switchRoleQuickly('admin', 'u-admin-1');
-                navigate('/admin/tai-khoan');
-              }}
-            >
-              Mở khóa trong Admin (UC.06)
-            </Button>
-          </div>
         </div>
       </div>
     );
   }
 
-  // 3. Nếu đang ở vai trò khác với tuyến đường yêu cầu -> điều hướng sang trang 403 chuẩn
   if (!allowedRoles.includes(currentUser.role)) {
     const targetRole = allowedRoles[0];
     return <Navigate to={`/403?required=${targetRole}`} replace />;
@@ -188,18 +183,28 @@ export const AppRoutes: React.FC = () => {
   return (
     <Suspense fallback={<RouteSkeletonFallback />}>
       <Routes>
-        {/* Admin Login Standalone */}
+        {/* Admin Login Standalone (UC.04) */}
         <Route path="/admin/dang-nhap" element={<AdminLoginPage />} />
+        <Route path="/admin/login" element={<Navigate to="/admin/dang-nhap" replace />} />
 
         {/* Public Layout */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/dang-ky" element={<RegisterPage />} />
+          <Route path="/register" element={<Navigate to="/dang-ky" replace />} />
           <Route path="/dang-nhap" element={<LoginPage />} />
+          <Route path="/login" element={<Navigate to="/dang-nhap" replace />} />
           <Route path="/quen-mat-khau" element={<ForgotPasswordPage />} />
           <Route path="/guides" element={<GuideSearchPage />} />
           <Route path="/guides/:id" element={<GuideProfilePage />} />
-          <Route path="/design-system" element={<DesignSystemPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/become-a-guide" element={<BecomeGuidePage />} />
+          <Route path="/cancellation-policy" element={<CancellationPolicyPage />} />
+          <Route path="/safety" element={<SafetyPage />} />
+          <Route path="/faq" element={<FaqPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/403" element={<ForbiddenPage />} />
         </Route>
 
@@ -217,7 +222,6 @@ export const AppRoutes: React.FC = () => {
           <Route path="/don/:id/dat-coc" element={<DepositPaymentPage />} />
           <Route path="/don/:id/thanh-toan-70" element={<BalancePaymentPage />} />
           <Route path="/thong-bao" element={<NotificationsPage />} />
-          <Route path="/tin-nhan" element={<MessagesPage />} />
           <Route path="/ho-so-ca-nhan" element={<ProfileSettingsPage />} />
         </Route>
 
@@ -236,7 +240,6 @@ export const AppRoutes: React.FC = () => {
           <Route path="/guide/vi" element={<WalletPage />} />
           <Route path="/guide/ho-so" element={<ProfileAndPricePage />} />
           <Route path="/guide/kyc" element={<KycSubmissionPage />} />
-          <Route path="/guide/tin-nhan" element={<MessagesPage />} />
           <Route path="/guide/thong-bao" element={<NotificationsPage />} />
         </Route>
 

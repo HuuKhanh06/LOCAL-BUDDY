@@ -1,5 +1,6 @@
-// components/common/StatusBadge.tsx & PaymentBadge.tsx
-// Phối màu ngữ nghĩa hài hòa với Burgundy (#1A0A0F), Blush (#F6E6EA), Navy (#1C1C28), Cyan (#1EC1CB)
+// components/common/StatusBadge.tsx
+// Chuẩn thiết kế [10]: Trạng thái luôn có icon + chữ, không chỉ màu.
+// Huy hiệu: PENDING warning · WAITING_PAYMENT accent · CONFIRMED blue · COMPLETED success · DISPUTED warning + icon cảnh báo · CANCELLED muted.
 
 import React from 'react';
 import { clsx } from 'clsx';
@@ -12,39 +13,39 @@ export const StatusBadge: React.FC<{ status: BookingStatus; className?: string }
 }) => {
   const config: Record<BookingStatus, { bg: string; text: string; border: string; icon: string }> = {
     PENDING: {
-      bg: 'bg-[#FEF1DC]',
-      text: 'text-[#8C4A08]',
-      border: 'border-[#F8CA84]',
+      bg: 'bg-[var(--lb-surface-2)]',
+      text: 'text-[var(--lb-warning)]',
+      border: 'border-[var(--lb-warning)]',
       icon: '⏳',
     },
     WAITING_PAYMENT: {
-      bg: 'bg-[#FEF1DC]',
-      text: 'text-[#8C4A08]',
-      border: 'border-[#F8CA84]',
+      bg: 'bg-[var(--lb-surface-2)]',
+      text: 'text-[var(--lb-accent-text)]',
+      border: 'border-[var(--lb-accent)]',
       icon: '⏱',
     },
     CONFIRMED: {
-      bg: 'bg-[#1EC1CB]',
-      text: 'text-[#1C1C28]', // Chữ navy trên nền cyan!
-      border: 'border-[#18A7B0]',
+      bg: 'bg-[var(--lb-surface-2)]',
+      text: 'text-[var(--lb-blue-text)]',
+      border: 'border-[var(--lb-blue)]',
       icon: '✓',
     },
     COMPLETED: {
-      bg: 'bg-[#E3F7EF]',
-      text: 'text-[#0F6E4B]',
-      border: 'border-[#99E2C4]',
+      bg: 'bg-[var(--lb-surface-2)]',
+      text: 'text-[var(--lb-success)]',
+      border: 'border-[var(--lb-success)]',
       icon: '✓✓',
     },
     DISPUTED: {
-      bg: 'bg-[#FCE8EB]',
-      text: 'text-[#A61B2B]',
-      border: 'border-[#F5B2BA]',
+      bg: 'bg-[var(--lb-surface-2)]',
+      text: 'text-[var(--lb-warning)]',
+      border: 'border-[var(--lb-warning)]',
       icon: '⚠️',
     },
     CANCELLED: {
-      bg: 'bg-[#F6E6EA]',
-      text: 'text-[#1A0A0F]',
-      border: 'border-[#E4C3CC]',
+      bg: 'bg-[var(--lb-surface-2)]',
+      text: 'text-[var(--lb-muted)]',
+      border: 'border-[var(--lb-border)]',
       icon: '✕',
     },
   };
@@ -71,58 +72,10 @@ export const PaymentBadge: React.FC<{ status: PaymentStatus; className?: string 
   status,
   className,
 }) => {
-  const config: Record<PaymentStatus, { border: string; text: string; bg: string }> = {
-    UNPAID: {
-      border: 'border-[#E4C3CC]',
-      text: 'text-[#52526B]',
-      bg: 'bg-white',
-    },
-    WAITING_DEPOSIT: {
-      border: 'border-[#F8CA84]',
-      text: 'text-[#8C4A08]',
-      bg: 'bg-[#FEF1DC]/40',
-    },
-    DEPOSITED: {
-      border: 'border-[#1EC1CB]',
-      text: 'text-[#1C1C28]',
-      bg: 'bg-[#E5F8F9]',
-    },
-    WAITING_FINAL: {
-      border: 'border-[#F8CA84]',
-      text: 'text-[#8C4A08]',
-      bg: 'bg-[#FEF1DC]/40',
-    },
-    PAID: {
-      border: 'border-[#99E2C4]',
-      text: 'text-[#0F6E4B]',
-      bg: 'bg-[#E3F7EF]',
-    },
-    WAITING_REFUND: {
-      border: 'border-[#F8CA84]',
-      text: 'text-[#8C4A08]',
-      bg: 'bg-[#FEF1DC]/40',
-    },
-    REFUNDED: {
-      border: 'border-[#E4C3CC]',
-      text: 'text-[#1A0A0F]',
-      bg: 'bg-[#F6E6EA]',
-    },
-    WAITING_RECONCILE: {
-      border: 'border-[#F8CA84]',
-      text: 'text-[#8C4A08]',
-      bg: 'bg-[#FEF1DC]',
-    },
-  };
-
-  const item = config[status] || config.UNPAID;
-
   return (
     <span
       className={clsx(
-        'inline-flex items-center px-3 py-1 rounded-full text-[12px] font-semibold border',
-        item.bg,
-        item.border,
-        item.text,
+        'inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border bg-[var(--lb-surface-2)] border-[var(--lb-border)] text-[var(--lb-muted)]',
         className
       )}
     >
