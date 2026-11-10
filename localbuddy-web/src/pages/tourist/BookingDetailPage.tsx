@@ -216,9 +216,9 @@ export const BookingDetailPage: React.FC = () => {
         <div>
           {isDepositPaid ? (
             <div className="flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-[12px] font-semibold text-emerald-900 shadow-xs">
-              <span>📞 SĐT Thổ địa: <strong>{guideItem?.user.phone || '0905678910'}</strong></span>
+              <span>📞 SĐT Thổ địa: <strong>{guideItem?.user.phone || '0905111222'}</strong></span>
               <span>•</span>
-              <span>✉️ {guideItem?.user.email || 'khanh.nguyen.dn@gmail.com'}</span>
+              <span>✉️ {guideItem?.user.email || 'duongdanghuan.guide@gmail.com'}</span>
             </div>
           ) : (
             <span className="text-[12px] text-[#78716C] bg-[#F3F1EC] px-3.5 py-1.5 rounded-full border border-[#E7E5E4]">
@@ -249,7 +249,7 @@ export const BookingDetailPage: React.FC = () => {
                 </span>
               </div>
               <h1 className="text-[20px] sm:text-[24px] font-black text-[#1C1917] mt-1">
-                Chuyến đi cùng Thổ địa {guideItem?.user.fullName || 'Nguyễn Hữu Khanh'}
+                Chuyến đi cùng Thổ địa {guideItem?.user.fullName || 'Dương Đăng Huân'}
               </h1>
             </div>
           </div>
@@ -527,8 +527,8 @@ export const BookingDetailPage: React.FC = () => {
 
           <div className="bg-[#F3F1EC] border border-[#E7E5E4] rounded-2xl p-4 text-[13px] text-[#57534E] space-y-2 leading-relaxed">
             <p>
-              <strong>Bên A (Du khách):</strong> {touristUser?.fullName || 'Dương Đăng Huân'} •{' '}
-              <strong>Bên B (Thổ địa):</strong> {guideItem?.user.fullName || 'Nguyễn Hữu Khanh'}
+              <strong>Bên A (Du khách):</strong> {touristUser?.fullName || 'Khách hàng'} •{' '}
+              <strong>Bên B (Thổ địa):</strong> {guideItem?.user.fullName || 'Dương Đăng Huân'}
             </p>
             <p>
               • <strong>Địa điểm:</strong> {booking.meetingLocation} vào ngày {formatDate(booking.date)} ({booking.startTime} – {booking.endTime}).

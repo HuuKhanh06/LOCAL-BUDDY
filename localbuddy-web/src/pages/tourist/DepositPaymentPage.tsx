@@ -242,7 +242,7 @@ export const DepositPaymentPage: React.FC = () => {
             <div>
               <span className="text-[#52526B] block text-[12px]">Hướng dẫn viên bản địa:</span>
               <strong className="text-[#1A0A0F]">
-                {guideItem?.user.fullName || 'Nguyễn Hữu Khanh'}
+                {guideItem?.user.fullName || 'Dương Đăng Huân'}
               </strong>
             </div>
             <div>

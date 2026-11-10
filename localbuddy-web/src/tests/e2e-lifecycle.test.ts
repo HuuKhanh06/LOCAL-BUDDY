@@ -25,7 +25,7 @@ describe('LocalBuddy Đà Nẵng — Kiểm thử E2E Vòng Đời Trọn Vẹn 
       'utf-8'
     );
     const seedSql = fs.readFileSync(
-      path.resolve(__dirname, '../../supabase/seed.sql'),
+      path.resolve(__dirname, 'fixtures/test-seed.sql'),
       'utf-8'
     );
 

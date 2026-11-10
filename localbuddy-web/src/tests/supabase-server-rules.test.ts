@@ -10,7 +10,7 @@ describe('LocalBuddy Đà Nẵng — Kiểm thử Hạ tầng PostgreSQL, RLS, Q
     db = new PGlite();
 
     const migrationsDir = path.resolve(__dirname, '../../supabase/migrations');
-    const seedPath = path.resolve(__dirname, '../../supabase/seed.sql');
+    const seedPath = path.resolve(__dirname, 'fixtures/test-seed.sql');
 
     const mig1 = fs.readFileSync(
       path.join(migrationsDir, '20261108000001_init_schema.sql'),

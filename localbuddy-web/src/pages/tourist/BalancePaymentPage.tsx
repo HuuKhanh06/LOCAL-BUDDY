@@ -131,7 +131,7 @@ export const BalancePaymentPage: React.FC = () => {
           Tất toán 70% còn lại • Đơn {booking.id}
         </h1>
         <p className="text-[14px] text-[#F6E6EA]/85 mt-1">
-          Hướng dẫn viên: <strong>{guideItem?.user.fullName || 'Nguyễn Hữu Khanh'}</strong> • Ngày{' '}
+          Hướng dẫn viên: <strong>{guideItem?.user.fullName || 'Dương Đăng Huân'}</strong> • Ngày{' '}
           {formatDate(booking.date)} ({formatTimeRange(booking.startTime, booking.endTime)})
         </p>
       </div>

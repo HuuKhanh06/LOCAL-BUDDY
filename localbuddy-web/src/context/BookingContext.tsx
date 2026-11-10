@@ -55,7 +55,7 @@ import {
   StorageBucketName,
 } from '../lib/supabase';
 
-const STORAGE_KEY = 'localbuddy_danang_clean_v1';
+const STORAGE_KEY = 'localbuddy_danang_clean_v2';
 
 export interface ActionResult {
   ok: boolean;
@@ -318,80 +318,47 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const mergeCloudData = (prev: StoredState, incoming: Partial<StoredState>): StoredState => {
     const next = { ...prev };
 
-    if (incoming.bookings && incoming.bookings.length > 0) {
-      const existingMap = new Map(next.bookings.map((b) => [b.id, b]));
-      for (const b of incoming.bookings) {
-        existingMap.set(b.id, b);
-      }
-      next.bookings = Array.from(existingMap.values()).sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+    if (incoming.bookings !== undefined) {
+      next.bookings = incoming.bookings;
     }
-
-    if (incoming.notifications && incoming.notifications.length > 0) {
-      const existingMap = new Map(next.notifications.map((n) => [n.id, n]));
-      for (const n of incoming.notifications) {
-        existingMap.set(n.id, n);
-      }
-      next.notifications = Array.from(existingMap.values()).sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+    if (incoming.notifications !== undefined) {
+      next.notifications = incoming.notifications;
     }
-
-    if (incoming.slots && incoming.slots.length > 0) {
-      const existingMap = new Map(next.slots.map((s) => [s.id, s]));
-      for (const s of incoming.slots) {
-        existingMap.set(s.id, s);
-      }
-      next.slots = Array.from(existingMap.values());
+    if (incoming.slots !== undefined) {
+      next.slots = incoming.slots;
     }
-
-    if (incoming.wallets && incoming.wallets.length > 0) {
-      const existingMap = new Map(next.wallets.map((w) => [w.guideId, w]));
-      for (const w of incoming.wallets) {
-        existingMap.set(w.guideId, w);
-      }
-      next.wallets = Array.from(existingMap.values());
+    if (incoming.wallets !== undefined) {
+      next.wallets = incoming.wallets;
     }
-
-    if (incoming.walletTransactions && incoming.walletTransactions.length > 0) {
-      const existingMap = new Map(next.walletTransactions.map((tx) => [tx.id, tx]));
-      for (const tx of incoming.walletTransactions) {
-        existingMap.set(tx.id, tx);
-      }
-      next.walletTransactions = Array.from(existingMap.values());
+    if (incoming.walletTransactions !== undefined) {
+      next.walletTransactions = incoming.walletTransactions;
     }
-
-    if (incoming.kycRecords && incoming.kycRecords.length > 0) {
-      const existingMap = new Map(next.kycRecords.map((k) => [k.id, k]));
-      for (const k of incoming.kycRecords) {
-        existingMap.set(k.id, k);
-      }
-      next.kycRecords = Array.from(existingMap.values());
+    if (incoming.kycRecords !== undefined) {
+      next.kycRecords = incoming.kycRecords;
     }
-
-    if (incoming.disputes && incoming.disputes.length > 0) {
-      const existingMap = new Map(next.disputes.map((d) => [d.id, d]));
-      for (const d of incoming.disputes) {
-        existingMap.set(d.id, d);
-      }
-      next.disputes = Array.from(existingMap.values());
+    if (incoming.disputes !== undefined) {
+      next.disputes = incoming.disputes;
     }
-
-    if (incoming.users && incoming.users.length > 0) {
-      const existingMap = new Map(next.users.map((u) => [u.id, u]));
-      for (const u of incoming.users) {
-        existingMap.set(u.id, u);
-      }
-      next.users = Array.from(existingMap.values());
+    if (incoming.cancellations !== undefined) {
+      next.cancellations = incoming.cancellations;
     }
-
-    if (incoming.guideProfiles && incoming.guideProfiles.length > 0) {
-      const existingMap = new Map(next.guideProfiles.map((gp) => [gp.userId, gp]));
-      for (const gp of incoming.guideProfiles) {
-        existingMap.set(gp.userId, gp);
-      }
-      next.guideProfiles = Array.from(existingMap.values());
+    if (incoming.users !== undefined) {
+      next.users = incoming.users;
+    }
+    if (incoming.guideProfiles !== undefined) {
+      next.guideProfiles = incoming.guideProfiles;
+    }
+    if (incoming.reviews !== undefined) {
+      next.reviews = incoming.reviews;
+    }
+    if (incoming.messages !== undefined) {
+      next.messages = incoming.messages;
+    }
+    if (incoming.payments !== undefined) {
+      next.payments = incoming.payments;
+    }
+    if (incoming.withdrawals !== undefined) {
+      next.withdrawals = incoming.withdrawals;
     }
 
     return next;

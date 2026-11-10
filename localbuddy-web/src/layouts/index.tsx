@@ -253,7 +253,7 @@ export const GuideLayout: React.FC = () => {
       searchPlaceholder="Tìm đơn..."
       onSearchSubmit={() => navigate('/guide/don-va-ca')}
       links={guideLinks}
-      defaultUserName="Nguyễn Hữu Khanh"
+      defaultUserName="Dương Đăng Huân"
     />
   );
 };

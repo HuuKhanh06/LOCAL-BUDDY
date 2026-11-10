@@ -70,9 +70,9 @@ export const initialUsers: User[] = [
   {
     id: 'u-guide-1',
     role: 'guide',
-    fullName: 'Nguyễn Hữu Khanh',
-    email: 'khanh.nguyen.dn@gmail.com',
-    phone: '0905678910',
+    fullName: 'Dương Đăng Huân',
+    email: 'duongdanghuan.guide@gmail.com',
+    phone: '0905111222',
     avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
     isLocked: false,
     violationCount: 0,
@@ -83,7 +83,7 @@ export const initialUsers: User[] = [
     id: 'u-admin-1',
     role: 'admin',
     fullName: 'Lê Văn Hoàng',
-    email: 'admin@localbuddy.vn',
+    email: 'le3245279@gmail.com',
     phone: '0905000111',
     avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&auto=format&fit=crop&q=80',
     isLocked: false,
@@ -96,8 +96,8 @@ export const initialUsers: User[] = [
 export const initialGuides: GuideProfile[] = [
   {
     userId: 'u-guide-1',
-    tagline: 'Thổ địa ẩm thực chợ Cồn, nhiếp ảnh Cầu Rồng & khám phá Bán đảo Sơn Trà',
-    bio: 'Xin chào! Mình là Nguyễn Hữu Khanh, sinh ra và lớn lên tại quận Sơn Trà, Đà Nẵng. Với hơn 5 năm đồng hành cùng du khách trong và ngoài nước, mình chuyên thiết kế các lịch trình linh hoạt theo giờ: từ săn bình minh trên đỉnh Bàn Cờ, khám phá các quán hải sản và bánh tráng cuốn thịt heo chính gốc người Đà Nẵng tại Chợ Cồn, đến chụp ảnh nghệ thuật dọc Cầu Rồng và Phố cổ Hội An.',
+    tagline: 'Thổ địa Đà Nẵng — Nhiếp ảnh Cầu Rồng, ẩm thực Chợ Cồn & bán đảo Sơn Trà',
+    bio: 'Xin chào! Mình là Dương Đăng Huân, sinh ra và lớn lên tại quận Sơn Trà, Đà Nẵng. Với hơn 5 năm đồng hành cùng du khách trong và ngoài nước, mình chuyên thiết kế các lịch trình linh hoạt theo giờ: từ săn bình minh trên đỉnh Bàn Cờ, khám phá các quán hải sản và bánh tráng cuốn thịt heo chính gốc người Đà Nẵng tại Chợ Cồn, đến chụp ảnh nghệ thuật dọc Cầu Rồng và Phố cổ Hội An.',
     hourlyRate: 250000,
     yearsExperience: 5,
     kycStatus: 'APPROVED',
@@ -106,7 +106,7 @@ export const initialGuides: GuideProfile[] = [
     totalReviews: 0,
     completedTours: 0,
     responseTimeText: 'Thường phản hồi trong 10 phút',
-    responseRate: 99,
+    responseRate: 100,
     areas: ['Cầu Rồng & Sông Hàn', 'Bán đảo Sơn Trà', 'Chợ Cồn & Chợ Hàn', 'Bãi biển Mỹ Khê'],
     languages: ['Tiếng Việt', 'Tiếng Anh'],
     skills: ['Ẩm thực bản địa', 'Nhiếp ảnh & Check-in', 'Khám phá Đà Nẵng về đêm', 'Lái xe máy an toàn'],
@@ -134,14 +134,14 @@ export const initialGuides: GuideProfile[] = [
       },
     ],
     bankName: 'Vietcombank - CN Đà Nẵng',
-    bankAccountNumber: '0041000987654',
-    bankAccountHolder: 'NGUYEN HUU KHANH',
+    bankAccountNumber: '0041000889988',
+    bankAccountHolder: 'DUONG DANG HUAN',
   },
 ];
 
 // ---------- 3. TIME SLOTS (AVAILABILITY_CALENDAR - UC.11, BR-04) ----------
 export const initialSlots: TimeSlotData[] = [
-  // Lịch đón khách sẵn sàng của HDV Nguyễn Hữu Khanh
+  // Lịch đón khách sẵn sàng của HDV Dương Đăng Huân
   // Ngày 2026-11-12
   {
     id: 'slot-101',
@@ -248,20 +248,20 @@ export const initialCancellations: CancellationRecord[] = [];
 // ---------- 7. REVIEWS (Trống) ----------
 export const initialReviews: Review[] = [];
 
-// ---------- 8. KYC RECORDS (Hồ sơ đã duyệt của HDV Nguyễn Hữu Khanh) ----------
+// ---------- 8. KYC RECORDS (Hồ sơ đã duyệt của HDV Dương Đăng Huân) ----------
 export const initialKycRecords: KycRecord[] = [
   {
     id: 'kyc-100',
     guideId: 'u-guide-1',
     idNumber: '048095006789',
     bankName: 'Vietcombank - CN Đà Nẵng',
-    bankAccountNumber: '0041000987654',
-    bankAccountHolder: 'NGUYEN HUU KHANH',
+    bankAccountNumber: '0041000889988',
+    bankAccountHolder: 'DUONG DANG HUAN',
     documents: [
       {
         id: 'doc-10',
         docType: 'CCCD_FRONT',
-        name: 'CCCD gắn chip mặt trước (Nguyễn Hữu Khanh)',
+        name: 'CCCD gắn chip mặt trước (Dương Đăng Huân)',
         url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80',
       },
       {
