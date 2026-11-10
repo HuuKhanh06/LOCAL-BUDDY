@@ -66,3 +66,4 @@ CHUNG: timer tự kích hoạt đúng hạn (NFR 3.4). Lưu UTC, hiển thị gi
  QĐ-16 Seed danh mục: khu vực (Hải Châu, Sơn Trà, Ngũ Hành Sơn, Liên Chiểu, Thanh Khê, Cẩm Lệ, Hòa Vang); chuyên môn (ẩm thực, lịch sử–văn hoá, check-in/chụp ảnh, biển–thiên nhiên, về đêm, mua sắm, gia đình); ngôn ngữ (vi, en, ja, ko, zh, fr).
  QĐ-17 PWA: manifest + icon để cài lên màn hình chính iOS/Android; không cần service worker.
  QĐ-18 Giao diện giới thiệu & Logo Withlocals: Nền kem đào `#FEEDDC`, điểm nhấn `#D12B79`, logo 2 gương mặt cười liên kết "local buddy", đạt 100% WCAG AA.
+ QĐ-19 Loại bỏ hoàn toàn nền xám tối legacy (#272A2D), chuyển toàn hệ thống sang nền sáng ấm Withlocals (#FEEDDC), thẻ trắng #FFFFFF, nút tìm kiếm vàng hổ phách #F2B33D, thẻ điểm đến 'QUE FAIRE À...' chuẩn ảnh mẫu.

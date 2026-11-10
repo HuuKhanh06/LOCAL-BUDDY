@@ -1,104 +1,71 @@
 // pages/public/HomePage.tsx
-// Thiết kế theo Mục [9] THAM KHẢO UI:
-// - Ô tìm kiếm làm trung tâm: Đà Nẵng cố định + ngày + giờ + số giờ + ngôn ngữ
-// - Chủ đề trải nghiệm Đà Nẵng đặc trưng
-// - Hàng Guide nổi bật (ảnh chân dung, tên, khu vực, ngôn ngữ, giá/giờ, điểm + số đánh giá, huy hiệu "Đã xác minh")
-// - "Cách hoạt động" 3 bước trực quan
-// - Khối tin cậy: KYC xác minh, giá minh bạch, chính sách huỷ rõ
-// - Khối nền cát (#E6E4DC) tạo nhịp điệu tương phản tự nhiên
-// - Đánh giá thật từ du khách
-// - CTA trở thành Guide
+// Trang chủ LocalBuddy phong cách Withlocals sáng ấm (#FEEDDC)
+// Bố cục chuẩn theo ảnh mẫu Withlocals:
+// - Hero banner: Tiêu đề lớn màu than đậm & điểm nhấn hồng mận (#D12B79), ô tìm kiếm dạng pill nổi nền trắng với nút vàng hổ phách (#F2B33D), khối ảnh ghép mosaic địa danh Đà Nẵng
+// - Thẻ điểm đến: Phong cách 'QUE FAIRE À...' chuẩn ảnh mẫu với ảnh trên, giới thiệu dưới, hàng avatar Thổ địa kèm vòng tròn xanh + và nút hồng mận 'Khám phá tour'
+// - Quy trình 3 bước giữ cọc 30%/70%
+// - Hàng Thổ địa tiêu biểu (100% KYC)
+// - Khối cam kết an tâm & Đánh giá thật
 // - FAQ Accordion câu hỏi thường gặp
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Search, MapPin, Calendar, Clock, Star, ArrowRight, ShieldCheck, CheckCircle2, ChevronDown } from 'lucide-react';
 import { useBookingContext } from '../../context/BookingContext';
 import { GuideCard } from '../../components/common/GuideCard';
 import { DANANG_AREAS, GUIDE_LANGUAGES } from '../../data/mockData';
 import { Logo } from '../../components/common/Logo';
 
-interface MediaShowcaseItem {
+interface DestinationCardItem {
   id: string;
-  area: string;
-  label: string;
-  type: 'video' | 'image';
-  src: string;
-  poster?: string;
-  span?: string;
+  destination: string;
+  headline: string;
+  desc: string;
+  image: string;
+  guideCount: number;
+  guideAvatars: string[];
+  areaParam: string;
 }
 
-const DANANG_MEDIA_SHOWCASE: MediaShowcaseItem[] = [
+const DESTINATION_CARDS: DestinationCardItem[] = [
   {
-    id: 'm-1',
-    area: 'Bán đảo Sơn Trà',
-    label: 'Bán đảo Sơn Trà & Voọc chà vá',
-    type: 'video',
-    src: 'https://assets.mixkit.co/videos/5371/5371-720.mp4',
-    poster:
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&auto=format&fit=crop&q=85',
-    span: 'md:col-span-2 md:row-span-2 h-80 md:h-[420px]',
+    id: 'dest-1',
+    destination: 'Bán đảo Sơn Trà',
+    headline: 'Trekking hoang sơ & Voọc chà vá',
+    desc: 'Bạn đến Sơn Trà và tự hỏi nên làm gì? Thổ địa bản xứ sẽ dẫn bạn trekking đường rừng nguyên sinh, ngắm bầy Voọc chà vá chân nâu và đón hoàng hôn Đỉnh Bàn Cờ.',
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=85',
+    guideCount: 36,
+    guideAvatars: [
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
+    ],
+    areaParam: 'Sơn Trà',
   },
   {
-    id: 'm-2',
-    area: 'Bà Nà Hills',
-    label: 'Cầu Vàng Bà Nà',
-    type: 'image',
-    src: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Golden_Bridge_%28Vietnam%29.jpg/1280px-Golden_Bridge_%28Vietnam%29.jpg',
-    span: 'h-64 md:h-[200px]',
+    id: 'dest-2',
+    destination: 'Cầu Rồng & Chợ Cồn',
+    headline: 'Ẩm thực đêm & Sông Hàn lung linh',
+    desc: 'Bạn đến Đà Nẵng và tìm kiếm hương vị bản địa? Thổ địa sẽ cùng bạn lùng sục ngõ chợ Cồn thưởng thức mì Quảng, bánh xèo tôm nhảy và xem Rồng phun lửa.',
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Marine_da_nang.jpg/1280px-Marine_da_nang.jpg',
+    guideCount: 42,
+    guideAvatars: [
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
+    ],
+    areaParam: 'Hải Châu',
   },
   {
-    id: 'm-3',
-    area: 'Bãi biển Mỹ Khê',
-    label: 'Bình minh Biển Mỹ Khê',
-    type: 'video',
-    src: 'https://assets.mixkit.co/videos/51500/51500-720.mp4',
-    poster:
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Da-Nang_Vietnam_Coracles-01.jpg/1280px-Da-Nang_Vietnam_Coracles-01.jpg',
-    span: 'h-64 md:h-[200px]',
-  },
-  {
-    id: 'm-4',
-    area: 'Đèo Hải Vân & Lăng Cô',
-    label: 'Cung đường Hải Vân Quan',
-    type: 'video',
-    src: 'https://assets.mixkit.co/videos/41576/41576-720.mp4',
-    poster:
-      'https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?w=1200&auto=format&fit=crop&q=85',
-    span: 'h-64 md:h-[200px]',
-  },
-  {
-    id: 'm-5',
-    area: 'Ngũ Hành Sơn',
-    label: 'Danh thắng Ngũ Hành Sơn',
-    type: 'image',
-    src: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=1200&auto=format&fit=crop&q=85',
-    span: 'h-64 md:h-[200px]',
-  },
-  {
-    id: 'm-6',
-    area: 'Cầu Rồng & Sông Hàn',
-    label: 'Vịnh Đà Nẵng & Sông Hàn về đêm',
-    type: 'video',
-    src: 'https://assets.mixkit.co/videos/5363/5363-720.mp4',
-    poster:
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Marine_da_nang.jpg/1280px-Marine_da_nang.jpg',
-    span: 'md:col-span-2 h-64 md:h-[240px]',
-  },
-  {
-    id: 'm-7',
-    area: 'Phố cổ Hội An',
-    label: 'Đèn lồng Phố cổ Hội An',
-    type: 'image',
-    src: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=1200&auto=format&fit=crop&q=85',
-    span: 'h-64 md:h-[240px]',
-  },
-  {
-    id: 'm-8',
-    area: 'Chợ Cồn & Chợ Hàn',
-    label: 'Thiên đường Ẩm thực Chợ Cồn',
-    type: 'image',
-    src: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Da-Nang_Vietnam_Coracles-01.jpg/1280px-Da-Nang_Vietnam_Coracles-01.jpg',
-    span: 'h-64 md:h-[240px]',
+    id: 'dest-3',
+    destination: 'Bãi biển Mỹ Khê',
+    headline: 'Bình minh biển & Thúng chai Mân Thái',
+    desc: 'Dạo bờ cát sớm mai cùng ngư dân kéo lưới thúng chai, chèo SUP đón ánh mặt trời vịnh biển và thưởng thức hải sản tươi rói chuẩn giá người địa phương.',
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Da-Nang_Vietnam_Coracles-01.jpg/1280px-Da-Nang_Vietnam_Coracles-01.jpg',
+    guideCount: 60,
+    guideAvatars: [
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200&auto=format&fit=crop&q=80',
+    ],
+    areaParam: 'Ngũ Hành Sơn',
   },
 ];
 
@@ -109,54 +76,46 @@ const EXPERIENCES = [
     desc: 'Mì Quảng ếch, bánh xèo tôm nhảy, hải sản Sơn Trà chuẩn vị người bản xứ.',
     icon: '🍜',
     param: 'Ẩm thực bản địa',
-    bg: 'bg-amber-50 border-amber-200 text-amber-900',
   },
   {
     id: 'exp-2',
     title: 'Cầu Rồng & Sông Hàn về đêm',
-    desc: 'Xem Rồng phun lửa, du thuyền sông Hàn và góc ngắm hoàng hôn vịnh biển.',
+    desc: 'Xem Rồng phun lửa, du thuyền sông Hàn và ngắm hoàng hôn vịnh biển.',
     icon: '🐉',
     param: 'Khám phá Đà Nẵng về đêm',
-    bg: 'bg-orange-50 border-orange-200 text-orange-900',
   },
   {
     id: 'exp-3',
     title: 'Sơn Trà & Bán đảo hoang sơ',
-    desc: 'Trekking ngắm Voọc chà vá chân nâu, Đỉnh Bàn Cờ và Chùa Linh Ứng uy nghiêm.',
+    desc: 'Trekking ngắm Voọc chà vá chân nâu, Đỉnh Bàn Cờ và Chùa Linh Ứng.',
     icon: '🐒',
     param: 'Thiên nhiên & Trekking Sơn Trà',
-    bg: 'bg-emerald-50 border-emerald-200 text-emerald-900',
   },
   {
     id: 'exp-4',
     title: 'Nhiếp ảnh & Check-in di sản',
-    desc: 'Những góc máy không góc chết tại Cầu Vàng, Làng chiếu Cẩm Nê và Ngũ Hành Sơn.',
+    desc: 'Những góc máy tại Cầu Vàng, Làng đá Non Nước và Ngũ Hành Sơn.',
     icon: '📸',
     param: 'Nhiếp ảnh & Check-in',
-    bg: 'bg-sky-50 border-sky-200 text-sky-900',
   },
 ];
 
 const FAQ_ITEMS = [
   {
     q: 'Vì sao tôi chỉ cần đặt cọc 30% khi đặt lịch Thổ địa?',
-    a: 'LocalBuddy áp dụng cơ chế thanh toán hai chặng minh bạch (BR-03, BR-05): Du khách chỉ cần thanh toán 30% tiền cọc sau khi Hướng dẫn viên bấm chấp nhận yêu cầu để giữ chỗ nguyên tử trong 15 phút. 70% còn lại bạn chỉ phải thanh toán sau khi chuyến đi thực tế đã hoàn thành (qua cổng Online hoặc trả Tiền mặt trực tiếp).',
+    a: 'LocalBuddy áp dụng cơ chế thanh toán hai chặng minh bạch theo chuẩn Withlocals (BR-03, BR-05): Du khách chỉ cần thanh toán 30% tiền cọc sau khi Hướng dẫn viên chấp nhận yêu cầu để khóa lịch nguyên tử trong 15 phút. 70% còn lại bạn chỉ phải thanh toán sau khi chuyến đi thực tế đã hoàn thành.',
   },
   {
     q: 'Chính sách hoàn tiền cọc khi hủy lịch được quy định như thế nào?',
-    a: 'Chính sách hủy đơn minh bạch theo mốc thời gian ΔT trước giờ hẹn (BR-06): Nếu bạn hủy trước trên 48 giờ, hệ thống hoàn trả 100% tiền cọc; hủy từ 24 đến 48 giờ, hoàn 50% tiền cọc; hủy dưới 24 giờ phạt 100% cọc để bồi hoàn cho Hướng dẫn viên đã giữ lịch. Trường hợp Hướng dẫn viên hủy đơn, bạn luôn được hoàn 100% tiền cọc ngay lập tức.',
+    a: 'Chính sách hủy đơn minh bạch theo mốc thời gian ΔT trước giờ hẹn: Nếu bạn hủy trước trên 48 giờ, hệ thống hoàn trả 100% tiền cọc; hủy từ 24 đến 48 giờ, hoàn 50% tiền cọc; hủy dưới 24 giờ phạt 100% cọc để bồi hoàn cho Hướng dẫn viên. Trường hợp Hướng dẫn viên hủy đơn, bạn luôn được hoàn 100% tiền cọc ngay lập tức.',
   },
   {
     q: 'Giá thuê trên website tính theo đầu người hay tính theo giờ?',
-    a: 'Toàn bộ đơn giá trên LocalBuddy được tính THEO GIỜ của Hướng dẫn viên (từ 150.000 ₫ đến 500.000 ₫/giờ). Đơn giá áp dụng chung cho cả nhóm du khách (tối đa 20 người theo phạm vi tour), hoàn toàn không thu thêm phụ phí theo đầu người.',
+    a: 'Toàn bộ đơn giá trên LocalBuddy được tính THEO GIỜ của Hướng dẫn viên (từ 80.000 ₫ đến 500.000 ₫/giờ). Đơn giá áp dụng chung cho cả nhóm du khách (tối đa 20 người), hoàn toàn không thu thêm phụ phí theo đầu người.',
   },
   {
     q: 'Làm thế nào để tôi liên hệ trực tiếp với Thổ địa?',
-    a: 'Để bảo vệ tính riêng tư và an toàn thông tin, sau khi Hướng dẫn viên chấp nhận yêu cầu và bạn hoàn tất đặt cọc 30%, hệ thống sẽ lập tức tạo Hợp đồng dịch vụ điện tử (SERVICE_AGREEMENT) và cung cấp đầy đủ Số điện thoại & Email của Hướng dẫn viên trong trang chi tiết đơn để hai bên trao đổi điểm hẹn.',
-  },
-  {
-    q: 'LocalBuddy có hỗ trợ du khách khi có khiếu nại hoặc sự cố phát sinh không?',
-    a: 'Có. Sau khi kết thúc tour, bạn có cửa sổ 24 giờ để bấm Xác nhận hoàn thành hoặc Gửi khiếu nại (UC.19) kèm hình ảnh bằng chứng nếu Hướng dẫn viên vắng mặt (No-show), đi trễ hoặc không đúng cam kết. Đội ngũ Quản trị viên (Admin) sẽ thẩm định và xử lý tranh chấp công minh theo UC.27.',
+    a: 'Sau khi Hướng dẫn viên chấp nhận yêu cầu và bạn hoàn tất đặt cọc 30%, hệ thống tự động khởi tạo Thỏa thuận dịch vụ điện tử (SERVICE_AGREEMENT) và cung cấp đầy đủ Số điện thoại & Email của Hướng dẫn viên để hai bên kết nối trực tiếp.',
   },
 ];
 
@@ -164,10 +123,8 @@ export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { verifiedGuides, slots, reviews, getUserById, getGuideById } = useBookingContext();
 
-  // Search state đầy đủ theo Mục [9]: Đà Nẵng cố định + ngày + giờ + số giờ + ngôn ngữ
   const [selectedArea, setSelectedArea] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTimePeriod, setSelectedTimePeriod] = useState('');
   const [selectedHours, setSelectedHours] = useState('3');
   const [selectedLang, setSelectedLang] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -181,368 +138,384 @@ export const HomePage: React.FC = () => {
     const params = new URLSearchParams();
     if (selectedArea) params.set('area', selectedArea);
     if (selectedDate) params.set('date', selectedDate);
-    if (selectedTimePeriod) params.set('time', selectedTimePeriod);
     if (selectedHours) params.set('hours', selectedHours);
     if (selectedLang) params.set('lang', selectedLang);
     navigate(`/guides?${params.toString()}`);
   };
 
   return (
-    <div className="space-y-16 py-2">
-      {/* 1. HERO VIDEO + Ô TÌM KIẾM TRUNG TÂM (Đà Nẵng cố định + ngày + giờ + số giờ + ngôn ngữ) */}
-      <section className="relative rounded-[28px] overflow-hidden bg-[#272A2D] border border-[#E7E5E4] min-h-[500px] flex flex-col justify-end p-6 sm:p-10">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1400&auto=format&fit=crop&q=85"
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="https://assets.mixkit.co/videos/5369/5369-720.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
+    <div className="bg-[#FEEDDC] text-[#1C1917] space-y-16 sm:space-y-24 py-4 sm:py-8">
+      {/* 1. HERO SECTION WITHLOCALS (Chuẩn mẫu media_1794288431741_ce8b68dc.jpg) */}
+      <section className="max-w-[1320px] mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+          {/* Left Hero Content */}
+          <div className="lg:col-span-7 space-y-6 sm:space-y-8">
+            <div className="space-y-4">
+              <Link
+                to="/how-it-works"
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#F1DEC9] text-[#D12B79] text-xs font-bold shadow-xs hover:bg-white/80 transition-all"
+              >
+                <Logo variant="icon" size="sm" />
+                <span>Nền tảng đặt Thổ địa theo giờ chuẩn Withlocals →</span>
+              </Link>
 
-        <div className="relative z-10 max-w-4xl w-full space-y-6">
-          <div className="space-y-2 text-white">
-            <Link
-              to="/how-it-works"
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white text-[12px] font-bold border border-white/30 transition-all group"
+              <h1 className="text-[40px] sm:text-[56px] lg:text-[64px] font-black tracking-tight leading-[1.08] text-[#1C1917]">
+                Trải nghiệm kỳ thú,{' '}
+                <span className="block text-[#D12B79]">cùng người bản xứ tuyệt vời</span>
+              </h1>
+
+              <p className="text-[17px] sm:text-[20px] text-[#6E6259] leading-relaxed max-w-xl font-medium">
+                Đặt trước những trải nghiệm độc bản tại Đà Nẵng, đồng hành theo giờ cùng Thổ địa bản địa đã xác thực KYC 100%.
+              </p>
+            </div>
+
+            {/* Floating Search Pill Bar (Chuẩn thanh tìm kiếm nổi trắng của Withlocals) */}
+            <form
+              onSubmit={handleSearch}
+              aria-label="Tìm Thổ địa bản địa Đà Nẵng"
+              className="bg-white rounded-[32px] sm:rounded-full p-2.5 sm:p-2 sm:pl-6 shadow-xl border border-[#F1DEC9] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5"
             >
-              <Logo variant="icon" size="sm" />
-              <span>Mô hình Thổ địa theo giờ chuẩn Withlocals</span>
-              <span className="group-hover:translate-x-0.5 transition-transform">→</span>
-            </Link>
-            <h1 className="text-[32px] sm:text-[48px] font-black tracking-tight leading-tight text-white drop-shadow-sm">
-              Khám phá Đà Nẵng cùng người bản địa
-            </h1>
-            <p className="text-[14px] sm:text-[16px] text-white/90 max-w-2xl font-medium drop-shadow-sm">
-              Trải nghiệm Đà Nẵng chân thực, linh hoạt theo giờ. 100% Thổ địa đã xác thực KYC, cọc 30% giữ chỗ, hoàn tiền minh bạch.
-            </p>
-          </div>
+              {/* Điểm đến */}
+              <div className="flex-1 flex items-center gap-2.5 px-2">
+                <MapPin className="w-5 h-5 text-[#D12B79] shrink-0" />
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#78716C]">
+                    Điểm đến tại Đà Nẵng
+                  </span>
+                  <select
+                    id="hp-search-area"
+                    aria-label="Điểm đến tại Đà Nẵng"
+                    value={selectedArea}
+                    onChange={(e) => setSelectedArea(e.target.value)}
+                    className="w-full text-[14px] font-bold text-[#1C1917] bg-transparent focus:outline-none cursor-pointer truncate"
+                  >
+                    <option value="">Toàn Đà Nẵng (Sơn Trà, Mỹ Khê, Cầu Rồng...)</option>
+                    {DANANG_AREAS.map((area) => (
+                      <option key={area} value={area}>
+                        {area}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
-          {/* Ô TÌM KIẾM TRUNG TÂM THEO [9]: Đà Nẵng cố định + ngày + giờ + số giờ + ngôn ngữ */}
-          <form
-            onSubmit={handleSearch}
-            aria-label="Tìm Thổ địa bản địa Đà Nẵng"
-            className="bg-white/95 backdrop-blur-md p-3 sm:p-4 rounded-[22px] shadow-2xl border border-white grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5"
-          >
-            {/* 1. Điểm đến cố định Đà Nẵng / Khu vực */}
-            <div className="flex flex-col">
-              <label htmlFor="hp-search-area" className="text-[10px] font-bold uppercase tracking-wider text-[#78716C] px-3">
-                Khu vực
-              </label>
-              <select
-                id="hp-search-area"
-                aria-label="Khu vực tại Đà Nẵng"
-                value={selectedArea}
-                onChange={(e) => setSelectedArea(e.target.value)}
-                className="px-3 py-2 rounded-xl text-[13px] font-semibold text-[#1C1917] bg-[#F3F1EC]/60 focus:bg-white focus:outline-none cursor-pointer"
-              >
-                <option value="">📍 Toàn Đà Nẵng</option>
-                {DANANG_AREAS.map((area) => (
-                  <option key={area} value={area}>
-                    {area}
-                  </option>
-                ))}
-              </select>
-            </div>
+              <div className="hidden sm:block w-[1px] h-8 bg-[#F1DEC9]" />
 
-            {/* 2. Ngày khởi hành */}
-            <div className="flex flex-col">
-              <label htmlFor="hp-search-date" className="text-[10px] font-bold uppercase tracking-wider text-[#78716C] px-3">
-                Ngày đi
-              </label>
-              <select
-                id="hp-search-date"
-                aria-label="Ngày khởi hành"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="px-3 py-2 rounded-xl text-[13px] font-semibold text-[#1C1917] bg-[#F3F1EC]/60 focus:bg-white focus:outline-none cursor-pointer"
-              >
-                <option value="">📅 Mọi ngày</option>
-                {availableDates.map((d) => (
-                  <option key={d} value={d}>
-                    {d.split('-').reverse().join('/')}
-                  </option>
-                ))}
-              </select>
-            </div>
+              {/* Ngày đi */}
+              <div className="flex items-center gap-2 px-2 sm:w-40">
+                <Calendar className="w-4 h-4 text-[#78716C] shrink-0" />
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#78716C]">
+                    Ngày khởi hành
+                  </span>
+                  <select
+                    id="hp-search-date"
+                    aria-label="Ngày khởi hành"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="w-full text-[13px] font-semibold text-[#1C1917] bg-transparent focus:outline-none cursor-pointer truncate"
+                  >
+                    <option value="">Mọi ngày</option>
+                    {availableDates.map((d) => (
+                      <option key={d} value={d}>
+                        {d.split('-').reverse().join('/')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
-            {/* 3. Khung giờ trong ngày */}
-            <div className="flex flex-col">
-              <label htmlFor="hp-search-time" className="text-[10px] font-bold uppercase tracking-wider text-[#78716C] px-3">
-                Khung giờ
-              </label>
-              <select
-                id="hp-search-time"
-                aria-label="Khung giờ trong ngày"
-                value={selectedTimePeriod}
-                onChange={(e) => setSelectedTimePeriod(e.target.value)}
-                className="px-3 py-2 rounded-xl text-[13px] font-semibold text-[#1C1917] bg-[#F3F1EC]/60 focus:bg-white focus:outline-none cursor-pointer"
-              >
-                <option value="">⏰ Cả ngày</option>
-                <option value="morning">Sáng (06:00 – 12:00)</option>
-                <option value="afternoon">Chiều (12:00 – 18:00)</option>
-                <option value="evening">Tối (18:00 – 22:00)</option>
-              </select>
-            </div>
+              <div className="hidden sm:block w-[1px] h-8 bg-[#F1DEC9]" />
 
-            {/* 4. Số giờ thuê (QĐ-02: 1–8 giờ) */}
-            <div className="flex flex-col">
-              <label htmlFor="hp-search-hours" className="text-[10px] font-bold uppercase tracking-wider text-[#78716C] px-3">
-                Thời lượng
-              </label>
-              <select
-                id="hp-search-hours"
-                aria-label="Số giờ thuê"
-                value={selectedHours}
-                onChange={(e) => setSelectedHours(e.target.value)}
-                className="px-3 py-2 rounded-xl text-[13px] font-semibold text-[#1C1917] bg-[#F3F1EC]/60 focus:bg-white focus:outline-none cursor-pointer"
-              >
-                <option value="1">1 giờ</option>
-                <option value="2">2 giờ</option>
-                <option value="3">3 giờ (phổ biến)</option>
-                <option value="4">4 giờ (nửa ngày)</option>
-                <option value="5">5 giờ</option>
-                <option value="6">6 giờ</option>
-                <option value="8">8 giờ (trọn ngày)</option>
-              </select>
-            </div>
+              {/* Số giờ thuê */}
+              <div className="flex items-center gap-2 px-2 sm:w-28">
+                <Clock className="w-4 h-4 text-[#78716C] shrink-0" />
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#78716C]">
+                    Thời lượng
+                  </span>
+                  <select
+                    id="hp-search-hours"
+                    aria-label="Số giờ thuê"
+                    value={selectedHours}
+                    onChange={(e) => setSelectedHours(e.target.value)}
+                    className="w-full text-[13px] font-semibold text-[#1C1917] bg-transparent focus:outline-none cursor-pointer"
+                  >
+                    <option value="1">1 giờ</option>
+                    <option value="2">2 giờ</option>
+                    <option value="3">3 giờ (chuẩn)</option>
+                    <option value="4">4 giờ</option>
+                    <option value="6">6 giờ</option>
+                    <option value="8">8 giờ</option>
+                  </select>
+                </div>
+              </div>
 
-            {/* 5. Ngôn ngữ hướng dẫn */}
-            <div className="flex flex-col">
-              <label htmlFor="hp-search-lang" className="text-[10px] font-bold uppercase tracking-wider text-[#78716C] px-3">
-                Ngôn ngữ
-              </label>
-              <select
-                id="hp-search-lang"
-                aria-label="Ngôn ngữ giao tiếp"
-                value={selectedLang}
-                onChange={(e) => setSelectedLang(e.target.value)}
-                className="px-3 py-2 rounded-xl text-[13px] font-semibold text-[#1C1917] bg-[#F3F1EC]/60 focus:bg-white focus:outline-none cursor-pointer"
-              >
-                <option value="">🗣 Mọi ngôn ngữ</option>
-                {GUIDE_LANGUAGES.map((lang) => (
-                  <option key={lang} value={lang}>
-                    {lang}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Nút Tìm kiếm magenta chuẩn Withlocals */}
-            <div className="flex items-end">
+              {/* Nút Tìm kiếm vàng hổ phách chuẩn Withlocals (#F2B33D) */}
               <button
                 type="submit"
-                className="w-full py-2.5 px-4 rounded-xl bg-[#D12B79] hover:bg-[#B51E63] text-white text-[13px] font-bold shadow-md transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                className="bg-[#F2B33D] hover:bg-[#E0A22C] text-[#1C1917] font-black text-[14px] px-8 py-3.5 rounded-full flex items-center justify-center gap-2 shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer shrink-0"
               >
-                <span>Tìm Thổ địa</span>
-                <span>→</span>
+                <Search className="w-4 h-4 stroke-[2.5]" />
+                <span>Tìm kiếm</span>
               </button>
+            </form>
+
+            {/* Trust rating badge */}
+            <div className="flex flex-wrap items-center gap-3 text-[13px] font-semibold text-[#1C1917] pt-1">
+              <span className="flex items-center gap-1">
+                <span>Xuất sắc 4.9 trên 5</span>
+                <span className="text-emerald-700 font-bold">★ Trustpilot</span>
+              </span>
+              <span className="text-[#D8C7B5]">•</span>
+              <span className="text-[#6E6259]">100% Thổ địa duyệt KYC</span>
+              <span className="text-[#D8C7B5]">•</span>
+              <span className="text-[#6E6259]">Cọc 30% giữ chỗ</span>
             </div>
-          </form>
+          </div>
+
+          {/* Right Hero Mosaic Collage (Chuẩn bố cục ảnh cắt góc tròn như Withlocals) */}
+          <div className="lg:col-span-5 relative">
+            <div className="grid grid-cols-2 gap-4">
+              {/* Ảnh dọc bên trái */}
+              <div className="space-y-4">
+                <div className="relative rounded-[32px] overflow-hidden shadow-xl aspect-[3/4] border-2 border-white group">
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    poster="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=85"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  >
+                    <source src="https://assets.mixkit.co/videos/5371/5371-720.mp4" type="video/mp4" />
+                  </video>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
+                      Đồng hành cùng Thổ địa
+                    </span>
+                    <h3 className="text-sm font-bold">Bán đảo Sơn Trà & Voọc chà vá</h3>
+                  </div>
+                </div>
+
+                <div className="relative rounded-[24px] overflow-hidden shadow-md aspect-[4/3] border-2 border-white group">
+                  <img
+                    src="https://images.unsplash.com/photo-1528127269322-539801943592?w=800&auto=format&fit=crop&q=85"
+                    alt="Phố cổ Hội An"
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-3 left-3 text-white text-xs font-bold">
+                    Đèn lồng Phố cổ Hội An
+                  </div>
+                </div>
+              </div>
+
+              {/* Cột ảnh bên phải */}
+              <div className="space-y-4 pt-6">
+                <div className="relative rounded-[28px] overflow-hidden shadow-lg aspect-[4/5] border-2 border-white group">
+                  <img
+                    src="https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Golden_Bridge_%28Vietnam%29.jpg/1280px-Golden_Bridge_%28Vietnam%29.jpg"
+                    alt="Cầu Vàng Bà Nà"
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
+                      Điểm check-in nổi tiếng
+                    </span>
+                    <h3 className="text-sm font-bold">Cầu Vàng Bà Nà Hills</h3>
+                  </div>
+                </div>
+
+                <div className="relative rounded-[24px] overflow-hidden shadow-md aspect-[4/3] border-2 border-white group">
+                  <img
+                    src="https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Da-Nang_Vietnam_Coracles-01.jpg/1280px-Da-Nang_Vietnam_Coracles-01.jpg"
+                    alt="Thuyền thúng Biển Mỹ Khê"
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-3 left-3 text-white text-xs font-bold">
+                    Làng chài & Biển Mỹ Khê
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 2. DẢI CAM KẾT VẬN HÀNH TIÊU CHUẨN (4 trụ cột niềm tin) */}
-      <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { num: '100% KYC', label: 'CCCD & Thẻ HDV xác thực' },
-          { num: 'Cọc 30%', label: 'Giữ chỗ nguyên tử 15 phút' },
-          { num: 'Hoàn 100%', label: 'Hủy trước 48 giờ miễn phí' },
-          { num: '0 Phí ẩn', label: 'Đơn giá theo giờ minh bạch' },
-        ].map((item) => (
-          <div
-            key={item.num}
-            className="bg-white border border-[#E7E5E4] rounded-[18px] px-4 py-3.5 text-center shadow-xs"
-          >
-            <span className="block text-[17px] font-black text-[#1C1917]">
-              {item.num}
-            </span>
-            <span className="text-[12px] text-[#78716C] font-medium">{item.label}</span>
-          </div>
-        ))}
-      </section>
-
-      {/* 3. CHỦ ĐỀ TRẢI NGHIỆM ĐÀ NẴNG (Mục [9]: chủ đề) */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
+      {/* 2. KHỐI THẺ ĐIỂM ĐẾN 'QUE FAIRE À...' (Chuẩn 100% mẫu media_1794288420521_05caa072.jpg) */}
+      <section className="max-w-[1320px] mx-auto px-4 sm:px-6 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#EB5B38]">
-              Trải nghiệm theo chủ đề
+            <span className="px-3.5 py-1 rounded-full bg-white border border-[#F1DEC9] text-[#D12B79] text-xs font-bold uppercase tracking-wider">
+              Khám phá Đà Nẵng
             </span>
-            <h2 className="text-[22px] sm:text-[26px] font-black text-[#1C1917] tracking-tight">
-              Khám phá Đà Nẵng theo cách của bạn
+            <h2 className="text-[28px] sm:text-[38px] font-black text-[#1C1917] tracking-tight mt-2">
+              Những trải nghiệm cùng người bản xứ
             </h2>
           </div>
           <Link
             to="/guides"
-            className="text-[13px] font-semibold text-[#57534E] hover:text-[#1C1917]"
+            className="text-[14px] font-bold text-[#D12B79] hover:underline inline-flex items-center gap-1"
           >
-            Tất cả chủ đề →
+            <span>Tất cả điểm đến & Thổ địa</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {EXPERIENCES.map((exp) => (
+        {/* Lưới thẻ theo phong cách thẻ thành phố Withlocals */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          {DESTINATION_CARDS.map((item) => (
             <div
-              key={exp.id}
-              onClick={() => navigate(`/guides?skill=${encodeURIComponent(exp.param)}`)}
-              className="bg-white border border-[#E7E5E4] hover:border-[#EB5B38] rounded-[20px] p-5 cursor-pointer transition-all hover:shadow-md space-y-3 group"
+              key={item.id}
+              onClick={() => navigate(`/guides?area=${encodeURIComponent(item.areaParam)}`)}
+              className="bg-white rounded-[26px] overflow-hidden border border-[#F1DEC9] shadow-xs hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between group"
             >
-              <div className="flex items-center justify-between">
-                <span className="text-3xl group-hover:scale-110 transition-transform">{exp.icon}</span>
-                <span className="text-[11px] font-bold text-[#78716C] group-hover:text-[#EB5B38]">
-                  Khám phá →
-                </span>
+              {/* Phần ảnh trên với tiêu đề QUE FAIRE À / TRẢI NGHIỆM TẠI */}
+              <div className="relative h-60 sm:h-64 overflow-hidden">
+                <img
+                  src={item.image}
+                  alt={item.destination}
+                  loading="lazy"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                <div className="absolute bottom-5 left-5 right-5 text-center">
+                  <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] text-white/90 border-b border-white/40 pb-1 mb-1">
+                    TRẢI NGHIỆM TẠI
+                  </span>
+                  <h3 className="text-[22px] sm:text-[24px] font-black text-white drop-shadow-sm">
+                    {item.destination}
+                  </h3>
+                </div>
               </div>
-              <div>
-                <h3 className="text-[16px] font-bold text-[#1C1917] group-hover:text-[#EB5B38] transition-colors">
-                  {exp.title}
-                </h3>
-                <p className="text-[12px] text-[#78716C] mt-1 line-clamp-2">
-                  {exp.desc}
+
+              {/* Phần thân mô tả */}
+              <div className="p-6 space-y-5 flex-1 flex flex-col justify-between">
+                <p className="text-[13px] text-[#6E6259] leading-relaxed">
+                  {item.desc}
                 </p>
+
+                {/* Hàng dưới: Avatar Thổ địa + Vòng tròn xanh lá + Nút hồng mận Withlocals */}
+                <div className="pt-4 border-t border-[#F1DEC9]/70 flex items-center justify-between gap-3">
+                  <div className="flex items-center -space-x-2">
+                    {item.guideAvatars.map((url, i) => (
+                      <img
+                        key={i}
+                        src={url}
+                        alt="Local Guide"
+                        className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-xs"
+                      />
+                    ))}
+                    <span className="w-8 h-8 rounded-full bg-[#708B46] text-white text-[11px] font-bold flex items-center justify-center border-2 border-white shadow-xs">
+                      +{item.guideCount}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="px-4 py-2.5 rounded-xl bg-[#D12B79] hover:bg-[#B51E63] text-white text-[12px] font-bold shadow-xs transition-colors cursor-pointer"
+                  >
+                    Khám phá {item.guideCount} tour
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 4. "CÁCH HOẠT ĐỘNG" 3 BƯỚC — PHONG CÁCH WITHLOCALS (Mục [9] & GĐ1) */}
-      <section className="bg-[#FEEDDC] border border-[#F1DEC9] rounded-[28px] p-6 sm:p-10 space-y-8 text-[#1C1917]">
-        <div className="text-center max-w-xl mx-auto space-y-2">
-          <span className="inline-block px-3.5 py-1 rounded-full bg-white text-[#D12B79] border border-[#F1DEC9] text-[11px] font-bold">
-            Quy trình 3 bước chuẩn Withlocals
-          </span>
-          <h2 className="text-[24px] sm:text-[32px] font-black tracking-tight text-[#1C1917]">
-            Cách LocalBuddy hoạt động
-          </h2>
-          <p className="text-[13px] sm:text-[14px] text-[#6E6259]">
-            Đơn giản, trực tiếp và an tâm tuyệt đối với cơ chế giữ cọc hai chặng 30% / 70%
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-[22px] p-6 space-y-3 border border-[#F1DEC9] shadow-xs">
-            <div className="w-11 h-11 rounded-2xl bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] font-black text-[18px] flex items-center justify-center">
-              1
-            </div>
-            <h3 className="text-[17px] font-black text-[#1C1917]">
-              Chọn Thổ địa & Khung giờ
-            </h3>
-            <p className="text-[13px] text-[#78716C] leading-relaxed">
-              Khám phá hồ sơ Thổ địa Đà Nẵng đã xác thực KYC 100%. Chọn ngày, khung giờ rảnh thật và gửi yêu cầu (hoàn toàn chưa tính phí).
+      {/* 3. QUY TRÌNH 3 BƯỚC HOẠT ĐỘNG (Thẻ trắng trên nền sáng ấm) */}
+      <section className="max-w-[1320px] mx-auto px-4 sm:px-6">
+        <div className="bg-white rounded-[32px] p-8 sm:p-12 border border-[#F1DEC9] shadow-xs space-y-10">
+          <div className="text-center max-w-xl mx-auto space-y-2">
+            <span className="inline-block px-3.5 py-1 rounded-full bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] text-[11px] font-bold uppercase tracking-wider">
+              Quy trình 3 bước Withlocals
+            </span>
+            <h2 className="text-[26px] sm:text-[34px] font-black tracking-tight text-[#1C1917]">
+              Cách LocalBuddy vận hành
+            </h2>
+            <p className="text-[14px] text-[#6E6259]">
+              Cơ chế thanh toán hai chặng 30% / 70% bảo vệ trọn vẹn cả du khách và Thổ địa
             </p>
           </div>
 
-          <div className="bg-white rounded-[22px] p-6 space-y-3 border border-[#F1DEC9] shadow-xs">
-            <div className="w-11 h-11 rounded-2xl bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] font-black text-[18px] flex items-center justify-center">
-              2
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-[#FEEDDC]/50 rounded-[22px] p-6 space-y-3 border border-[#F1DEC9]">
+              <div className="w-12 h-12 rounded-2xl bg-white text-[#D12B79] border border-[#F1DEC9] font-black text-[20px] flex items-center justify-center shadow-xs">
+                1
+              </div>
+              <h3 className="text-[18px] font-black text-[#1C1917]">
+                Chọn Thổ địa & Khung giờ
+              </h3>
+              <p className="text-[13px] text-[#6E6259] leading-relaxed">
+                Khám phá hồ sơ Thổ địa Đà Nẵng đã xác thực KYC 100%. Chọn ngày, khung giờ rảnh thật và gửi yêu cầu (hoàn toàn chưa tính phí).
+              </p>
             </div>
-            <h3 className="text-[17px] font-black text-[#1C1917]">
-              Guide nhận đơn & Cọc 30%
-            </h3>
-            <p className="text-[13px] text-[#78716C] leading-relaxed">
-              Thổ địa phản hồi trong 24 giờ. Khi được chấp nhận, hệ thống giữ chỗ 15 phút để bạn nộp cọc 30%, nhận hợp đồng điện tử và số điện thoại/email liên hệ trực tiếp.
-            </p>
+
+            <div className="bg-[#FEEDDC]/50 rounded-[22px] p-6 space-y-3 border border-[#F1DEC9]">
+              <div className="w-12 h-12 rounded-2xl bg-white text-[#D12B79] border border-[#F1DEC9] font-black text-[20px] flex items-center justify-center shadow-xs">
+                2
+              </div>
+              <h3 className="text-[18px] font-black text-[#1C1917]">
+                Guide nhận đơn & Cọc 30%
+              </h3>
+              <p className="text-[13px] text-[#6E6259] leading-relaxed">
+                Thổ địa phản hồi trong 24 giờ. Khi chấp nhận, hệ thống giữ chỗ 15 phút để bạn nộp cọc 30%, nhận thỏa thuận dịch vụ và số liên hệ trực tiếp.
+              </p>
+            </div>
+
+            <div className="bg-[#FEEDDC]/50 rounded-[22px] p-6 space-y-3 border border-[#F1DEC9]">
+              <div className="w-12 h-12 rounded-2xl bg-white text-[#D12B79] border border-[#F1DEC9] font-black text-[20px] flex items-center justify-center shadow-xs">
+                3
+              </div>
+              <h3 className="text-[18px] font-black text-[#1C1917]">
+                Đồng hành & Tất toán 70%
+              </h3>
+              <p className="text-[13px] text-[#6E6259] leading-relaxed">
+                Gặp gỡ tại điểm hẹn Đà Nẵng, tận hưởng chuyến đi riêng tư. Kết thúc tour, bạn thanh toán 70% còn lại qua cổng Online hoặc Tiền mặt trực tiếp.
+              </p>
+            </div>
           </div>
 
-          <div className="bg-white rounded-[22px] p-6 space-y-3 border border-[#F1DEC9] shadow-xs">
-            <div className="w-11 h-11 rounded-2xl bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] font-black text-[18px] flex items-center justify-center">
-              3
-            </div>
-            <h3 className="text-[17px] font-black text-[#1C1917]">
-              Đồng hành & Tất toán 70%
-            </h3>
-            <p className="text-[13px] text-[#78716C] leading-relaxed">
-              Gặp gỡ tại điểm hẹn Đà Nẵng, tận hưởng chuyến đi riêng tư. Kết thúc tour, bấm xác nhận hoàn thành và thanh toán 70% còn lại (Online hoặc Tiền mặt).
-            </p>
-          </div>
-        </div>
-
-        <div className="text-center pt-2">
-          <Link
-            to="/how-it-works"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-[#FDF6ED] border border-[#F1DEC9] text-[#D12B79] font-bold text-[13px] shadow-xs transition-all"
-          >
-            <span>Xem hướng dẫn chi tiết & Mô hình vận hành chuẩn Withlocals</span>
-            <span>→</span>
-          </Link>
-        </div>
-      </section>
-
-      {/* 5. KHỐI TIN CẬY (KYC xác minh, Giá minh bạch, Chính sách huỷ rõ) */}
-      <section className="space-y-6">
-        <div className="text-center max-w-xl mx-auto space-y-2">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#347CCB]">
-            Cam kết cốt lõi
-          </span>
-          <h2 className="text-[22px] sm:text-[28px] font-black text-[#1C1917] tracking-tight">
-            Nền tảng đặt Thổ địa đáng tin cậy
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="bg-white border border-[#E7E5E4] rounded-[22px] p-6 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#347CCB] flex items-center justify-center text-xl">
-              🛡️
-            </div>
-            <h3 className="text-[17px] font-bold text-[#1C1917]">
-              100% Xác thực KYC
-            </h3>
-            <p className="text-[13px] text-[#78716C] leading-relaxed">
-              Mọi Thổ địa đều được kiểm duyệt danh tính qua Căn cước công dân gắn chip và Thẻ Hướng dẫn viên du lịch do Sở Du lịch cấp.
-            </p>
-          </div>
-
-          <div className="bg-white border border-[#E7E5E4] rounded-[22px] p-6 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
-              💎
-            </div>
-            <h3 className="text-[17px] font-bold text-[#1C1917]">
-              Đơn giá theo giờ minh bạch
-            </h3>
-            <p className="text-[13px] text-[#78716C] leading-relaxed">
-              Giá thuê cố định theo giờ từ 150.000 ₫ – 500.000 ₫/giờ. Tuyệt đối không phụ thu theo số lượng người tham gia, không ép vào điểm mua sắm.
-            </p>
-          </div>
-
-          <div className="bg-white border border-[#E7E5E4] rounded-[22px] p-6 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
-              ⚖️
-            </div>
-            <h3 className="text-[17px] font-bold text-[#1C1917]">
-              Chính sách hủy bảo vệ cả hai bên
-            </h3>
-            <p className="text-[13px] text-[#78716C] leading-relaxed">
-              Hủy trước 48 giờ hoàn 100% cọc; hủy 24h–48h hoàn 50% cọc. Nếu Thổ địa hủy đơn, du khách luôn được hoàn 100% cọc kèm quyền khiếu nại.
-            </p>
+          <div className="text-center pt-2">
+            <Link
+              to="/how-it-works"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#D12B79] hover:bg-[#B51E63] text-white font-bold text-[13px] shadow-xs transition-all"
+            >
+              <span>Xem hướng dẫn chi tiết trang giới thiệu</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* 6. HÀNG GUIDE NỔI BẬT (Thẻ Guide chuẩn theo [9]) */}
-      <section className="space-y-4">
+      {/* 4. HÀNG GUIDE TIÊU BIỂU (Thẻ Guide chuẩn với viền #F1DEC9) */}
+      <section className="max-w-[1320px] mx-auto px-4 sm:px-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#EB5B38]">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#D12B79]">
               Thổ địa tiêu biểu
             </span>
-            <h2 className="text-[22px] sm:text-[26px] font-black text-[#1C1917] tracking-tight">
+            <h2 className="text-[24px] sm:text-[32px] font-black text-[#1C1917] tracking-tight">
               Hướng dẫn viên bản địa Đà Nẵng
             </h2>
           </div>
           <Link
             to="/guides"
-            className="px-4 py-2 rounded-full bg-white border border-[#E7E5E4] text-[13px] font-semibold text-[#1C1917] hover:bg-[#F3F1EC]"
+            className="px-5 py-2.5 rounded-full bg-white border border-[#F1DEC9] text-[13px] font-bold text-[#1C1917] hover:bg-[#FDF6ED] shadow-xs"
           >
             Xem tất cả ({verifiedGuides.length}) →
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {verifiedGuides.map(({ user, profile }) => (
             <GuideCard
               key={user.id}
@@ -566,125 +539,109 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 7. BỘ SƯU TẬP VIDEO & HÌNH ẢNH THỰC TẾ ĐÀ NẴNG */}
-      <section className="space-y-4">
+      {/* 5. DẢI CAM KẾT VẬN HÀNH TIÊU CHUẨN (4 trụ cột niềm tin) */}
+      <section className="max-w-[1320px] mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {[
+            { num: '100% KYC', label: 'CCCD & Thẻ HDV xác thực' },
+            { num: 'Cọc 30%', label: 'Giữ chỗ nguyên tử 15 phút' },
+            { num: 'Hoàn 100%', label: 'Hủy trước 48 giờ miễn phí' },
+            { num: '0 Phí ẩn', label: 'Đơn giá theo giờ minh bạch' },
+          ].map((item) => (
+            <div
+              key={item.num}
+              className="bg-white border border-[#F1DEC9] rounded-[22px] px-5 py-5 text-center shadow-xs"
+            >
+              <span className="block text-[20px] font-black text-[#1C1917]">
+                {item.num}
+              </span>
+              <span className="text-[13px] text-[#6E6259] font-medium">{item.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 6. CHỦ ĐỀ TRẢI NGHIỆM ĐÀ NẴNG */}
+      <section className="max-w-[1320px] mx-auto px-4 sm:px-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#347CCB]">
-              Góc nhìn thực tế
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#D12B79]">
+              Trải nghiệm theo chủ đề
             </span>
-            <h2 className="text-[22px] sm:text-[26px] font-black text-[#1C1917] tracking-tight">
-              Khoảnh khắc Đà Nẵng
+            <h2 className="text-[24px] sm:text-[30px] font-black text-[#1C1917] tracking-tight">
+              Khám phá Đà Nẵng theo cách của bạn
             </h2>
           </div>
           <Link
             to="/guides"
-            className="text-[13px] font-semibold text-[#57534E] hover:text-[#1C1917]"
+            className="text-[13px] font-bold text-[#6E6259] hover:text-[#1C1917]"
           >
-            Tất cả điểm đến →
+            Tất cả chủ đề →
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {DANANG_MEDIA_SHOWCASE.map((item) => {
-            const areaGuides = verifiedGuides.filter(({ profile }) =>
-              profile.areas.includes(item.area)
-            );
-            const avatars = (
-              areaGuides.length > 0 ? areaGuides : verifiedGuides
-            ).slice(0, 3);
-
-            return (
-              <div
-                key={item.id}
-                onClick={() =>
-                  navigate(`/guides?area=${encodeURIComponent(item.area)}`)
-                }
-                className={`group relative rounded-[22px] overflow-hidden bg-[#F3F1EC] border border-[#E7E5E4] cursor-pointer ${item.span || 'h-64'}`}
-              >
-                {item.type === 'video' ? (
-                  <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    poster={item.poster}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  >
-                    <source src={item.src} type="video/mp4" />
-                  </video>
-                ) : (
-                  <img
-                    src={item.src}
-                    alt={item.label}
-                    loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                )}
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-
-                <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 text-[#1C1917] text-[10px] font-bold backdrop-blur-xs">
-                  {item.type === 'video' ? '▶ Video' : '📷 Ảnh thực tế'}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {EXPERIENCES.map((exp) => (
+            <div
+              key={exp.id}
+              onClick={() => navigate(`/guides?skill=${encodeURIComponent(exp.param)}`)}
+              className="bg-white border border-[#F1DEC9] hover:border-[#D12B79] rounded-[24px] p-6 cursor-pointer transition-all hover:shadow-md space-y-3 group shadow-xs"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-3xl group-hover:scale-110 transition-transform">{exp.icon}</span>
+                <span className="text-[12px] font-bold text-[#78716C] group-hover:text-[#D12B79]">
+                  Khám phá →
                 </span>
-
-                <div className="absolute bottom-3.5 left-4 right-4 flex items-center justify-between gap-2">
-                  <h3 className="text-[16px] font-bold text-white drop-shadow-xs">
-                    {item.label}
-                  </h3>
-                  <div className="flex items-center -space-x-2 shrink-0">
-                    {avatars.map(({ user, profile }) => (
-                      <img
-                        key={user.id}
-                        src={profile.avatarUrl}
-                        alt={user.fullName}
-                        className="w-7 h-7 rounded-full object-cover border-2 border-white"
-                      />
-                    ))}
-                  </div>
-                </div>
               </div>
-            );
-          })}
+              <div>
+                <h3 className="text-[17px] font-bold text-[#1C1917] group-hover:text-[#D12B79] transition-colors">
+                  {exp.title}
+                </h3>
+                <p className="text-[13px] text-[#6E6259] mt-1 line-clamp-2">
+                  {exp.desc}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* 8. ĐÁNH GIÁ THỰC TẾ TỪ DU KHÁCH (Chỉ hiển thị khi có đánh giá thật trong CSDL) */}
+      {/* 7. ĐÁNH GIÁ THỰC TẾ TỪ DU KHÁCH */}
       {reviews.length > 0 && (
-        <section className="space-y-4">
+        <section className="max-w-[1320px] mx-auto px-4 sm:px-6 space-y-6">
           <div className="text-center max-w-xl mx-auto space-y-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#EB5B38]">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#D12B79]">
               Đánh giá xác thực
             </span>
-            <h2 className="text-[22px] sm:text-[26px] font-black text-[#1C1917] tracking-tight">
+            <h2 className="text-[24px] sm:text-[30px] font-black text-[#1C1917] tracking-tight">
               Cảm nhận của du khách sau chuyến đi
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {reviews.slice(0, 3).map((rev) => {
               const tourist = getUserById(rev.touristId);
               const guide = getGuideById(rev.guideId);
               return (
                 <div
                   key={rev.id}
-                  className="bg-white border border-[#E7E5E4] rounded-[22px] p-6 space-y-3 flex flex-col justify-between shadow-xs"
+                  className="bg-white border border-[#F1DEC9] rounded-[24px] p-6 space-y-4 flex flex-col justify-between shadow-xs"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center gap-1 text-amber-500 text-sm">
                       {'★'.repeat(rev.stars)}
                     </div>
-                    <p className="text-[13px] text-[#57534E] leading-relaxed italic">
+                    <p className="text-[13px] text-[#6E6259] leading-relaxed italic">
                       “{rev.comment}”
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-[#E7E5E4] flex items-center justify-between text-[12px]">
+                  <div className="pt-3 border-t border-[#F1DEC9] flex items-center justify-between text-[12px]">
                     <div>
                       <strong className="block text-[#1C1917]">{tourist?.fullName || 'Du khách'}</strong>
                       <span className="text-[#78716C]">{rev.createdAt.split('T')[0]}</span>
                     </div>
-                    <span className="px-2 py-0.5 rounded bg-[#F3F1EC] text-[11px] font-semibold text-[#57534E]">
+                    <span className="px-2.5 py-1 rounded-full bg-[#FEEDDC] text-[11px] font-semibold text-[#1C1917] border border-[#F1DEC9]">
                       Thổ địa: {guide?.user.fullName || 'Đà Nẵng'}
                     </span>
                   </div>
@@ -695,59 +652,63 @@ export const HomePage: React.FC = () => {
         </section>
       )}
 
-      {/* 9. CTA TRỞ THÀNH GUIDE (Mục [9]: CTA trở thành Guide) */}
-      <section className="rounded-[26px] bg-[#272A2D] text-white p-8 sm:p-12 relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
-        <div className="space-y-3 max-w-xl z-10">
-          <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-[#EB5B38] text-[11px] font-bold border border-white/15">
-            Dành cho Thổ địa Đà Nẵng
-          </span>
-          <h2 className="text-[24px] sm:text-[32px] font-black tracking-tight leading-snug">
-            Bạn là người Đà Nẵng am hiểu văn hóa và ẩm thực quê hương?
-          </h2>
-          <p className="text-[13px] sm:text-[14px] text-white/80 leading-relaxed">
-            Trở thành Thổ địa LocalBuddy để kết nối bạn bè khắp nơi, chủ động xếp lịch rảnh theo giờ và nhận thù lao xứng đáng, minh bạch.
-          </p>
-        </div>
+      {/* 8. CTA TRỞ THÀNH GUIDE (Thẻ trắng viền ấm) */}
+      <section className="max-w-[1320px] mx-auto px-4 sm:px-6">
+        <div className="bg-white rounded-[32px] p-8 sm:p-12 border border-[#F1DEC9] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
+          <div className="space-y-3 max-w-xl text-center sm:text-left">
+            <span className="inline-block px-3.5 py-1 rounded-full bg-[#FEEDDC] text-[#D12B79] text-[11px] font-bold border border-[#F1DEC9]">
+              Dành cho Thổ địa Đà Nẵng
+            </span>
+            <h2 className="text-[24px] sm:text-[32px] font-black tracking-tight leading-snug text-[#1C1917]">
+              Bạn là người Đà Nẵng am hiểu văn hóa và ẩm thực quê hương?
+            </h2>
+            <p className="text-[14px] text-[#6E6259] leading-relaxed">
+              Trở thành Thổ địa LocalBuddy để kết nối du khách khắp thế giới, chủ động bật lịch rảnh theo giờ và nhận thù lao xứng đáng, minh bạch.
+            </p>
+          </div>
 
-        <div className="z-10 shrink-0">
-          <Link
-            to="/dang-ky?role=guide"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#D12B79] hover:bg-[#B51E63] text-white text-[14px] font-bold shadow-lg transition-all transform hover:scale-105"
-          >
-            <span>Đăng ký làm Thổ địa ngay</span>
-            <span>→</span>
-          </Link>
+          <div className="shrink-0">
+            <Link
+              to="/dang-ky?role=guide"
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#D12B79] hover:bg-[#B51E63] text-white text-[14px] font-bold shadow-md transition-all transform hover:scale-105"
+            >
+              <span>Đăng ký làm Thổ địa ngay</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* 10. FAQ ACCORDION (Mục [9]: FAQ) */}
-      <section className="space-y-5 max-w-3xl mx-auto">
+      {/* 9. FAQ ACCORDION */}
+      <section className="max-w-[960px] mx-auto px-4 sm:px-6 space-y-6">
         <div className="text-center space-y-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#78716C]">
             Giải đáp thắc mắc
           </span>
-          <h2 className="text-[22px] sm:text-[26px] font-black text-[#1C1917] tracking-tight">
+          <h2 className="text-[24px] sm:text-[30px] font-black text-[#1C1917] tracking-tight">
             Câu hỏi thường gặp
           </h2>
         </div>
 
-        <div className="divide-y divide-[#E7E5E4] border border-[#E7E5E4] rounded-[22px] bg-white overflow-hidden shadow-xs">
+        <div className="divide-y divide-[#F1DEC9] border border-[#F1DEC9] rounded-[24px] bg-white overflow-hidden shadow-xs">
           {FAQ_ITEMS.map((item, idx) => {
             const isOpen = openFaq === idx;
             return (
-              <div key={item.q} className="p-4 sm:p-5">
+              <div key={item.q} className="p-5">
                 <button
                   type="button"
                   onClick={() => setOpenFaq(isOpen ? null : idx)}
                   className="w-full flex items-center justify-between text-left font-bold text-[15px] text-[#1C1917] gap-3 cursor-pointer"
                 >
                   <span>{item.q}</span>
-                  <span className="text-[18px] text-[#78716C] shrink-0">
-                    {isOpen ? '−' : '+'}
-                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 text-[#D12B79] transition-transform duration-300 shrink-0 ${
+                      isOpen ? 'rotate-180' : ''
+                    }`}
+                  />
                 </button>
                 {isOpen && (
-                  <p className="mt-3 text-[13px] text-[#57534E] leading-relaxed">
+                  <p className="mt-3 text-[13px] text-[#6E6259] leading-relaxed border-t border-[#FEEDDC] pt-3">
                     {item.a}
                   </p>
                 )}

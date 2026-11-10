@@ -241,7 +241,7 @@ export const BookingDetailPage: React.FC = () => {
             )}
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-2.5 py-0.5 rounded bg-[#272A2D] text-white text-[12px] font-bold tracking-wider">
+                <span className="px-2.5 py-0.5 rounded bg-[#FEEDDC] text-[#1C1917] border border-[#F1DEC9] text-[12px] font-bold tracking-wider">
                   {booking.id}
                 </span>
                 <span className="text-[12px] text-[#78716C]">
@@ -283,7 +283,7 @@ export const BookingDetailPage: React.FC = () => {
                   expirePendingBooking(booking.id);
                   showToast('Đã giả lập quá hạn 24h HDV không phản hồi -> Đơn tự động hủy!', 'warning');
                 }}
-                className="px-2.5 py-1.5 rounded-xl bg-[#272A2D] text-white text-[11px] font-bold cursor-pointer hover:bg-black transition-colors"
+                className="px-2.5 py-1.5 rounded-xl bg-[#D12B79] hover:bg-[#B51E63] text-white text-[11px] font-bold cursor-pointer transition-colors shadow-xs"
               >
                 ⚡ Tua hết 24h
               </button>
@@ -324,7 +324,7 @@ export const BookingDetailPage: React.FC = () => {
           <div className="p-5 rounded-2xl bg-sky-50 border-2 border-sky-300 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="text-[11px] font-extrabold uppercase tracking-wider bg-[#272A2D] text-white px-2.5 py-0.5 rounded">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] px-2.5 py-0.5 rounded">
                   UC.17 → UC.18 / UC.19 • Cửa sổ xác nhận 24 giờ (BR-08, BR-12)
                 </span>
                 <h3 className="text-[16px] font-bold text-[#1C1917] mt-1">
@@ -706,8 +706,8 @@ export const BookingDetailPage: React.FC = () => {
                         onClick={() => setSimulatedDelta(opt.val)}
                         className={`px-2.5 py-1 rounded-full text-[11px] font-bold border cursor-pointer ${
                           simulatedDelta === opt.val
-                            ? 'bg-[#272A2D] text-white border-[#272A2D]'
-                            : 'bg-white text-[#1C1917] border-[#E7E5E4]'
+                            ? 'bg-[#D12B79] text-white border-[#D12B79]'
+                            : 'bg-white text-[#1C1917] border-[#F1DEC9]'
                         }`}
                       >
                         {opt.label}
@@ -763,8 +763,8 @@ export const BookingDetailPage: React.FC = () => {
                   onClick={() => setCancelReason(preset)}
                   className={`px-2.5 py-1 rounded-full text-[12px] font-semibold border cursor-pointer ${
                     cancelReason === preset
-                      ? 'bg-[#272A2D] text-white border-[#272A2D]'
-                      : 'bg-[#F3F1EC] text-[#1C1917] border-[#E7E5E4]'
+                      ? 'bg-[#D12B79] text-white border-[#D12B79]'
+                      : 'bg-[#FEEDDC] text-[#1C1917] border-[#F1DEC9]'
                   }`}
                 >
                   {preset}

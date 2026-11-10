@@ -13,7 +13,7 @@
 - [x] **GĐ9: Triển khai & Báo cáo** (CI/CD GitHub Actions deploy GitHub Pages, xuất bản BAO_CAO_CUOI.md, phát hành git tag v1.0.0).
 - [x] **GĐ10: Chuẩn hóa UI/UX Mục [9] & [10]** (Trang chủ 3 bước, khối tin cậy KYC/giá/hủy, FAQ accordion, profile 2 cột sticky, timeline dọc).
 - [x] **GĐ11: Nghiệm thu toàn diện & Xác thực chất lượng** (Build production sạch 100%, 0 vi phạm phạm vi, bảo mật ẩn tuyệt đối phí sàn với Tourist).
-- [x] **GĐ12: Giao diện Giới thiệu & Logo phong cách Withlocals** (Trang /how-it-works, nền ấm #FEEDDC, logo 2 gương mặt cười liên kết, bảng màu #D12B79, video Đà Nẵng, WCAG AA).
+- [x] **GĐ12: Giao diện sáng ấm & Bố cục Withlocals toàn diện** (Bỏ hoàn toàn nền xám tối, đồng bộ sang nền kem #FEEDDC, logo 2 gương mặt cười liên kết, thanh tìm kiếm nổi vàng hổ phách, thẻ 'QUE FAIRE À...', đạt 100% WCAG AA).
 
 ---
 

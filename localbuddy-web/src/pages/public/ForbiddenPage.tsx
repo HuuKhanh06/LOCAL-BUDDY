@@ -28,19 +28,19 @@ export const ForbiddenPage: React.FC = () => {
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-lg w-full bg-white border border-[#E4C3CC] rounded-[16px] p-8 shadow-md text-center space-y-5">
-        <div className="w-16 h-16 rounded-full bg-[#FCE8EB] text-[#A61B2B] flex items-center justify-center mx-auto">
+      <div className="max-w-lg w-full bg-white border border-[#F1DEC9] rounded-[24px] p-8 shadow-sm text-center space-y-5">
+        <div className="w-16 h-16 rounded-full bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center mx-auto">
           <ShieldAlert className="w-8 h-8" />
         </div>
 
         <div className="space-y-2">
-          <span className="inline-block px-3 py-1 rounded-full bg-[#F6E6EA] text-[#1A0A0F] text-xs font-extrabold uppercase tracking-wider">
+          <span className="inline-block px-3.5 py-1 rounded-full bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] text-xs font-bold uppercase tracking-wider">
             Mã lỗi 403 • Từ chối truy cập (RBAC)
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1A0A0F]">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#1C1917]">
             Bạn không có quyền truy cập trang này
           </h1>
-          <p className="text-sm text-[#52526B] leading-relaxed">
+          <p className="text-sm text-[#6E6259] leading-relaxed">
             Khu vực này chỉ dành cho vai trò <strong>{roleLabel}</strong>.
             {currentUser ? (
               <>

@@ -14,41 +14,41 @@ import { useBookingContext } from '../context/BookingContext';
 import { formatMoney } from '../utils/money';
 import { Logo } from '../components/common/Logo';
 
-const CommercialFooter: React.FC<{ isWarm?: boolean }> = ({ isWarm }) => {
+const CommercialFooter: React.FC = () => {
   return (
-    <footer className={isWarm ? "bg-[#F5E6D3] text-[#6E6259] border-t border-[#E8D4C1] mt-16 py-8" : "bg-[var(--lb-surface)] text-[var(--lb-muted)] border-t border-[var(--lb-border)] mt-16 py-8"}>
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <footer className="bg-[#F5E5D5] text-[#6E6259] border-t border-[#E8D4C1] mt-16 py-10">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3">
           <Logo size="sm" />
           <div>
-            <span className={`text-[14px] font-bold block ${isWarm ? "text-[#1C1917]" : "text-[var(--lb-text)]"}`}>
+            <span className="text-[14px] font-bold text-[#1C1917] block">
               LocalBuddy Đà Nẵng
             </span>
-            <span className={`text-[11px] ${isWarm ? "text-[#78716C]" : "text-[var(--lb-muted)]"}`}>
-              Đặt Hướng dẫn viên bản địa theo giờ • Cọc 30% • Hoàn 100% trước 48h
+            <span className="text-[12px] text-[#78716C]">
+              Đặt Hướng dẫn viên bản địa theo giờ • Cọc 30% giữ chỗ • Hoàn 100% trước 48h
             </span>
           </div>
         </div>
 
-        <div className={`flex flex-wrap items-center gap-4 text-[13px] font-medium ${isWarm ? "text-[#6E6259]" : "text-[var(--lb-muted)]"}`}>
-          <Link to="/how-it-works" className={isWarm ? "hover:text-[#D12B79]" : "hover:text-[var(--lb-text)]"}>
+        <div className="flex flex-wrap items-center gap-5 text-[13px] font-semibold text-[#6E6259]">
+          <Link to="/how-it-works" className="hover:text-[#D12B79] transition-colors">
             Cách hoạt động
           </Link>
-          <Link to="/become-a-guide" className={isWarm ? "hover:text-[#D12B79]" : "hover:text-[var(--lb-text)]"}>
+          <Link to="/become-a-guide" className="hover:text-[#D12B79] transition-colors">
             Trở thành Guide
           </Link>
-          <Link to="/cancellation-policy" className={isWarm ? "hover:text-[#D12B79]" : "hover:text-[var(--lb-text)]"}>
+          <Link to="/cancellation-policy" className="hover:text-[#D12B79] transition-colors">
             Chính sách hủy
           </Link>
-          <Link to="/safety" className={isWarm ? "hover:text-[#D12B79]" : "hover:text-[var(--lb-text)]"}>
+          <Link to="/safety" className="hover:text-[#D12B79] transition-colors">
             An toàn
           </Link>
-          <Link to="/faq" className={isWarm ? "hover:text-[#D12B79]" : "hover:text-[var(--lb-text)]"}>
+          <Link to="/faq" className="hover:text-[#D12B79] transition-colors">
             Hỏi đáp
           </Link>
         </div>
       </div>
-      <div className={`max-w-[1320px] mx-auto px-4 sm:px-6 mt-6 pt-4 border-t text-center text-[11px] ${isWarm ? "border-[#E8D4C1] text-[#78716C]" : "border-[var(--lb-border)]/50 text-[var(--lb-muted)]"}`}>
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 mt-6 pt-4 border-t border-[#E8D4C1] text-center text-[11px] text-[#78716C]">
         Dự án học phần Phân tích & Thiết kế Hệ thống Nâng cao — dữ liệu minh hoạ.
       </div>
     </footer>
@@ -56,16 +56,13 @@ const CommercialFooter: React.FC<{ isWarm?: boolean }> = ({ isWarm }) => {
 };
 
 export const PublicLayout: React.FC = () => {
-  const location = useLocation();
-  const isWarm = location.pathname === '/how-it-works';
-
   return (
-    <div className={`min-h-screen flex flex-col pb-16 lg:pb-0 transition-colors ${isWarm ? 'bg-[#FEEDDC] text-[#1C1917]' : 'bg-[var(--lb-bg)] text-[var(--lb-text)]'}`}>
+    <div className="min-h-screen flex flex-col bg-[#FEEDDC] text-[#1C1917] pb-16 lg:pb-0">
       <Header role="tourist" />
-      <main className={`flex-1 w-full mx-auto ${isWarm ? 'max-w-full p-0' : 'max-w-[1320px] px-4 sm:px-6 py-6'}`}>
+      <main className="flex-1 w-full mx-auto">
         <Outlet />
       </main>
-      <CommercialFooter isWarm={isWarm} />
+      <CommercialFooter />
       <TouristBottomNav />
     </div>
   );
@@ -73,7 +70,7 @@ export const PublicLayout: React.FC = () => {
 
 export const TouristLayout: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--lb-bg)] text-[var(--lb-text)] pb-16 lg:pb-0">
+    <div className="min-h-screen flex flex-col bg-[#FEEDDC] text-[#1C1917] pb-16 lg:pb-0">
       <Header role="tourist" />
       <main className="flex-1 max-w-[1320px] w-full mx-auto px-4 sm:px-6 py-6">
         <Outlet />
@@ -129,7 +126,7 @@ const DashboardShell: React.FC<{
 
       {drawerOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-50 flex bg-[var(--lb-bg-deep)]/75 backdrop-blur-xs"
+          className="lg:hidden fixed inset-0 z-50 flex bg-black/50 backdrop-blur-xs"
           onClick={() => setDrawerOpen(false)}
         >
           <div className="h-full shadow-xl bg-[var(--lb-surface)]" onClick={(e) => e.stopPropagation()}>

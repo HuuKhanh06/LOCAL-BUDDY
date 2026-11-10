@@ -81,17 +81,17 @@ export const FeeConfigPage: React.FC = () => {
           onSubmit={handleSave}
           className="lg:col-span-2 bg-white rounded-2xl border border-[#E7E5E4] p-6 shadow-xs space-y-6"
         >
-          <div className="flex items-center justify-between bg-[#272A2D] text-white p-5 rounded-xl">
+          <div className="flex items-center justify-between bg-[#FEEDDC] text-[#1C1917] border border-[#F1DEC9] p-5 rounded-2xl">
             <div>
-              <div className="text-xs uppercase tracking-wider text-[#E6E4DC]/75 font-semibold">
+              <div className="text-xs uppercase tracking-wider text-[#6E6259] font-bold">
                 Tỷ lệ phí dịch vụ hiện hành (`Fee_Rate`)
               </div>
-              <div className="text-3xl font-extrabold text-[#EB5B38] mt-1">
+              <div className="text-3xl font-black text-[#D12B79] mt-1">
                 {Math.round(feeRate * 100)}% / đơn hoàn thành
               </div>
             </div>
             <div className="text-right">
-              <span className="px-3 py-1 rounded-full bg-white/10 text-[#E6E4DC] text-xs font-bold">
+              <span className="px-3 py-1 rounded-full bg-white text-[#D12B79] border border-[#F1DEC9] text-xs font-bold shadow-xs">
                 Khung chuẩn BR-13: 10% – 15%
               </span>
             </div>
@@ -360,7 +360,7 @@ export const FeeConfigPage: React.FC = () => {
                       {formatDateTimeVN(log.time)}
                     </td>
                     <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 rounded bg-[#272A2D] text-[#E6E4DC] font-bold text-[10px]">
+                      <span className="px-2 py-0.5 rounded bg-[#FEEDDC] text-[#1C1917] border border-[#F1DEC9] font-bold text-[10px]">
                         {log.category}
                       </span>
                     </td>

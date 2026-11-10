@@ -184,7 +184,7 @@ export const AccountsPage: React.FC = () => {
                         </span>
                       )}
                       {user.role === 'admin' && (
-                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#272A2D] text-[#E6E4DC]">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9]">
                           Quản trị viên
                         </span>
                       )}

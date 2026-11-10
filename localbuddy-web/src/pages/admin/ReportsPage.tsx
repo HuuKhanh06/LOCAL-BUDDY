@@ -288,8 +288,8 @@ export const ReportsPage: React.FC = () => {
                   onClick={() => setPeriodFilter(p)}
                   className={`px-3 py-1.5 rounded-xl text-[12px] font-bold transition-all cursor-pointer border ${
                     periodFilter === p
-                      ? 'bg-[#272A2D] text-white border-[#272A2D]'
-                      : 'bg-[#F3F1EC] text-[#1C1917] border-[#E7E5E4] hover:border-[#272A2D]'
+                      ? 'bg-[#D12B79] text-white border-[#D12B79]'
+                      : 'bg-white text-[#1C1917] border-[#F1DEC9] hover:border-[#D12B79]'
                   }`}
                 >
                   {p === 'ALL' ? 'Toàn bộ' : p === 'THIS_MONTH' ? '30 ngày qua' : '7 ngày qua'}
@@ -310,15 +310,15 @@ export const ReportsPage: React.FC = () => {
 
           {/* 4 KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-[#272A2D] text-white rounded-2xl p-5 shadow-md">
-              <div className="flex items-center justify-between text-xs text-white/80 font-semibold uppercase">
+            <div className="bg-white text-[#1C1917] border border-[#F1DEC9] rounded-2xl p-5 shadow-xs">
+              <div className="flex items-center justify-between text-xs text-[#78716C] font-semibold uppercase">
                 <span>Tổng GMV Đã tất toán</span>
-                <TrendingUp className="w-4 h-4 text-[#EB5B38]" />
+                <TrendingUp className="w-4 h-4 text-[#D12B79]" />
               </div>
-              <div className="text-2xl font-black text-white mt-2">
+              <div className="text-2xl font-black text-[#1C1917] mt-2">
                 {formatMoney(totalGmvCompleted)}
               </div>
-              <div className="text-xs text-white/70 mt-1.5">
+              <div className="text-xs text-[#6E6259] mt-1.5">
                 Tổng GMV luồng booking: <strong>{formatMoney(totalGmvPipeline)}</strong>
               </div>
             </div>
@@ -448,7 +448,7 @@ export const ReportsPage: React.FC = () => {
                       <tr key={item.user.id} className="hover:bg-[#F3F1EC]/60">
                         <td className="py-3.5 px-3">
                           <div className="flex items-center gap-2.5">
-                            <span className="w-6 h-6 rounded-full bg-[#272A2D] text-white text-xs font-bold flex items-center justify-center">
+                            <span className="w-6 h-6 rounded-full bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] text-xs font-bold flex items-center justify-center">
                               #{idx + 1}
                             </span>
                             <img
@@ -672,8 +672,8 @@ export const ReportsPage: React.FC = () => {
                     onClick={() => setStatusFilter(st)}
                     className={`px-3 py-1.5 rounded-xl text-[11px] font-bold shrink-0 transition-all cursor-pointer border ${
                       statusFilter === st
-                        ? 'bg-[#272A2D] text-white border-[#272A2D]'
-                        : 'bg-[#F3F1EC] text-[#1C1917] border-[#E7E5E4] hover:border-[#272A2D]'
+                        ? 'bg-[#D12B79] text-white border-[#D12B79]'
+                        : 'bg-white text-[#1C1917] border-[#F1DEC9] hover:border-[#D12B79]'
                     }`}
                   >
                     {st === 'ALL' ? 'Tất cả' : st}

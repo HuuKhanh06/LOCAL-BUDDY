@@ -9,20 +9,20 @@ export const NotFoundPage: React.FC = () => {
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-lg w-full bg-white border border-[#E4C3CC] rounded-[16px] p-8 shadow-md text-center space-y-5">
-        <div className="w-16 h-16 rounded-full bg-[#E5F8F9] text-[#1C1C28] border-2 border-[#1EC1CB] flex items-center justify-center mx-auto">
+      <div className="max-w-lg w-full bg-white border border-[#F1DEC9] rounded-[24px] p-8 shadow-sm text-center space-y-5">
+        <div className="w-16 h-16 rounded-full bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] flex items-center justify-center mx-auto">
           <Compass className="w-8 h-8" />
         </div>
 
         <div className="space-y-2">
-          <span className="inline-block px-3 py-1 rounded-full bg-[#1C1C28] text-[#1EC1CB] text-xs font-extrabold uppercase tracking-wider">
+          <span className="inline-block px-3.5 py-1 rounded-full bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] text-xs font-bold uppercase tracking-wider">
             Mã lỗi 404 • Lạc đường rồi!
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1A0A0F]">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#1C1917]">
             Không tìm thấy trang bạn yêu cầu
           </h1>
-          <p className="text-sm text-[#52526B] leading-relaxed">
-            Đường dẫn này không tồn tại hoặc đã được di chuyển. Hãy để các Hướng dẫn viên bản địa Đà Nẵng đưa bạn quay lại lộ trình chính nhé!
+          <p className="text-sm text-[#6E6259] leading-relaxed">
+            Đường dẫn này không tồn tại hoặc đã được di chuyển. Hãy để các Thổ địa bản xứ Đà Nẵng đưa bạn quay lại lộ trình chính nhé!
           </p>
         </div>
 

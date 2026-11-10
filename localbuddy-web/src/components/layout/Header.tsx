@@ -13,7 +13,6 @@ import { Logo } from '../common/Logo';
 
 export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role: propRole }) => {
   const location = useLocation();
-  const isWarm = location.pathname === '/how-it-works';
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { t, i18n } = useTranslation();
@@ -62,12 +61,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
   };
 
   return (
-    <header className={clsx(
-      "sticky top-0 z-40 backdrop-blur-md border-b transition-colors",
-      isWarm
-        ? "bg-[#FEEDDC]/95 border-[#E8D4C1] text-[#1C1917]"
-        : "bg-[var(--lb-surface)]/95 text-[var(--lb-text)] border-[var(--lb-border)]"
-    )}>
+    <header className="sticky top-0 z-40 bg-[#FEEDDC]/95 backdrop-blur-md border-b border-[#F1DEC9] text-[#1C1917] transition-colors">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         {/* Logo Withlocals style */}
         <Link to="/" className="flex items-center shrink-0">
@@ -77,24 +71,16 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
         {/* Ô tìm nhanh */}
         <form
           onSubmit={handleQuickSearchSubmit}
-          className={clsx(
-            "hidden md:flex items-center border rounded-full px-3.5 h-9 w-52 lg:w-64 transition-all",
-            isWarm
-              ? "bg-white/80 border-[#E8D4C1] focus-within:border-[#D12B79]"
-              : "bg-[var(--lb-surface-2)] border-[var(--lb-border)] focus-within:border-[var(--lb-blue)]"
-          )}
+          className="hidden md:flex items-center bg-white/90 border border-[#F1DEC9] focus-within:border-[#D12B79] rounded-full px-3.5 h-9 w-52 lg:w-64 transition-all shadow-xs"
         >
-          <Search className={clsx("w-3.5 h-3.5 shrink-0 mr-2", isWarm ? "text-[#78716C]" : "text-[var(--lb-muted)]")} />
+          <Search className="w-3.5 h-3.5 text-[#78716C] shrink-0 mr-2" />
           <input
             type="text"
             value={quickQuery}
             onChange={(e) => setQuickQuery(e.target.value)}
             placeholder="Sơn Trà, Hội An..."
             aria-label="Tìm nhanh"
-            className={clsx(
-              "bg-transparent text-[13px] w-full focus:outline-none",
-              isWarm ? "text-[#1C1917] placeholder:text-[#78716C]" : "text-[var(--lb-text)] placeholder:text-[var(--lb-muted)]"
-            )}
+            className="bg-transparent text-[13px] text-[#1C1917] placeholder:text-[#78716C] w-full focus:outline-none"
           />
         </form>
 
@@ -105,8 +91,8 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
             className={clsx(
               'px-3.5 py-1.5 rounded-full transition-colors',
               location.pathname === '/'
-                ? (isWarm ? 'bg-[#D12B79] text-white font-semibold' : 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-semibold')
-                : (isWarm ? 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3E2CF]' : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]')
+                ? 'bg-[#D12B79] text-white font-semibold shadow-xs'
+                : 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3DEC8]'
             )}
           >
             {t('nav_home')}
@@ -116,8 +102,8 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
             className={clsx(
               'px-3.5 py-1.5 rounded-full transition-colors',
               location.pathname.startsWith('/how-it-works')
-                ? (isWarm ? 'bg-[#D12B79] text-white font-semibold' : 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-semibold')
-                : (isWarm ? 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3E2CF]' : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]')
+                ? 'bg-[#D12B79] text-white font-semibold shadow-xs'
+                : 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3DEC8]'
             )}
           >
             Giới thiệu
@@ -127,8 +113,8 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
             className={clsx(
               'px-3.5 py-1.5 rounded-full transition-colors',
               location.pathname.startsWith('/guides')
-                ? (isWarm ? 'bg-[#D12B79] text-white font-semibold' : 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-semibold')
-                : (isWarm ? 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3E2CF]' : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]')
+                ? 'bg-[#D12B79] text-white font-semibold shadow-xs'
+                : 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3DEC8]'
             )}
           >
             {t('nav_guides')}
@@ -138,8 +124,8 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
             className={clsx(
               'px-3.5 py-1.5 rounded-full transition-colors',
               location.pathname.startsWith('/don')
-                ? (isWarm ? 'bg-[#D12B79] text-white font-semibold' : 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-semibold')
-                : (isWarm ? 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3E2CF]' : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]')
+                ? 'bg-[#D12B79] text-white font-semibold shadow-xs'
+                : 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3DEC8]'
             )}
           >
             Lịch đặt
@@ -153,22 +139,22 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
             type="button"
             onClick={toggleLanguage}
             title="Đổi ngôn ngữ"
-            className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--lb-surface-2)] border border-[var(--lb-border)] text-[11px] font-bold text-[var(--lb-text)] hover:border-[var(--lb-blue)] cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-[#F1DEC9] text-[11px] font-bold text-[#1C1917] hover:border-[#D12B79] cursor-pointer shadow-xs"
           >
-            <Globe className="w-3.5 h-3.5 text-[var(--lb-blue)]" />
+            <Globe className="w-3.5 h-3.5 text-[#D12B79]" />
             <span>{i18n.language.toUpperCase()}</span>
           </button>
 
           {/* Chuyển nhanh 2 tài khoản hệ thống */}
-          <div className="hidden sm:flex items-center bg-[var(--lb-surface-2)] p-0.5 rounded-full border border-[var(--lb-border)]">
+          <div className="hidden sm:flex items-center bg-white p-0.5 rounded-full border border-[#F1DEC9] shadow-xs">
             <button
               type="button"
               onClick={() => handleQuickRoleSwitch('guide', 'u-guide-1')}
               className={clsx(
                 'px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer',
                 activeRole === 'guide'
-                  ? 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] shadow-xs'
-                  : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)]'
+                  ? 'bg-[#D12B79] text-white shadow-xs'
+                  : 'text-[#6E6259] hover:text-[#1C1917]'
               )}
             >
               HDV
@@ -179,8 +165,8 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
               className={clsx(
                 'px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer',
                 activeRole === 'admin'
-                  ? 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] shadow-xs'
-                  : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)]'
+                  ? 'bg-[#D12B79] text-white shadow-xs'
+                  : 'text-[#6E6259] hover:text-[#1C1917]'
               )}
             >
               Admin
@@ -190,11 +176,11 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
           <Link
             to="/thong-bao"
             aria-label="Thông báo"
-            className="relative p-2 rounded-full bg-[var(--lb-surface-2)] border border-[var(--lb-border)] hover:border-[var(--lb-blue)] text-[var(--lb-text)] transition-colors"
+            className="relative p-2 rounded-full bg-white border border-[#F1DEC9] hover:border-[#D12B79] text-[#1C1917] transition-colors shadow-xs"
           >
             <Bell className="w-4 h-4" />
             {unreadNotifsCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] text-[10px] font-bold flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-[#D12B79] text-white text-[10px] font-bold flex items-center justify-center">
                 {unreadNotifsCount}
               </span>
             )}
@@ -210,7 +196,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                       ? '/admin/kyc'
                       : '/ho-so-ca-nhan'
                 }
-                className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full bg-[var(--lb-surface-2)] border border-[var(--lb-border)] hover:border-[var(--lb-blue)] transition-colors"
+                className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full bg-white border border-[#F1DEC9] hover:border-[#D12B79] transition-colors shadow-xs"
               >
                 <img
                   src={
@@ -220,14 +206,14 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                   alt={displayUserName}
                   className="w-7 h-7 rounded-full object-cover"
                 />
-                <span className="hidden xl:block text-[12px] font-semibold text-[var(--lb-text)] max-w-[96px] truncate">
+                <span className="hidden xl:block text-[12px] font-semibold text-[#1C1917] max-w-[96px] truncate">
                   {displayUserName.split(' ').slice(-2).join(' ')}
                 </span>
               </Link>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="hidden sm:inline-block px-2 py-1 text-[12px] text-[var(--lb-muted)] hover:text-[var(--lb-text)] cursor-pointer"
+                className="hidden sm:inline-block px-2 py-1 text-[12px] text-[#6E6259] hover:text-[#1C1917] cursor-pointer"
               >
                 {t('common_logout')}
               </button>
@@ -236,13 +222,13 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
             <div className="flex items-center gap-1.5">
               <Link
                 to="/dang-nhap"
-                className="px-3 py-1.5 rounded-full text-[var(--lb-text)] text-[12px] font-semibold hover:bg-[var(--lb-surface-2)] transition-colors"
+                className="px-3.5 py-1.5 rounded-full text-[#D12B79] text-[13px] font-bold hover:bg-white/60 transition-colors"
               >
                 {t('common_login')}
               </Link>
               <Link
                 to="/dang-ky"
-                className="px-3.5 py-1.5 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] text-[12px] font-semibold hover:bg-[var(--lb-accent-hover)] transition-colors"
+                className="px-4 py-1.5 rounded-full bg-[#D12B79] text-white text-[13px] font-bold hover:bg-[#B51E63] shadow-xs transition-colors"
               >
                 {t('common_register')}
               </Link>
@@ -252,7 +238,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
           <button
             type="button"
             onClick={() => setMobileMenuOpen((v) => !v)}
-            className="lg:hidden p-2 rounded-full bg-[var(--lb-surface-2)] border border-[var(--lb-border)] text-[var(--lb-text)] cursor-pointer"
+            className="lg:hidden p-2 rounded-full bg-white border border-[#F1DEC9] text-[#1C1917] cursor-pointer shadow-xs"
             aria-label="Menu"
           >
             {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -261,22 +247,29 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
       </div>
 
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[var(--lb-surface)] border-t border-[var(--lb-border)] px-4 py-3 space-y-2.5">
-          <div className="flex flex-col gap-1 pb-2 border-b border-[var(--lb-border)] text-[13px]">
+        <div className="lg:hidden bg-[#FEEDDC] border-t border-[#F1DEC9] px-4 py-3 space-y-2.5">
+          <div className="flex flex-col gap-1 pb-2 border-b border-[#F1DEC9] text-[13px]">
             <Link
               to="/how-it-works"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg font-semibold text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)] flex items-center justify-between"
+              className="px-3 py-2 rounded-lg font-bold text-[#1C1917] hover:bg-white/80 flex items-center justify-between"
             >
               <span>🌟 Giới thiệu & Mô hình hoạt động</span>
-              <span className="text-xs text-[var(--lb-muted)]">Withlocals →</span>
+              <span className="text-xs text-[#D12B79]">Withlocals →</span>
             </Link>
             <Link
               to="/guides"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg font-semibold text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]"
+              className="px-3 py-2 rounded-lg font-bold text-[#1C1917] hover:bg-white/80"
             >
               🔍 Tìm Hướng dẫn viên
+            </Link>
+            <Link
+              to="/don-cua-toi"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-lg font-bold text-[#1C1917] hover:bg-white/80"
+            >
+              📋 Lịch đặt của tôi
             </Link>
           </div>
           <div className="flex items-center gap-1.5">
@@ -286,7 +279,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                 handleQuickRoleSwitch('guide', 'u-guide-1');
                 setMobileMenuOpen(false);
               }}
-              className="flex-1 py-1.5 rounded-full bg-[var(--lb-surface-2)] border border-[var(--lb-border)] text-[12px] font-semibold"
+              className="flex-1 py-1.5 rounded-full bg-white border border-[#F1DEC9] text-[12px] font-bold text-[#1C1917] shadow-xs"
             >
               HDV Khanh
             </button>
@@ -296,24 +289,24 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                 handleQuickRoleSwitch('admin', 'u-admin-1');
                 setMobileMenuOpen(false);
               }}
-              className="flex-1 py-1.5 rounded-full bg-[var(--lb-surface-2)] border border-[var(--lb-border)] text-[12px] font-semibold"
+              className="flex-1 py-1.5 rounded-full bg-white border border-[#F1DEC9] text-[12px] font-bold text-[#1C1917] shadow-xs"
             >
               Admin Hoàng
             </button>
           </div>
           {!currentUser && (
-            <div className="flex items-center gap-2 pt-1 border-t border-[var(--lb-border)]">
+            <div className="flex items-center gap-2 pt-2 border-t border-[#F1DEC9]">
               <Link
                 to="/dang-nhap"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex-1 py-2 text-center rounded-full bg-[var(--lb-surface-2)] border border-[var(--lb-border)] text-[13px] font-semibold"
+                className="flex-1 py-2 text-center rounded-full bg-white border border-[#F1DEC9] text-[#1C1917] text-[13px] font-bold shadow-xs"
               >
                 {t('common_login')}
               </Link>
               <Link
                 to="/dang-ky"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex-1 py-2 text-center rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] text-[13px] font-semibold"
+                className="flex-1 py-2 text-center rounded-full bg-[#D12B79] text-white text-[13px] font-bold shadow-xs"
               >
                 {t('common_register')}
               </Link>

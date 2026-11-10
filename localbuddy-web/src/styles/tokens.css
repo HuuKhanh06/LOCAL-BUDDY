@@ -1,11 +1,14 @@
 /* ============================================================
-   LOCALBUDDY ĐÀ NẴNG – DESIGN SYSTEM TOKENS
-   Tham khảo tiêu chuẩn Withlocals:
-   - Nền chủ đạo Withlocals: #FEEDDC (kem đào / linen ấm)
-   - Điểm nhấn thương hiệu: #D12B79 (hồng mận / raspberry magenta)
-   - Nền tối / Charcoal: #272A2D, #1E2124
-   - Thẻ & Bề mặt: #FFFFFF, #2F3337
-   - Điểm nhấn cam & xanh bổ trợ: #EB5B38, #347CCB
+   LOCALBUDDY ĐÀ NẴNG – DESIGN SYSTEM TOKENS (WITHLOCALS LIGHT WARM THEME)
+   Toàn bộ hệ thống giao diện chuẩn sáng ấm theo Withlocals:
+   - Nền chủ đạo: #FEEDDC (kem đào / linen ấm tự nhiên)
+   - Bề mặt thẻ trắng: #FFFFFF
+   - Bề mặt phụ ấm: #FDF6ED / #F8EDE2
+   - Viền thẻ ấm: #F1DEC9
+   - Chữ than đậm: #1C1917 (độ tương phản 15.29:1, đạt chuẩn WCAG AAA)
+   - Chữ phụ mờ ấm: #6E6259 (độ tương phản 5.8:1, đạt chuẩn WCAG AA)
+   - Điểm nhấn thương hiệu Withlocals: #D12B79 (hồng mận / raspberry magenta)
+   - Điểm nhấn nút tìm kiếm: #F2B33D (vàng hổ phách Withlocals)
    ============================================================ */
 
 :root {
@@ -15,29 +18,33 @@
   --lb-withlocals-primary-hover: #B51E63;
   --lb-withlocals-border: #F1DEC9;
   --lb-withlocals-card: #FFFFFF;
+  --lb-withlocals-amber: #F2B33D;
+  --lb-withlocals-amber-hover: #E0A22C;
 
-  /* Standard System Tokens */
-  --lb-bg: #272A2D;
-  --lb-bg-deep: #1E2124;
-  --lb-surface: #2F3337;
-  --lb-surface-2: #383D42;
-  --lb-border: #454B51;
-  --lb-text: #E6E4DC;
-  --lb-muted: #A8ABA8;
-  --lb-accent: #EB5B38;
-  --lb-accent-hover: #F06F4F;
-  --lb-on-accent: #1B1D1F;
-  --lb-accent-text: #F27C5E;
+  /* Standard System Tokens – Chuyển đổi toàn bộ sang nền sáng Withlocals */
+  --lb-bg: #FEEDDC;
+  --lb-bg-deep: #F5E2CF;
+  --lb-surface: #FFFFFF;
+  --lb-surface-2: #FDF6ED;
+  --lb-border: #F1DEC9;
+  --lb-text: #1C1917;
+  --lb-muted: #6E6259;
+  --lb-accent: #D12B79;
+  --lb-accent-hover: #B51E63;
+  --lb-on-accent: #FFFFFF;
+  --lb-accent-text: #B81B66;
   --lb-blue: #347CCB;
-  --lb-blue-text: #6FA3E0;
-  --lb-blue-solid: #2F6FB8;
+  --lb-blue-text: #285B9A;
+  --lb-blue-solid: #285B9A;
   --lb-sand: #FEEDDC;
   --lb-on-sand: #1C1917;
-  --lb-accent-on-sand: #D12B79;
+  --lb-accent-on-sand: #B81B66;
   --lb-blue-on-sand: #285B9A;
-  --lb-success: #4ADE80;
-  --lb-warning: #FBBF24;
-  --lb-error: #F87171;
+  --lb-amber: #F2B33D;
+  --lb-amber-hover: #E0A22C;
+  --lb-success: #16A34A;
+  --lb-warning: #D97706;
+  --lb-error: #DC2626;
 
   /* Semantic shortcuts */
   --color-bg: var(--lb-bg);

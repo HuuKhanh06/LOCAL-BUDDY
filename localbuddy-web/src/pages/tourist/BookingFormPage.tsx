@@ -146,26 +146,26 @@ export const BookingFormPage: React.FC = () => {
       </div>
 
       {/* Thẻ tóm tắt HDV & Ca đã chọn */}
-      <div className="bg-[#272A2D] text-white rounded-[22px] p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md">
+      <div className="bg-white text-[#1C1917] rounded-[22px] p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-[#F1DEC9] shadow-xs">
         <div className="flex items-center gap-4">
           <img
             src={profile.avatarUrl}
             alt={user.fullName}
-            className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-xs shrink-0"
+            className="w-16 h-16 rounded-full object-cover border-2 border-[#F1DEC9] shadow-xs shrink-0"
           />
           <div>
-            <span className="text-[11px] font-bold text-[#EB5B38] uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-[#D12B79] uppercase tracking-wider">
               Thổ địa đồng hành
             </span>
-            <h3 className="text-[20px] font-black text-white">{user.fullName}</h3>
-            <p className="text-[13px] text-white/80 mt-0.5">
+            <h3 className="text-[20px] font-black text-[#1C1917]">{user.fullName}</h3>
+            <p className="text-[13px] text-[#6E6259] mt-0.5">
               📅 Ngày {formatDate(date)} • ⏰ Khung {startTime} – {endTime} ({hours} giờ)
             </p>
           </div>
         </div>
-        <div className="sm:text-right bg-white/10 px-4 py-2.5 rounded-2xl border border-white/15">
-          <span className="text-[11px] text-white/70 block">Đơn giá niêm yết</span>
-          <span className="text-[18px] font-black text-white tabular-nums">
+        <div className="sm:text-right bg-[#FEEDDC] px-4 py-2.5 rounded-2xl border border-[#F1DEC9]">
+          <span className="text-[11px] text-[#78716C] block">Đơn giá niêm yết</span>
+          <span className="text-[18px] font-black text-[#D12B79] tabular-nums">
             {profile.hourlyRate.toLocaleString('vi-VN')} ₫ / giờ
           </span>
         </div>
@@ -218,8 +218,8 @@ export const BookingFormPage: React.FC = () => {
                   onClick={() => setMeetingLocation(spot)}
                   className={`px-3 py-1 rounded-full text-[12px] font-medium border transition-colors cursor-pointer ${
                     meetingLocation === spot
-                      ? 'bg-[#272A2D] text-white border-[#272A2D]'
-                      : 'bg-[#F3F1EC] text-[#1C1917] border-[#E7E5E4] hover:border-[#272A2D]'
+                      ? 'bg-[#D12B79] text-white border-[#D12B79]'
+                      : 'bg-white text-[#1C1917] border-[#F1DEC9] hover:border-[#D12B79]'
                   }`}
                 >
                   {spot}

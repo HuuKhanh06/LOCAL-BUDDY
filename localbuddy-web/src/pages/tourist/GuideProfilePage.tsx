@@ -107,7 +107,7 @@ export const GuideProfilePage: React.FC = () => {
     <div className="space-y-8 py-2">
       {/* 1. GALLERY: BENTO MEDIA THỰC TẾ ĐẦU TRANG */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3 h-[300px] sm:h-[380px]">
-        <div className="md:col-span-7 relative rounded-[24px] overflow-hidden bg-[#272A2D] border border-[#E7E5E4]">
+        <div className="md:col-span-7 relative rounded-[24px] overflow-hidden bg-[#FDF6ED] border border-[#F1DEC9]">
           <video
             autoPlay
             muted
@@ -131,7 +131,7 @@ export const GuideProfilePage: React.FC = () => {
         </div>
 
         <div className="hidden md:grid md:col-span-5 grid-rows-2 gap-3 h-full">
-          <div className="relative rounded-[20px] overflow-hidden bg-[#F3F1EC] border border-[#E7E5E4]">
+          <div className="relative rounded-[20px] overflow-hidden bg-[#FDF6ED] border border-[#F1DEC9]">
             <img
               src={profile.coverUrl}
               alt={user.fullName}
@@ -139,14 +139,14 @@ export const GuideProfilePage: React.FC = () => {
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-[20px] overflow-hidden bg-[#F3F1EC] border border-[#E7E5E4]">
+            <div className="rounded-[20px] overflow-hidden bg-[#FDF6ED] border border-[#F1DEC9]">
               <img
                 src="https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Golden_Bridge_%28Vietnam%29.jpg/1280px-Golden_Bridge_%28Vietnam%29.jpg"
                 alt="Cầu Vàng Đà Nẵng"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="rounded-[20px] overflow-hidden bg-[#F3F1EC] border border-[#E7E5E4]">
+            <div className="rounded-[20px] overflow-hidden bg-[#FDF6ED] border border-[#F1DEC9]">
               <img
                 src="https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Da-Nang_Vietnam_Coracles-01.jpg/1280px-Da-Nang_Vietnam_Coracles-01.jpg"
                 alt="Biển Đà Nẵng"

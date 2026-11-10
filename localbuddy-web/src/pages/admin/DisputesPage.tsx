@@ -165,7 +165,7 @@ export const DisputesPage: React.FC = () => {
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E7E5E4] pb-4">
                   <div className="flex flex-wrap items-center gap-2.5">
-                    <span className="font-mono font-extrabold text-sm px-2.5 py-1 rounded bg-[#272A2D] text-[#E6E4DC]">
+                    <span className="font-mono font-extrabold text-sm px-2.5 py-1 rounded bg-[#FEEDDC] text-[#1C1917] border border-[#F1DEC9]">
                       {disp.id}
                     </span>
                     <span className="font-bold text-sm text-[#1C1917]">

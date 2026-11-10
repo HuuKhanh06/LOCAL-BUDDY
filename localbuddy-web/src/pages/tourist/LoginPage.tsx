@@ -9,6 +9,7 @@ import { Input } from '../../components/ui/Input';
 import { useBookingContext } from '../../context/BookingContext';
 import { useToast } from '../../components/ui/Toast';
 import { supabaseAuthApi, isSupabaseConfigured } from '../../lib/supabase';
+import { Logo } from '../../components/common/Logo';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -88,8 +89,8 @@ export const LoginPage: React.FC = () => {
     <div className="max-w-md mx-auto py-12 px-4">
       <div className="bg-[var(--lb-surface)] border border-[var(--lb-border)] rounded-[24px] p-6 sm:p-8 shadow-xl space-y-6">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-black text-[16px] flex items-center justify-center mx-auto mb-3">
-            LB
+          <div className="flex justify-center mb-3">
+            <Logo variant="icon" size="lg" />
           </div>
           <h1 className="text-[22px] font-bold text-[var(--lb-text)]">
             Đăng nhập hệ thống

@@ -11,6 +11,7 @@ import { useToast } from '../../components/ui/Toast';
 import { useBookingContext } from '../../context/BookingContext';
 import { DANANG_AREAS, GUIDE_LANGUAGES } from '../../data/mockData';
 import { supabaseAuthApi } from '../../lib/supabase';
+import { Logo } from '../../components/common/Logo';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -131,6 +132,9 @@ export const RegisterPage: React.FC = () => {
     <div className="max-w-xl mx-auto py-10 px-4">
       <div className="bg-[var(--lb-surface)] border border-[var(--lb-border)] rounded-[24px] p-6 sm:p-8 shadow-xl space-y-6">
         <div className="text-center">
+          <div className="flex justify-center mb-3">
+            <Logo variant="icon" size="lg" />
+          </div>
           <h1 className="text-[22px] font-bold text-[var(--lb-text)]">
             Đăng ký tài khoản LocalBuddy
           </h1>
