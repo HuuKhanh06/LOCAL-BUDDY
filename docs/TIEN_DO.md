@@ -1,25 +1,24 @@
 # BÁO CÁO TIẾN ĐỘ THỰC HIỆN DỰ ÁN (TIEN_DO.md)
 
-## 1. TỔNG QUAN CÁC GIAI ĐOẠN
-- [x] **GĐ0: Kiểm toán & Kế hoạch** (Trích tài liệu, lập ma trận 29 UC, kiểm toán bản cũ, chép quy tắc bất biến)
-- [x] **GĐ1: Nền móng** (Dọn dẹp code rác, thiết lập bảng màu tokens mới, cấu hình i18n, router, Auth Supabase)
-- [x] **GĐ2: CSDL & Logic Server** (Migrations Postgres, enum, RPC T1–T19, RLS, lazy expiry, seed data)
-- [x] **GĐ3: Thanh toán & Ví** (PaymentProvider Sandbox + VNPay, Edge Functions, hóa đơn cọc, Thỏa thuận dịch vụ)
-- [x] **GĐ4: Lát cắt dọc luồng chính** (Tìm kiếm, xem hồ sơ, đặt lịch, chấp nhận, cọc 30%, xác nhận)
-- [x] **GĐ5: Hoàn tất & Tiền** (Yêu cầu hoàn thành, xác nhận hoàn thành, trả 70% Online / Tiền mặt, rút tiền, review)
-- [x] **GĐ6: Hủy · Tranh chấp · Admin** (Modal hủy xem trước, xử lý tranh chấp, quản trị KYC/rút tiền/phí sàn)
-- [x] **GĐ7: Trang công khai & Media** (Landing page, video hero, ảnh Đà Nẵng, trang tĩnh pháp lý, CREDITS.md)
-- [x] **GĐ8: Hoàn thiện** (Kiểm toán sạch audit-clean, WCAG AA, Lighthouse, đa ngôn ngữ vi/en, Vitest E2E 11/11 ✅)
-- [x] **GĐ9: Triển khai & Báo cáo** (Deploy GitHub Pages / Actions, smoke test, BAO_CAO_CUOI.md, tag v1.0.0)
+## 1. TỔNG QUAN CÁC GIAI ĐOẠN (GĐ0 → GĐ11)
+- [x] **GĐ0: Kiểm toán & Kế hoạch** (Trích tài liệu 29 UC, lập ma trận truy vết UC_TRACE, kiểm toán 10 lỗi bản cũ, chép quy tắc bất biến mục [2][3]).
+- [x] **GĐ1: Nền móng & Design System** (Dọn code thừa, thiết lập tokens `--lb-*`, font Be Vietnam Pro, i18n chuẩn 18 thông báo, 4 layouts, RBAC guard, manifest PWA).
+- [x] **GĐ2: CSDL & Logic Server** (Migrations PostgreSQL 27 bảng RLS, enum, server functions T1–T19, Atomic slot lock, lazy expiry, seed data chuẩn).
+- [x] **GĐ3: Thanh toán & Ví** (PaymentProvider Sandbox/VNPay, Thỏa thuận dịch vụ điện tử BR-10, ví Guide, đối soát dòng tiền).
+- [x] **GĐ4: Lát cắt dọc luồng chính** (Tìm kiếm, xem hồ sơ, đặt lịch PENDING, chấp nhận 24h, cọc 30% giữ chỗ nguyên tử 15p, CONFIRMED).
+- [x] **GĐ5: Hoàn tất & Tiền** (Yêu cầu hoàn thành sau tour, cửa sổ xác nhận 24h, thanh toán 70% Online / Tiền mặt, đối soát ví HDV).
+- [x] **GĐ6: Hủy · Tranh chấp · Admin** (Modal hủy xem trước phạt cọc 3 bậc ΔT, xử lý tranh chấp 2 nhánh tài chính, thẩm định KYC, cấu hình phí sàn 10%–15%).
+- [x] **GĐ7: Trang công khai & Media** (Landing page, video hero mp4, ảnh thực tế Đà Nẵng, trang tĩnh điều khoản/chính sách, CREDITS.md).
+- [x] **GĐ8: Hoàn thiện & Kiểm toán** (Script audit-clean 0 lỗi TODO/lorem, WCAG AA contrast ≥ 4.5:1, 11/11 automated tests pass).
+- [x] **GĐ9: Triển khai & Báo cáo** (CI/CD GitHub Actions deploy GitHub Pages, xuất bản BAO_CAO_CUOI.md, phát hành git tag v1.0.0).
+- [x] **GĐ10: Chuẩn hóa UI/UX Mục [9] & [10]** (Trang chủ 3 bước, khối tin cậy KYC/giá/hủy, FAQ accordion, profile 2 cột sticky, timeline dọc).
+- [x] **GĐ11: Nghiệm thu toàn diện & Xác thực chất lượng** (Build production sạch 100%, 0 vi phạm phạm vi, bảo mật ẩn tuyệt đối phí sàn với Tourist).
 
 ---
 
-## 2. CHI TIẾT TRẠNG THÁI HIỆN TẠI
-- **Giai đoạn đang thực hiện**: Hoàn tất GĐ9 — Xuất bản Báo cáo cuối và chuẩn bị phát hành v1.0.0.
-- **Kết quả nghiệm thu**:
-  1. 29/29 Use Case đạt chuẩn nghiệm thu theo `docs/UC_TRACE.md`.
-  2. Toàn bộ 11 tests Vitest (Hạ tầng DB, RLS, Quyết toán tiền, Vòng đời E2E) chạy qua 100%.
-  3. Đã loại bỏ hoàn toàn tính năng thừa (Chat, tin nhắn 2 chiều, mã giảm giá, tiền tệ ngoài VNĐ).
-  4. Đã ẩn tuyệt đối phí sàn `fee_rate` và tiền phí đối với Tourist ở mọi màn hình và chứng từ.
-  5. Đã cấu hình GitHub Actions tự động build và deploy lên GitHub Pages `https://HuuKhanh06.github.io/LOCAL-BUDDY/`.
-  6. Hồ sơ bản quyền media đầy đủ tại `docs/CREDITS.md`.
+## 2. KẾT QUẢ NGHIỆM THU TOÀN DIỆN
+1. **29/29 Use Case**: Hoàn tất 100% theo đúng ma trận truy vết tại `docs/UC_TRACE.md`.
+2. **Kiểm thử tự động**: 11/11 bài test Vitest (8 server rules RLS/RPC + 3 E2E lifecycle) vượt qua 100%.
+3. **Bảo mật & Quyền riêng tư**: Ẩn tuyệt đối `fee_rate` và tiền phí sàn với Tourist; SĐT & Email Guide chỉ mở sau khi cọc 30% thành công.
+4. **Phạm vi nghiệp vụ**: Chuẩn 29 UC, 0 chat/messaging nội bộ, 0 đánh giá 2 chiều (chỉ Tourist đánh giá Guide), 0 tour trọn gói, 0 tiền tệ ngoài VNĐ.
+5. **Truy cập trực tuyến**: Tự động build và deploy tại `https://huukhanh06.github.io/LOCAL-BUDDY/`.
