@@ -2,7 +2,7 @@
 // Bảng màu chuẩn: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState } from 'react';
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { Bell, Menu, Search } from 'lucide-react';
 import {
   Header,
@@ -16,7 +16,7 @@ import { Logo } from '../components/common/Logo';
 
 const CommercialFooter: React.FC = () => {
   return (
-    <footer className="bg-[#F5E5D5] text-[#6E6259] border-t border-[#E8D4C1] mt-16 py-10">
+    <footer className="bg-[#F5E5D5] text-[#6E6259] border-t border-[#EAD7C2] mt-16 py-10">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3">
           <Logo size="sm" />
@@ -25,31 +25,31 @@ const CommercialFooter: React.FC = () => {
               LocalBuddy Đà Nẵng
             </span>
             <span className="text-[12px] text-[#78716C]">
-              Đặt Hướng dẫn viên bản địa theo giờ • Cọc 30% giữ chỗ • Hoàn 100% trước 48h
+              Đặt Thổ địa bản xứ theo giờ • Cọc 30% giữ chỗ nguyên tử • Hoàn 100% trước 48h
             </span>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-5 text-[13px] font-semibold text-[#6E6259]">
           <Link to="/how-it-works" className="hover:text-[#D12B79] transition-colors">
-            Cách hoạt động
+            Giới thiệu
           </Link>
           <Link to="/become-a-guide" className="hover:text-[#D12B79] transition-colors">
-            Trở thành Guide
+            Trở thành Thổ địa
           </Link>
           <Link to="/cancellation-policy" className="hover:text-[#D12B79] transition-colors">
-            Chính sách hủy
+            Chính sách hủy đơn
           </Link>
           <Link to="/safety" className="hover:text-[#D12B79] transition-colors">
-            An toàn
+            An toàn & Tin cậy
           </Link>
           <Link to="/faq" className="hover:text-[#D12B79] transition-colors">
-            Hỏi đáp
+            Câu hỏi thường gặp
           </Link>
         </div>
       </div>
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 mt-6 pt-4 border-t border-[#E8D4C1] text-center text-[11px] text-[#78716C]">
-        Dự án học phần Phân tích & Thiết kế Hệ thống Nâng cao — dữ liệu minh hoạ.
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 mt-6 pt-4 border-t border-[#EAD7C2] text-center text-[12px] text-[#78716C]">
+        © 2026 LocalBuddy Đà Nẵng. Nền tảng kết nối Thổ địa bản xứ theo giờ hàng đầu tại Đà Nẵng.
       </div>
     </footer>
   );

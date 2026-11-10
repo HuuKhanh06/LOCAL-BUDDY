@@ -1,8 +1,9 @@
 // pages/public/HomePage.tsx
 // Trang chủ LocalBuddy phong cách Withlocals sáng ấm (#FEEDDC)
-// Bố cục chuẩn theo ảnh mẫu Withlocals:
+// Bố cục chuẩn theo ảnh mẫu Withlocals (https://www.withlocals.com/fr/):
 // - Hero banner: Tiêu đề lớn màu than đậm & điểm nhấn hồng mận (#D12B79), ô tìm kiếm dạng pill nổi nền trắng với nút vàng hổ phách (#F2B33D), khối ảnh ghép mosaic địa danh Đà Nẵng
-// - Thẻ điểm đến: Phong cách 'QUE FAIRE À...' chuẩn ảnh mẫu với ảnh trên, giới thiệu dưới, hàng avatar Thổ địa kèm vòng tròn xanh + và nút hồng mận 'Khám phá tour'
+// - Thẻ điểm đến: Phong cách 'QUE FAIRE À...' chuẩn ảnh mẫu với ảnh trên, giới thiệu dưới, hàng avatar Thổ địa kèm vòng tròn xanh + và nút hồng mận 'Khám phá tour', viền thẻ ấm (#EAD7C2)
+// - Khối Tour Ẩm thực & Văn hóa Đánh số (1-5) chuẩn mẫu Withlocals (ảnh món ăn, số thứ tự, mô tả, avatar stack, nút khám phá)
 // - Quy trình 3 bước giữ cọc 30%/70%
 // - Hàng Thổ địa tiêu biểu (100% KYC)
 // - Khối cam kết an tâm & Đánh giá thật
@@ -10,10 +11,10 @@
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, MapPin, Calendar, Clock, Star, ArrowRight, ShieldCheck, CheckCircle2, ChevronDown } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, ArrowRight, ChevronDown } from 'lucide-react';
 import { useBookingContext } from '../../context/BookingContext';
 import { GuideCard } from '../../components/common/GuideCard';
-import { DANANG_AREAS, GUIDE_LANGUAGES } from '../../data/mockData';
+import { DANANG_AREAS } from '../../data/mockData';
 import { Logo } from '../../components/common/Logo';
 
 interface DestinationCardItem {
@@ -43,7 +44,7 @@ const DESTINATION_CARDS: DestinationCardItem[] = [
   },
   {
     id: 'dest-2',
-    destination: 'Cầu Rồng & Chợ Cồn',
+    destination: 'Cầu Rồng & Sông Hàn',
     headline: 'Ẩm thực đêm & Sông Hàn lung linh',
     desc: 'Bạn đến Đà Nẵng và tìm kiếm hương vị bản địa? Thổ địa sẽ cùng bạn lùng sục ngõ chợ Cồn thưởng thức mì Quảng, bánh xèo tôm nhảy và xem Rồng phun lửa.',
     image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Marine_da_nang.jpg/1280px-Marine_da_nang.jpg',
@@ -66,6 +67,130 @@ const DESTINATION_CARDS: DestinationCardItem[] = [
       'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200&auto=format&fit=crop&q=80',
     ],
     areaParam: 'Ngũ Hành Sơn',
+  },
+  {
+    id: 'dest-4',
+    destination: 'Ngũ Hành Sơn & Non Nước',
+    headline: 'Huyền tích động cổ & Làng đá 400 năm',
+    desc: 'Khám phá huyền tích Phật giáo trong các hang động kỳ ảo tại Động Huyền Không, viếng Chùa Linh Ứng non nước và chiêm ngưỡng nghề điêu khắc đá truyền thống.',
+    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800&auto=format&fit=crop&q=85',
+    guideCount: 25,
+    guideAvatars: [
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+    ],
+    areaParam: 'Ngũ Hành Sơn',
+  },
+  {
+    id: 'dest-5',
+    destination: 'Bà Nà Hills & Cầu Vàng',
+    headline: 'Cầu Vàng mây phủ & Làng Pháp',
+    desc: 'Trải nghiệm cáp treo kỷ lục ngắm trọn thung lũng xanh mướt, dạo bước trên Cầu Vàng giữa biển mây bồng bềnh và lắng nghe những tích truyện xứ Đà cùng Thổ địa.',
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Golden_Bridge_%28Vietnam%29.jpg/1280px-Golden_Bridge_%28Vietnam%29.jpg',
+    guideCount: 38,
+    guideAvatars: [
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200&auto=format&fit=crop&q=80',
+    ],
+    areaParam: 'Hải Châu',
+  },
+  {
+    id: 'dest-6',
+    destination: 'Phố cổ Hội An & Rừng dừa',
+    headline: 'Đèn lồng sông Hoài & Chèo thúng',
+    desc: 'Thả đèn hoa đăng lung linh dòng sông Hoài, ngồi thuyền thúng len lỏi giữa rừng dừa Bảy Mẫu và thưởng thức món cao lầu, bánh bao bánh vạc trứ danh.',
+    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=85',
+    guideCount: 45,
+    guideAvatars: [
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
+    ],
+    areaParam: 'Ngũ Hành Sơn',
+  },
+];
+
+interface NumberedTourItem {
+  id: string;
+  number: number;
+  title: string;
+  shortTitle: string;
+  desc: string;
+  image: string;
+  guideCount: number;
+  guideAvatars: string[];
+  param: string;
+}
+
+const NUMBERED_TOURS: NumberedTourItem[] = [
+  {
+    id: 'tour-1',
+    number: 1,
+    title: 'Ẩm thực Chợ Cồn & Phố đêm',
+    shortTitle: 'Chợ Cồn & Ẩm thực đêm',
+    desc: 'Chợ Cồn là thiên đường ẩm thực đường phố lừng danh Đà thành. Thổ địa dẫn bạn thưởng thức mì Quảng ếch, bánh xèo tôm nhảy và ốc hút cay nồng chuẩn vị bản xứ.',
+    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=85',
+    guideCount: 28,
+    guideAvatars: [
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
+    ],
+    param: 'Ẩm thực bản địa',
+  },
+  {
+    id: 'tour-2',
+    number: 2,
+    title: 'Hải sản Biển Mỹ Khê & Làng chài Mân Thái',
+    shortTitle: 'Hải sản Biển Mỹ Khê',
+    desc: 'Đà Nẵng là thiên đường hải sản tươi sống phong vị miền Trung. Cùng thổ địa đón thuyền thúng cập bến sớm mai, thưởng thức ghẹ hấp sả, mực nướng sa tế và chip chip xào lá quế.',
+    image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=800&auto=format&fit=crop&q=85',
+    guideCount: 18,
+    guideAvatars: [
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
+    ],
+    param: 'Ẩm thực bản địa',
+  },
+  {
+    id: 'tour-3',
+    number: 3,
+    title: 'Bán đảo Sơn Trà & Đỉnh Bàn Cờ',
+    shortTitle: 'Bán đảo Sơn Trà',
+    desc: 'Trekking qua tán rừng nguyên sinh ngắm loài linh trưởng Voọc chà vá chân nâu quý hiếm. Dừng chân tại Đỉnh Bàn Cờ uống trà ngắm trọn toàn cảnh vịnh biển Đà Nẵng từ trên cao.',
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=85',
+    guideCount: 22,
+    guideAvatars: [
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200&auto=format&fit=crop&q=80',
+    ],
+    param: 'Thiên nhiên & Trekking Sơn Trà',
+  },
+  {
+    id: 'tour-4',
+    number: 4,
+    title: 'Cầu Rồng, Cầu Tình Yêu & Sông Hàn về đêm',
+    shortTitle: 'Cầu Rồng & Sông Hàn',
+    desc: 'Thưởng ngoạn màn trình diễn Rồng phun lửa và phun nước độc đáo vào cuối tuần. Tận hưởng gió mát trên du thuyền sông Hàn và hòa mình vào nhịp sống sôi động của phố đi bộ Bạch Đằng.',
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Marine_da_nang.jpg/1280px-Marine_da_nang.jpg',
+    guideCount: 31,
+    guideAvatars: [
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
+    ],
+    param: 'Khám phá Đà Nẵng về đêm',
+  },
+  {
+    id: 'tour-5',
+    number: 5,
+    title: 'Làng đá Non Nước & Ngũ Hành Sơn',
+    shortTitle: 'Ngũ Hành Sơn & Non Nước',
+    desc: 'Chiêm ngưỡng kiệt tác điêu khắc đá mỹ nghệ Non Nước hơn 400 năm tuổi, chinh phục các ngọn Kim, Mộc, Thủy, Hỏa, Thổ và khám phá sự huyền bí trong Động Huyền Không cổ kính.',
+    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800&auto=format&fit=crop&q=85',
+    guideCount: 25,
+    guideAvatars: [
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200&auto=format&fit=crop&q=80',
+    ],
+    param: 'Nhiếp ảnh & Check-in',
   },
 ];
 
@@ -126,7 +251,6 @@ export const HomePage: React.FC = () => {
   const [selectedArea, setSelectedArea] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedHours, setSelectedHours] = useState('3');
-  const [selectedLang, setSelectedLang] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const availableDates = Array.from(
@@ -139,13 +263,12 @@ export const HomePage: React.FC = () => {
     if (selectedArea) params.set('area', selectedArea);
     if (selectedDate) params.set('date', selectedDate);
     if (selectedHours) params.set('hours', selectedHours);
-    if (selectedLang) params.set('lang', selectedLang);
     navigate(`/guides?${params.toString()}`);
   };
 
   return (
     <div className="bg-[#FEEDDC] text-[#1C1917] space-y-16 sm:space-y-24 py-4 sm:py-8">
-      {/* 1. HERO SECTION WITHLOCALS (Chuẩn mẫu media_1794288431741_ce8b68dc.jpg) */}
+      {/* 1. HERO SECTION WITHLOCALS (Chuẩn mẫu media_1794289911371_f8b0b2d1.jpg) */}
       <section className="max-w-[1320px] mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
           {/* Left Hero Content */}
@@ -153,14 +276,14 @@ export const HomePage: React.FC = () => {
             <div className="space-y-4">
               <Link
                 to="/how-it-works"
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#F1DEC9] text-[#D12B79] text-xs font-bold shadow-xs hover:bg-white/80 transition-all"
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#EAD7C2] text-[#D12B79] text-xs font-bold shadow-xs hover:bg-white/80 transition-all"
               >
                 <Logo variant="icon" size="sm" />
                 <span>Nền tảng đặt Thổ địa theo giờ chuẩn Withlocals →</span>
               </Link>
 
-              <h1 className="text-[40px] sm:text-[56px] lg:text-[64px] font-black tracking-tight leading-[1.08] text-[#1C1917]">
-                Trải nghiệm kỳ thú,{' '}
+              <h1 className="text-[38px] sm:text-[54px] lg:text-[62px] font-black tracking-tight leading-[1.08] text-[#1C1917]">
+                Trải nghiệm đầy mê hoặc,{' '}
                 <span className="block text-[#D12B79]">cùng người bản xứ tuyệt vời</span>
               </h1>
 
@@ -173,14 +296,14 @@ export const HomePage: React.FC = () => {
             <form
               onSubmit={handleSearch}
               aria-label="Tìm Thổ địa bản địa Đà Nẵng"
-              className="bg-white rounded-[32px] sm:rounded-full p-2.5 sm:p-2 sm:pl-6 shadow-xl border border-[#F1DEC9] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5"
+              className="bg-white rounded-[32px] sm:rounded-full p-2.5 sm:p-2 sm:pl-6 shadow-xl border border-[#EAD7C2] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5"
             >
               {/* Điểm đến */}
               <div className="flex-1 flex items-center gap-2.5 px-2">
                 <MapPin className="w-5 h-5 text-[#D12B79] shrink-0" />
                 <div className="flex flex-col min-w-0 flex-1">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-[#78716C]">
-                    Điểm đến tại Đà Nẵng
+                    Bạn muốn đi đâu?
                   </span>
                   <select
                     id="hp-search-area"
@@ -199,7 +322,7 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="hidden sm:block w-[1px] h-8 bg-[#F1DEC9]" />
+              <div className="hidden sm:block w-[1px] h-8 bg-[#EAD7C2]" />
 
               {/* Ngày đi */}
               <div className="flex items-center gap-2 px-2 sm:w-40">
@@ -225,7 +348,7 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="hidden sm:block w-[1px] h-8 bg-[#F1DEC9]" />
+              <div className="hidden sm:block w-[1px] h-8 bg-[#EAD7C2]" />
 
               {/* Số giờ thuê */}
               <div className="flex items-center gap-2 px-2 sm:w-28">
@@ -264,7 +387,7 @@ export const HomePage: React.FC = () => {
             {/* Trust rating badge */}
             <div className="flex flex-wrap items-center gap-3 text-[13px] font-semibold text-[#1C1917] pt-1">
               <span className="flex items-center gap-1">
-                <span>Xuất sắc 4.9 trên 5</span>
+                <span>Xuất sắc 4.8 trên 5</span>
                 <span className="text-emerald-700 font-bold">★ Trustpilot</span>
               </span>
               <span className="text-[#D8C7B5]">•</span>
@@ -345,37 +468,46 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {/* Carousel navigation pills */}
+            <div className="flex items-center justify-center gap-3 pt-4 text-xs font-bold text-[#6E6259]">
+              <span className="cursor-pointer hover:text-[#1C1917]">‹</span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EAD7C2] text-[#1C1917] shadow-xs">
+                📍 Đà Nẵng, Việt Nam
+              </span>
+              <span className="cursor-pointer hover:text-[#1C1917]">›</span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 2. KHỐI THẺ ĐIỂM ĐẾN 'QUE FAIRE À...' (Chuẩn 100% mẫu media_1794288420521_05caa072.jpg) */}
+      {/* 2. KHỐI THẺ ĐIỂM ĐẾN 'VIVEZ LOCAL DANS DES VILLES CHARMANTES' (Chuẩn 100% mẫu Withlocals media_1794289944077_b9ba7517.jpg) */}
       <section className="max-w-[1320px] mx-auto px-4 sm:px-6 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <span className="px-3.5 py-1 rounded-full bg-white border border-[#F1DEC9] text-[#D12B79] text-xs font-bold uppercase tracking-wider">
-              Khám phá Đà Nẵng
-            </span>
-            <h2 className="text-[28px] sm:text-[38px] font-black text-[#1C1917] tracking-tight mt-2">
-              Những trải nghiệm cùng người bản xứ
+            <h2 className="text-[28px] sm:text-[40px] font-black text-[#1C1917] tracking-tight">
+              Trải nghiệm bản địa tại các <span className="text-[#D12B79]">Điểm đến quyến rũ</span>
             </h2>
+            <p className="text-[14px] sm:text-[16px] text-[#6E6259] mt-1 font-medium">
+              Tìm kiếm buổi đồng hành riêng tư với một trong những thổ địa bản xứ của chúng tôi
+            </p>
           </div>
           <Link
             to="/guides"
-            className="text-[14px] font-bold text-[#D12B79] hover:underline inline-flex items-center gap-1"
+            className="text-[14px] font-bold text-[#D12B79] hover:underline inline-flex items-center gap-1 shrink-0"
           >
             <span>Tất cả điểm đến & Thổ địa</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
-        {/* Lưới thẻ theo phong cách thẻ thành phố Withlocals */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        {/* Lưới thẻ theo phong cách thẻ thành phố Withlocals có viền ấm rõ nét */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {DESTINATION_CARDS.map((item) => (
             <div
               key={item.id}
               onClick={() => navigate(`/guides?area=${encodeURIComponent(item.areaParam)}`)}
-              className="bg-white rounded-[26px] overflow-hidden border border-[#F1DEC9] shadow-xs hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between group"
+              className="bg-white rounded-[26px] overflow-hidden border border-[#EAD7C2] shadow-xs hover:shadow-xl hover:border-[#D12B79] transition-all cursor-pointer flex flex-col justify-between group"
             >
               {/* Phần ảnh trên với tiêu đề QUE FAIRE À / TRẢI NGHIỆM TẠI */}
               <div className="relative h-60 sm:h-64 overflow-hidden">
@@ -385,10 +517,10 @@ export const HomePage: React.FC = () => {
                   loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="absolute bottom-5 left-5 right-5 text-center">
                   <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] text-white/90 border-b border-white/40 pb-1 mb-1">
-                    TRẢI NGHIỆM TẠI
+                    BẠN MUỐN LÀM GÌ TẠI
                   </span>
                   <h3 className="text-[22px] sm:text-[24px] font-black text-white drop-shadow-sm">
                     {item.destination}
@@ -396,14 +528,14 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Phần thân mô tả */}
-              <div className="p-6 space-y-5 flex-1 flex flex-col justify-between">
+              {/* Phần thân mô tả trên nền kem Withlocals nhẹ */}
+              <div className="p-6 space-y-5 flex-1 flex flex-col justify-between bg-white">
                 <p className="text-[13px] text-[#6E6259] leading-relaxed">
                   {item.desc}
                 </p>
 
                 {/* Hàng dưới: Avatar Thổ địa + Vòng tròn xanh lá + Nút hồng mận Withlocals */}
-                <div className="pt-4 border-t border-[#F1DEC9]/70 flex items-center justify-between gap-3">
+                <div className="pt-4 border-t border-[#EAD7C2] flex items-center justify-between gap-3">
                   <div className="flex items-center -space-x-2">
                     {item.guideAvatars.map((url, i) => (
                       <img
@@ -413,7 +545,7 @@ export const HomePage: React.FC = () => {
                         className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-xs"
                       />
                     ))}
-                    <span className="w-8 h-8 rounded-full bg-[#708B46] text-white text-[11px] font-bold flex items-center justify-center border-2 border-white shadow-xs">
+                    <span className="w-8 h-8 rounded-full bg-[#5D8035] text-white text-[11px] font-bold flex items-center justify-center border-2 border-white shadow-xs">
                       +{item.guideCount}
                     </span>
                   </div>
@@ -431,11 +563,84 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. QUY TRÌNH 3 BƯỚC HOẠT ĐỘNG (Thẻ trắng trên nền sáng ấm) */}
+      {/* 3. KHỐI TOUR ẨM THỰC & VĂN HÓA ĐÁNH SỐ (1-5) (Chuẩn 100% ảnh mẫu Withlocals media_1794290060825_b0cb0216.jpg) */}
+      <section className="max-w-[1320px] mx-auto px-4 sm:px-6 space-y-6">
+        <div>
+          <h2 className="text-[28px] sm:text-[40px] font-black text-[#1C1917] tracking-tight">
+            Tour Ẩm thực & Văn hóa <span className="text-[#D12B79]">Đặc sắc</span>
+          </h2>
+          <p className="text-[14px] sm:text-[16px] text-[#6E6259] mt-1 font-medium">
+            Hành trình vị giác và giai thoại miền Trung không thể nào quên cùng thổ địa sành ăn
+          </p>
+        </div>
+
+        {/* Lưới các thẻ ẩm thực đánh số Withlocals với viền ấm #EAD7C2 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {NUMBERED_TOURS.map((tour) => (
+            <div
+              key={tour.id}
+              onClick={() => navigate(`/guides?skill=${encodeURIComponent(tour.param)}`)}
+              className="bg-white rounded-[24px] overflow-hidden border border-[#EAD7C2] shadow-xs hover:shadow-xl hover:border-[#D12B79] transition-all cursor-pointer flex flex-col justify-between group"
+            >
+              {/* Ảnh món ăn hoặc cảnh quan phía trên */}
+              <div className="relative h-56 sm:h-60 overflow-hidden">
+                <img
+                  src={tour.image}
+                  alt={tour.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <span className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-white/95 text-[#1C1917] font-black text-xs border border-[#EAD7C2] shadow-xs">
+                  Điểm đến #{tour.number}
+                </span>
+              </div>
+
+              {/* Phần thông tin đánh số */}
+              <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <h3 className="text-[19px] sm:text-[21px] font-black text-[#1C1917] group-hover:text-[#D12B79] transition-colors">
+                    {tour.number}. {tour.shortTitle}
+                  </h3>
+                  <p className="text-[13px] text-[#6E6259] leading-relaxed line-clamp-3">
+                    {tour.desc}
+                  </p>
+                </div>
+
+                {/* Hàng nút dưới cùng: Avatar stack + green circle + Magenta button */}
+                <div className="pt-4 border-t border-[#EAD7C2] flex items-center justify-between gap-3">
+                  <div className="flex items-center -space-x-2">
+                    {tour.guideAvatars.map((url, i) => (
+                      <img
+                        key={i}
+                        src={url}
+                        alt="Local Guide"
+                        className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-xs"
+                      />
+                    ))}
+                    <span className="w-8 h-8 rounded-full bg-[#5D8035] text-white text-[11px] font-bold flex items-center justify-center border-2 border-white shadow-xs">
+                      +{tour.guideCount}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="px-4 py-2 rounded-xl bg-white hover:bg-[#FEEDDC] border border-[#D12B79] text-[#D12B79] font-bold text-[12px] shadow-xs transition-colors cursor-pointer group-hover:bg-[#D12B79] group-hover:text-white"
+                  >
+                    Khám phá {tour.guideCount} tour
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 4. QUY TRÌNH 3 BƯỚC HOẠT ĐỘNG (Thẻ trắng viền ấm #EAD7C2 trên nền sáng) */}
       <section className="max-w-[1320px] mx-auto px-4 sm:px-6">
-        <div className="bg-white rounded-[32px] p-8 sm:p-12 border border-[#F1DEC9] shadow-xs space-y-10">
+        <div className="bg-white rounded-[32px] p-8 sm:p-12 border border-[#EAD7C2] shadow-xs space-y-10">
           <div className="text-center max-w-xl mx-auto space-y-2">
-            <span className="inline-block px-3.5 py-1 rounded-full bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] text-[11px] font-bold uppercase tracking-wider">
+            <span className="inline-block px-3.5 py-1 rounded-full bg-[#FEEDDC] text-[#D12B79] border border-[#EAD7C2] text-[11px] font-bold uppercase tracking-wider">
               Quy trình 3 bước Withlocals
             </span>
             <h2 className="text-[26px] sm:text-[34px] font-black tracking-tight text-[#1C1917]">
@@ -447,8 +652,8 @@ export const HomePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-[#FEEDDC]/50 rounded-[22px] p-6 space-y-3 border border-[#F1DEC9]">
-              <div className="w-12 h-12 rounded-2xl bg-white text-[#D12B79] border border-[#F1DEC9] font-black text-[20px] flex items-center justify-center shadow-xs">
+            <div className="bg-[#FEEDDC]/50 rounded-[22px] p-6 space-y-3 border border-[#EAD7C2]">
+              <div className="w-12 h-12 rounded-2xl bg-white text-[#D12B79] border border-[#EAD7C2] font-black text-[20px] flex items-center justify-center shadow-xs">
                 1
               </div>
               <h3 className="text-[18px] font-black text-[#1C1917]">
@@ -459,8 +664,8 @@ export const HomePage: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-[#FEEDDC]/50 rounded-[22px] p-6 space-y-3 border border-[#F1DEC9]">
-              <div className="w-12 h-12 rounded-2xl bg-white text-[#D12B79] border border-[#F1DEC9] font-black text-[20px] flex items-center justify-center shadow-xs">
+            <div className="bg-[#FEEDDC]/50 rounded-[22px] p-6 space-y-3 border border-[#EAD7C2]">
+              <div className="w-12 h-12 rounded-2xl bg-white text-[#D12B79] border border-[#EAD7C2] font-black text-[20px] flex items-center justify-center shadow-xs">
                 2
               </div>
               <h3 className="text-[18px] font-black text-[#1C1917]">
@@ -471,8 +676,8 @@ export const HomePage: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-[#FEEDDC]/50 rounded-[22px] p-6 space-y-3 border border-[#F1DEC9]">
-              <div className="w-12 h-12 rounded-2xl bg-white text-[#D12B79] border border-[#F1DEC9] font-black text-[20px] flex items-center justify-center shadow-xs">
+            <div className="bg-[#FEEDDC]/50 rounded-[22px] p-6 space-y-3 border border-[#EAD7C2]">
+              <div className="w-12 h-12 rounded-2xl bg-white text-[#D12B79] border border-[#EAD7C2] font-black text-[20px] flex items-center justify-center shadow-xs">
                 3
               </div>
               <h3 className="text-[18px] font-black text-[#1C1917]">
@@ -496,7 +701,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. HÀNG GUIDE TIÊU BIỂU (Thẻ Guide chuẩn với viền #F1DEC9) */}
+      {/* 5. HÀNG GUIDE TIÊU BIỂU (Thẻ Guide chuẩn với viền #EAD7C2) */}
       <section className="max-w-[1320px] mx-auto px-4 sm:px-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -509,7 +714,7 @@ export const HomePage: React.FC = () => {
           </div>
           <Link
             to="/guides"
-            className="px-5 py-2.5 rounded-full bg-white border border-[#F1DEC9] text-[13px] font-bold text-[#1C1917] hover:bg-[#FDF6ED] shadow-xs"
+            className="px-5 py-2.5 rounded-full bg-white border border-[#EAD7C2] text-[13px] font-bold text-[#1C1917] hover:bg-[#FDF6ED] shadow-xs"
           >
             Xem tất cả ({verifiedGuides.length}) →
           </Link>
@@ -539,7 +744,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. DẢI CAM KẾT VẬN HÀNH TIÊU CHUẨN (4 trụ cột niềm tin) */}
+      {/* 6. DẢI CAM KẾT VẬN HÀNH TIÊU CHUẨN (4 trụ cột niềm tin với viền #EAD7C2) */}
       <section className="max-w-[1320px] mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
@@ -550,7 +755,7 @@ export const HomePage: React.FC = () => {
           ].map((item) => (
             <div
               key={item.num}
-              className="bg-white border border-[#F1DEC9] rounded-[22px] px-5 py-5 text-center shadow-xs"
+              className="bg-white border border-[#EAD7C2] rounded-[22px] px-5 py-5 text-center shadow-xs"
             >
               <span className="block text-[20px] font-black text-[#1C1917]">
                 {item.num}
@@ -561,7 +766,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 6. CHỦ ĐỀ TRẢI NGHIỆM ĐÀ NẴNG */}
+      {/* 7. CHỦ ĐỀ TRẢI NGHIỆM ĐÀ NẴNG */}
       <section className="max-w-[1320px] mx-auto px-4 sm:px-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -585,7 +790,7 @@ export const HomePage: React.FC = () => {
             <div
               key={exp.id}
               onClick={() => navigate(`/guides?skill=${encodeURIComponent(exp.param)}`)}
-              className="bg-white border border-[#F1DEC9] hover:border-[#D12B79] rounded-[24px] p-6 cursor-pointer transition-all hover:shadow-md space-y-3 group shadow-xs"
+              className="bg-white border border-[#EAD7C2] hover:border-[#D12B79] rounded-[24px] p-6 cursor-pointer transition-all hover:shadow-md space-y-3 group shadow-xs"
             >
               <div className="flex items-center justify-between">
                 <span className="text-3xl group-hover:scale-110 transition-transform">{exp.icon}</span>
@@ -606,7 +811,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 7. ĐÁNH GIÁ THỰC TẾ TỪ DU KHÁCH */}
+      {/* 8. ĐÁNH GIÁ THỰC TẾ TỪ DU KHÁCH */}
       {reviews.length > 0 && (
         <section className="max-w-[1320px] mx-auto px-4 sm:px-6 space-y-6">
           <div className="text-center max-w-xl mx-auto space-y-1">
@@ -625,7 +830,7 @@ export const HomePage: React.FC = () => {
               return (
                 <div
                   key={rev.id}
-                  className="bg-white border border-[#F1DEC9] rounded-[24px] p-6 space-y-4 flex flex-col justify-between shadow-xs"
+                  className="bg-white border border-[#EAD7C2] rounded-[24px] p-6 space-y-4 flex flex-col justify-between shadow-xs"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center gap-1 text-amber-500 text-sm">
@@ -636,12 +841,12 @@ export const HomePage: React.FC = () => {
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-[#F1DEC9] flex items-center justify-between text-[12px]">
+                  <div className="pt-3 border-t border-[#EAD7C2] flex items-center justify-between text-[12px]">
                     <div>
                       <strong className="block text-[#1C1917]">{tourist?.fullName || 'Du khách'}</strong>
                       <span className="text-[#78716C]">{rev.createdAt.split('T')[0]}</span>
                     </div>
-                    <span className="px-2.5 py-1 rounded-full bg-[#FEEDDC] text-[11px] font-semibold text-[#1C1917] border border-[#F1DEC9]">
+                    <span className="px-2.5 py-1 rounded-full bg-[#FEEDDC] text-[11px] font-semibold text-[#1C1917] border border-[#EAD7C2]">
                       Thổ địa: {guide?.user.fullName || 'Đà Nẵng'}
                     </span>
                   </div>
@@ -652,11 +857,11 @@ export const HomePage: React.FC = () => {
         </section>
       )}
 
-      {/* 8. CTA TRỞ THÀNH GUIDE (Thẻ trắng viền ấm) */}
+      {/* 9. CTA TRỞ THÀNH GUIDE (Thẻ trắng viền ấm #EAD7C2) */}
       <section className="max-w-[1320px] mx-auto px-4 sm:px-6">
-        <div className="bg-white rounded-[32px] p-8 sm:p-12 border border-[#F1DEC9] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
+        <div className="bg-white rounded-[32px] p-8 sm:p-12 border border-[#EAD7C2] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
           <div className="space-y-3 max-w-xl text-center sm:text-left">
-            <span className="inline-block px-3.5 py-1 rounded-full bg-[#FEEDDC] text-[#D12B79] text-[11px] font-bold border border-[#F1DEC9]">
+            <span className="inline-block px-3.5 py-1 rounded-full bg-[#FEEDDC] text-[#D12B79] text-[11px] font-bold border border-[#EAD7C2]">
               Dành cho Thổ địa Đà Nẵng
             </span>
             <h2 className="text-[24px] sm:text-[32px] font-black tracking-tight leading-snug text-[#1C1917]">
@@ -679,7 +884,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 9. FAQ ACCORDION */}
+      {/* 10. FAQ ACCORDION (Viền ấm #EAD7C2) */}
       <section className="max-w-[960px] mx-auto px-4 sm:px-6 space-y-6">
         <div className="text-center space-y-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#78716C]">
@@ -690,7 +895,7 @@ export const HomePage: React.FC = () => {
           </h2>
         </div>
 
-        <div className="divide-y divide-[#F1DEC9] border border-[#F1DEC9] rounded-[24px] bg-white overflow-hidden shadow-xs">
+        <div className="divide-y divide-[#EAD7C2] border border-[#EAD7C2] rounded-[24px] bg-white overflow-hidden shadow-xs">
           {FAQ_ITEMS.map((item, idx) => {
             const isOpen = openFaq === idx;
             return (

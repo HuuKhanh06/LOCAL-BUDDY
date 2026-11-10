@@ -39,7 +39,7 @@ export const GuideCard: React.FC<GuideCardProps> = ({
   return (
     <article
       onClick={onClick}
-      className="group bg-[var(--lb-surface)] border border-[var(--lb-border)] rounded-[16px] overflow-hidden hover:border-[var(--lb-accent)] transition-all cursor-pointer flex flex-col justify-between"
+      className="group bg-white border border-[#EAD7C2] hover:border-[#D12B79] rounded-[22px] overflow-hidden shadow-xs hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between"
     >
       {/* Cover Media */}
       <div className="relative h-60 w-full bg-[var(--lb-surface-2)] overflow-hidden">
@@ -53,23 +53,23 @@ export const GuideCard: React.FC<GuideCardProps> = ({
         ) : (
           <div className="w-full h-full bg-[var(--lb-surface-2)]" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--lb-bg-deep)]/85 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
         {isVerified && (
-          <span className="absolute top-3.5 left-3.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[var(--lb-surface)] text-[var(--lb-text)] border border-[var(--lb-border)] backdrop-blur-xs">
+          <span className="absolute top-3.5 left-3.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/95 text-[#1C1917] border border-[#EAD7C2] shadow-xs">
             ✓ Đã xác thực KYC
           </span>
         )}
 
-        <div className="absolute top-3.5 right-3.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--lb-surface)] text-[var(--lb-text)] border border-[var(--lb-border)] text-[12px] font-bold backdrop-blur-xs">
-          <span className="text-[var(--lb-warning)]">★</span>
+        <div className="absolute top-3.5 right-3.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/95 text-[#1C1917] border border-[#EAD7C2] text-[12px] font-bold shadow-xs">
+          <span className="text-amber-500">★</span>
           <span className="tabular-nums">{avgRating > 0 ? avgRating.toFixed(1) : '5.0'}</span>
-          <span className="text-[var(--lb-muted)] font-normal">({totalReviews})</span>
+          <span className="text-[#6E6259] font-normal">({totalReviews})</span>
         </div>
 
         {/* Avatar + Name on cover */}
         <div className="absolute bottom-3.5 left-4 right-4 flex items-center gap-3">
-          <div className="w-11 h-11 rounded-full border-2 border-[var(--lb-accent)] bg-[var(--lb-surface-2)] overflow-hidden shrink-0 shadow-md">
+          <div className="w-11 h-11 rounded-full border-2 border-white bg-stone-100 overflow-hidden shrink-0 shadow-md">
             {avatarUrl ? (
               <img
                 src={avatarUrl}
@@ -78,16 +78,16 @@ export const GuideCard: React.FC<GuideCardProps> = ({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center font-bold text-[var(--lb-text)]">
+              <div className="w-full h-full flex items-center justify-center font-bold text-[#1C1917]">
                 {name.charAt(0)}
               </div>
             )}
           </div>
-          <div className="min-w-0 text-[var(--lb-text)]">
-            <h3 className="text-[16px] font-bold text-[var(--lb-text)] truncate leading-tight">
+          <div className="min-w-0 text-white">
+            <h3 className="text-[16px] font-bold text-white truncate leading-tight drop-shadow-sm">
               {name}
             </h3>
-            <p className="text-[12px] text-[var(--lb-muted)] truncate">
+            <p className="text-[12px] text-stone-200 truncate">
               {areas[0] || 'Đà Nẵng'} • {languages.slice(0, 2).join(', ')}
             </p>
           </div>

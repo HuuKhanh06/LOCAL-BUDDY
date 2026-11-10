@@ -4,7 +4,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
-  BarChart3,
   TrendingUp,
   CheckCircle2,
   XCircle,
@@ -13,10 +12,7 @@ import {
   Award,
   MapPin,
   Download,
-  Clock,
   Search,
-  ShieldCheck,
-  RefreshCw,
 } from 'lucide-react';
 import { useBookingContext } from '../../context/BookingContext';
 import { formatMoney } from '../../utils/money';

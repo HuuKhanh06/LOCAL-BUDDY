@@ -61,7 +61,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FEEDDC]/95 backdrop-blur-md border-b border-[#F1DEC9] text-[#1C1917] transition-colors">
+    <header className="sticky top-0 z-40 bg-[#FEEDDC]/95 backdrop-blur-md border-b border-[#EAD7C2] text-[#1C1917] transition-colors">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         {/* Logo Withlocals style */}
         <Link to="/" className="flex items-center shrink-0">
@@ -71,7 +71,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
         {/* Ô tìm nhanh */}
         <form
           onSubmit={handleQuickSearchSubmit}
-          className="hidden md:flex items-center bg-white/90 border border-[#F1DEC9] focus-within:border-[#D12B79] rounded-full px-3.5 h-9 w-52 lg:w-64 transition-all shadow-xs"
+          className="hidden md:flex items-center bg-white/90 border border-[#EAD7C2] focus-within:border-[#D12B79] rounded-full px-3.5 h-9 w-52 lg:w-64 transition-all shadow-xs"
         >
           <Search className="w-3.5 h-3.5 text-[#78716C] shrink-0 mr-2" />
           <input
@@ -106,7 +106,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                 : 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3DEC8]'
             )}
           >
-            Giới thiệu
+            {t('nav_how_it_works')}
           </Link>
           <Link
             to="/guides"
@@ -128,7 +128,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                 : 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3DEC8]'
             )}
           >
-            Lịch đặt
+            {t('nav_my_bookings')}
           </Link>
         </nav>
 
@@ -139,14 +139,14 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
             type="button"
             onClick={toggleLanguage}
             title="Đổi ngôn ngữ"
-            className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-[#F1DEC9] text-[11px] font-bold text-[#1C1917] hover:border-[#D12B79] cursor-pointer shadow-xs"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-[#EAD7C2] text-[11px] font-bold text-[#1C1917] hover:border-[#D12B79] cursor-pointer shadow-xs"
           >
             <Globe className="w-3.5 h-3.5 text-[#D12B79]" />
             <span>{i18n.language.toUpperCase()}</span>
           </button>
 
           {/* Chuyển nhanh 2 tài khoản hệ thống */}
-          <div className="hidden sm:flex items-center bg-white p-0.5 rounded-full border border-[#F1DEC9] shadow-xs">
+          <div className="hidden sm:flex items-center bg-white p-0.5 rounded-full border border-[#EAD7C2] shadow-xs">
             <button
               type="button"
               onClick={() => handleQuickRoleSwitch('guide', 'u-guide-1')}
@@ -176,7 +176,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
           <Link
             to="/thong-bao"
             aria-label="Thông báo"
-            className="relative p-2 rounded-full bg-white border border-[#F1DEC9] hover:border-[#D12B79] text-[#1C1917] transition-colors shadow-xs"
+            className="relative p-2 rounded-full bg-white border border-[#EAD7C2] hover:border-[#D12B79] text-[#1C1917] transition-colors shadow-xs"
           >
             <Bell className="w-4 h-4" />
             {unreadNotifsCount > 0 && (
@@ -196,7 +196,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                       ? '/admin/kyc'
                       : '/ho-so-ca-nhan'
                 }
-                className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full bg-white border border-[#F1DEC9] hover:border-[#D12B79] transition-colors shadow-xs"
+                className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full bg-white border border-[#EAD7C2] hover:border-[#D12B79] transition-colors shadow-xs"
               >
                 <img
                   src={
@@ -238,7 +238,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
           <button
             type="button"
             onClick={() => setMobileMenuOpen((v) => !v)}
-            className="lg:hidden p-2 rounded-full bg-white border border-[#F1DEC9] text-[#1C1917] cursor-pointer shadow-xs"
+            className="lg:hidden p-2 rounded-full bg-white border border-[#EAD7C2] text-[#1C1917] cursor-pointer shadow-xs"
             aria-label="Menu"
           >
             {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -247,8 +247,8 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
       </div>
 
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#FEEDDC] border-t border-[#F1DEC9] px-4 py-3 space-y-2.5">
-          <div className="flex flex-col gap-1 pb-2 border-b border-[#F1DEC9] text-[13px]">
+        <div className="lg:hidden bg-[#FEEDDC] border-t border-[#EAD7C2] px-4 py-3 space-y-2.5">
+          <div className="flex flex-col gap-1 pb-2 border-b border-[#EAD7C2] text-[13px]">
             <Link
               to="/how-it-works"
               onClick={() => setMobileMenuOpen(false)}
@@ -279,7 +279,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                 handleQuickRoleSwitch('guide', 'u-guide-1');
                 setMobileMenuOpen(false);
               }}
-              className="flex-1 py-1.5 rounded-full bg-white border border-[#F1DEC9] text-[12px] font-bold text-[#1C1917] shadow-xs"
+              className="flex-1 py-1.5 rounded-full bg-white border border-[#EAD7C2] text-[12px] font-bold text-[#1C1917] shadow-xs"
             >
               HDV Khanh
             </button>
@@ -289,17 +289,17 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
                 handleQuickRoleSwitch('admin', 'u-admin-1');
                 setMobileMenuOpen(false);
               }}
-              className="flex-1 py-1.5 rounded-full bg-white border border-[#F1DEC9] text-[12px] font-bold text-[#1C1917] shadow-xs"
+              className="flex-1 py-1.5 rounded-full bg-white border border-[#EAD7C2] text-[12px] font-bold text-[#1C1917] shadow-xs"
             >
               Admin Hoàng
             </button>
           </div>
           {!currentUser && (
-            <div className="flex items-center gap-2 pt-2 border-t border-[#F1DEC9]">
+            <div className="flex items-center gap-2 pt-2 border-t border-[#EAD7C2]">
               <Link
                 to="/dang-nhap"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex-1 py-2 text-center rounded-full bg-white border border-[#F1DEC9] text-[#1C1917] text-[13px] font-bold shadow-xs"
+                className="flex-1 py-2 text-center rounded-full bg-white border border-[#EAD7C2] text-[#1C1917] text-[13px] font-bold shadow-xs"
               >
                 {t('common_login')}
               </Link>

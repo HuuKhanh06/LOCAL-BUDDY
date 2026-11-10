@@ -1,29 +1,18 @@
 // pages/public/HowItWorksPage.tsx
 // Trang Giới thiệu & Mô hình hoạt động LocalBuddy chuẩn phong cách Withlocals (https://www.withlocals.com/fr/)
-// Màu nền kem ấm Withlocals: #FEEDDC, Điểm nhấn mận Withlocals: #D12B79, Thẻ trắng #FFFFFF
+// Màu nền kem ấm Withlocals: #FEEDDC, Điểm nhấn mận Withlocals: #D12B79, Thẻ trắng #FFFFFF, Viền ấm rõ nét #EAD7C2
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Compass,
-  ShieldCheck,
-  Clock,
-  Heart,
   ChevronDown,
   ArrowRight,
   CheckCircle2,
-  Calendar,
-  CreditCard,
-  Smile,
-  MapPin,
-  Play,
-  Award,
 } from 'lucide-react';
 import { Logo } from '../../components/common/Logo';
 
 export const HowItWorksPage: React.FC = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [activeTab, setActiveTab] = useState<'tourist' | 'guide'>('tourist');
 
   const faqs = [
     {
@@ -54,7 +43,7 @@ export const HowItWorksPage: React.FC = () => {
       <section className="max-w-[1240px] mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#F1DEC9] text-[#D12B79] text-xs font-bold shadow-xs">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#EAD7C2] text-[#D12B79] text-xs font-bold shadow-xs">
               <Logo variant="icon" size="sm" />
               <span>Mô hình đặt Thổ địa theo giờ chuẩn Withlocals</span>
             </div>
@@ -79,14 +68,14 @@ export const HowItWorksPage: React.FC = () => {
               </Link>
               <Link
                 to="/become-a-guide"
-                className="px-6 py-3.5 rounded-full bg-white hover:bg-white/80 border border-[#F1DEC9] text-[#1C1917] font-bold text-[14px] transition-all"
+                className="px-6 py-3.5 rounded-full bg-white hover:bg-white/80 border border-[#EAD7C2] text-[#1C1917] font-bold text-[14px] transition-all"
               >
                 Trở thành Hướng dẫn viên
               </Link>
             </div>
 
             {/* Micro Trust badges */}
-            <div className="grid grid-cols-3 gap-3 pt-6 border-t border-[#E8D4C1] text-xs">
+            <div className="grid grid-cols-3 gap-3 pt-6 border-t border-[#EAD7C2] text-xs">
               <div className="space-y-0.5">
                 <div className="font-extrabold text-sm text-[#1C1917]">100% Linh hoạt</div>
                 <div className="text-[#78716C]">Lịch trình theo giờ bạn chọn</div>
@@ -130,7 +119,7 @@ export const HowItWorksPage: React.FC = () => {
 
       {/* 2. COMMENT ÇA MARCHE (CÁCH THỨC HOẠT ĐỘNG 3 BƯỚC) */}
       <section className="max-w-[1240px] mx-auto px-4 sm:px-6">
-        <div className="bg-white rounded-[32px] p-8 sm:p-14 border border-[#F1DEC9] shadow-sm space-y-12">
+        <div className="bg-white rounded-[32px] p-8 sm:p-14 border border-[#EAD7C2] shadow-sm space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="px-3.5 py-1 rounded-full bg-[#FEEDDC] text-[#D12B79] text-xs font-bold uppercase tracking-wider">
               Quy trình trải nghiệm 3 bước
@@ -146,23 +135,23 @@ export const HowItWorksPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
             {/* Step 1 */}
             <div className="space-y-4 relative">
-              <div className="w-14 h-14 rounded-2xl bg-[#FEEDDC] text-[#D12B79] font-black text-2xl flex items-center justify-center border border-[#F1DEC9]">
+              <div className="w-14 h-14 rounded-2xl bg-[#FEEDDC] text-[#D12B79] font-black text-2xl flex items-center justify-center border border-[#EAD7C2]">
                 1
               </div>
               <h3 className="text-xl font-black text-[#1C1917]">
                 Chọn Thổ địa & Khung giờ
               </h3>
               <p className="text-sm text-[#78716C] leading-relaxed">
-                Lọc danh sách theo ngôn ngữ (Việt, Anh, Hàn, Nhật, Pháp), sở thích (ẩm thực đường phố, chụp ảnh check-in, lịch sử Chăm Pa) và mức giá từ 80k/giờ.
+                Lọc danh sách theo ngôn ngữ (Việt, Anh, Hàn, Nhật, Pháp), sở thích (ẩm thực đường phố, chụp ảnh check-in, thiên nhiên Sơn Trà) và mức giá từ 80k/giờ.
               </p>
               <div className="text-xs font-bold text-[#D12B79] flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4" /> Chỉ hiện HDV đã được duyệt KYC
+                <CheckCircle2 className="w-4 h-4" /> Chỉ hiện HDV đã được duyệt KYC 100%
               </div>
             </div>
 
             {/* Step 2 */}
             <div className="space-y-4 relative">
-              <div className="w-14 h-14 rounded-2xl bg-[#FEEDDC] text-[#D12B79] font-black text-2xl flex items-center justify-center border border-[#F1DEC9]">
+              <div className="w-14 h-14 rounded-2xl bg-[#FEEDDC] text-[#D12B79] font-black text-2xl flex items-center justify-center border border-[#EAD7C2]">
                 2
               </div>
               <h3 className="text-xl font-black text-[#1C1917]">
@@ -178,7 +167,7 @@ export const HowItWorksPage: React.FC = () => {
 
             {/* Step 3 */}
             <div className="space-y-4 relative">
-              <div className="w-14 h-14 rounded-2xl bg-[#FEEDDC] text-[#D12B79] font-black text-2xl flex items-center justify-center border border-[#F1DEC9]">
+              <div className="w-14 h-14 rounded-2xl bg-[#FEEDDC] text-[#D12B79] font-black text-2xl flex items-center justify-center border border-[#EAD7C2]">
                 3
               </div>
               <h3 className="text-xl font-black text-[#1C1917]">
@@ -198,7 +187,7 @@ export const HowItWorksPage: React.FC = () => {
       {/* 3. TRIẾT LÝ WITHLOCALS: POURQUOI VOYAGER AVEC UN LOCAL GUIDE? */}
       <section className="max-w-[1240px] mx-auto px-4 sm:px-6 space-y-10">
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <span className="px-3.5 py-1 rounded-full bg-white border border-[#F1DEC9] text-[#D12B79] text-xs font-bold uppercase tracking-wider">
+          <span className="px-3.5 py-1 rounded-full bg-white border border-[#EAD7C2] text-[#D12B79] text-xs font-bold uppercase tracking-wider">
             Giá trị khác biệt
           </span>
           <h2 className="text-[28px] sm:text-[40px] font-black text-[#1C1917] tracking-tight">
@@ -210,8 +199,8 @@ export const HowItWorksPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-[24px] p-6 border border-[#F1DEC9] space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center text-2xl">
+          <div className="bg-white rounded-[24px] p-6 border border-[#EAD7C2] space-y-3 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center text-2xl border border-amber-200">
               🎯
             </div>
             <h3 className="font-extrabold text-base text-[#1C1917]">100% Cá nhân hóa</h3>
@@ -220,8 +209,8 @@ export const HowItWorksPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white rounded-[24px] p-6 border border-[#F1DEC9] space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-700 flex items-center justify-center text-2xl">
+          <div className="bg-white rounded-[24px] p-6 border border-[#EAD7C2] space-y-3 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-700 flex items-center justify-center text-2xl border border-rose-200">
               🛡️
             </div>
             <h3 className="font-extrabold text-base text-[#1C1917]">Bảo vệ quyền lợi</h3>
@@ -230,8 +219,8 @@ export const HowItWorksPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white rounded-[24px] p-6 border border-[#F1DEC9] space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-2xl">
+          <div className="bg-white rounded-[24px] p-6 border border-[#EAD7C2] space-y-3 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-2xl border border-emerald-200">
               🌱
             </div>
             <h3 className="font-extrabold text-base text-[#1C1917]">Du lịch bền vững</h3>
@@ -240,8 +229,8 @@ export const HowItWorksPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white rounded-[24px] p-6 border border-[#F1DEC9] space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-700 flex items-center justify-center text-2xl">
+          <div className="bg-white rounded-[24px] p-6 border border-[#EAD7C2] space-y-3 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-700 flex items-center justify-center text-2xl border border-sky-200">
               🤝
             </div>
             <h3 className="font-extrabold text-base text-[#1C1917]">Kết nối chân thành</h3>
@@ -256,7 +245,7 @@ export const HowItWorksPage: React.FC = () => {
       <section className="max-w-[1240px] mx-auto px-4 sm:px-6 space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <span className="px-3.5 py-1 rounded-full bg-white border border-[#F1DEC9] text-[#D12B79] text-xs font-bold uppercase tracking-wider">
+            <span className="px-3.5 py-1 rounded-full bg-white border border-[#EAD7C2] text-[#D12B79] text-xs font-bold uppercase tracking-wider">
               Khám phá Đà Nẵng
             </span>
             <h2 className="text-[28px] sm:text-[36px] font-black text-[#1C1917] tracking-tight mt-2">
@@ -274,7 +263,7 @@ export const HowItWorksPage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Card 1: Sơn Trà */}
-          <div className="bg-white rounded-[24px] overflow-hidden border border-[#F1DEC9] shadow-xs group">
+          <div className="bg-white rounded-[24px] overflow-hidden border border-[#EAD7C2] shadow-xs group">
             <div className="relative h-56 overflow-hidden">
               <video
                 autoPlay
@@ -300,7 +289,7 @@ export const HowItWorksPage: React.FC = () => {
           </div>
 
           {/* Card 2: Biển Mỹ Khê */}
-          <div className="bg-white rounded-[24px] overflow-hidden border border-[#F1DEC9] shadow-xs group">
+          <div className="bg-white rounded-[24px] overflow-hidden border border-[#EAD7C2] shadow-xs group">
             <div className="relative h-56 overflow-hidden">
               <video
                 autoPlay
@@ -326,7 +315,7 @@ export const HowItWorksPage: React.FC = () => {
           </div>
 
           {/* Card 3: Cầu Rồng & Sông Hàn */}
-          <div className="bg-white rounded-[24px] overflow-hidden border border-[#F1DEC9] shadow-xs group">
+          <div className="bg-white rounded-[24px] overflow-hidden border border-[#EAD7C2] shadow-xs group">
             <div className="relative h-56 overflow-hidden">
               <video
                 autoPlay
@@ -353,42 +342,42 @@ export const HowItWorksPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. KHỐI AN TOÀN & BẢO ĐẢM MINH BẠCH (GARANTIE & CONFIANCE) */}
+      {/* 5. KHỐI AN TOÀN & BẢO ĐẢM MINH BẠCH (GARANTIE & CONFIANCE) - SÁNG ẤM WITHLOCALS */}
       <section className="max-w-[1240px] mx-auto px-4 sm:px-6">
-        <div className="bg-[#1C1917] text-white rounded-[32px] p-8 sm:p-14 space-y-8">
+        <div className="bg-white text-[#1C1917] rounded-[32px] p-8 sm:p-14 border border-[#EAD7C2] shadow-xs space-y-8">
           <div className="max-w-2xl space-y-3">
-            <span className="px-3.5 py-1 rounded-full bg-white/10 text-[#FEEDDC] text-xs font-bold uppercase tracking-wider">
+            <span className="px-3.5 py-1 rounded-full bg-[#FEEDDC] text-[#D12B79] border border-[#EAD7C2] text-xs font-bold uppercase tracking-wider">
               An tâm tuyệt đối
             </span>
-            <h2 className="text-[28px] sm:text-[38px] font-black tracking-tight text-white">
+            <h2 className="text-[28px] sm:text-[38px] font-black tracking-tight text-[#1C1917]">
               Cam kết dịch vụ & Bảo vệ du khách 100%
             </h2>
-            <p className="text-sm text-white/80">
+            <p className="text-sm text-[#6E6259]">
               Mọi chuyến đi trên LocalBuddy đều được bảo chứng bởi công nghệ đối soát và hợp đồng dịch vụ rõ ràng.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-white/10">
-            <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-[#EAD7C2]">
+            <div className="space-y-2 bg-[#FEEDDC]/40 p-6 rounded-2xl border border-[#EAD7C2]">
               <div className="text-2xl font-black text-[#D12B79]">30% / 70%</div>
-              <h4 className="font-bold text-base text-white">Thanh toán hai chặng</h4>
-              <p className="text-xs text-white/70 leading-relaxed">
+              <h3 className="font-bold text-base text-[#1C1917]">Thanh toán hai chặng</h3>
+              <p className="text-xs text-[#6E6259] leading-relaxed">
                 Chỉ thanh toán cọc 30% sau khi Guide đồng ý. 70% còn lại chỉ thanh toán sau khi chuyến đi đã hoàn tất.
               </p>
             </div>
 
-            <div className="space-y-2">
-              <div className="text-2xl font-black text-emerald-400">Hoàn 100%</div>
-              <h4 className="font-bold text-base text-white">Chính sách hủy linh hoạt</h4>
-              <p className="text-xs text-white/70 leading-relaxed">
+            <div className="space-y-2 bg-[#FEEDDC]/40 p-6 rounded-2xl border border-[#EAD7C2]">
+              <div className="text-2xl font-black text-emerald-700">Hoàn 100%</div>
+              <h3 className="font-bold text-base text-[#1C1917]">Chính sách hủy linh hoạt</h3>
+              <p className="text-xs text-[#6E6259] leading-relaxed">
                 Hủy trước trên 48 giờ: nhận lại 100% tiền cọc. HDV hủy: hoàn 100% ngay lập tức và ghi nhận kỷ luật hệ thống.
               </p>
             </div>
 
-            <div className="space-y-2">
-              <div className="text-2xl font-black text-sky-400">24/7</div>
-              <h4 className="font-bold text-base text-white">Phân xử tranh chấp công minh</h4>
-              <p className="text-xs text-white/70 leading-relaxed">
+            <div className="space-y-2 bg-[#FEEDDC]/40 p-6 rounded-2xl border border-[#EAD7C2]">
+              <div className="text-2xl font-black text-[#285B9A]">24/7</div>
+              <h3 className="font-bold text-base text-[#1C1917]">Phân xử tranh chấp công minh</h3>
+              <p className="text-xs text-[#6E6259] leading-relaxed">
                 Cửa sổ khiếu nại 24h sau tour. Đội ngũ Quản trị viên thẩm định bằng chứng và giải quyết bảo vệ du khách.
               </p>
             </div>
@@ -399,7 +388,7 @@ export const HowItWorksPage: React.FC = () => {
       {/* 6. FAQ ACCORDION */}
       <section className="max-w-[960px] mx-auto px-4 sm:px-6 space-y-8">
         <div className="text-center space-y-2">
-          <span className="px-3.5 py-1 rounded-full bg-white border border-[#F1DEC9] text-[#D12B79] text-xs font-bold uppercase tracking-wider">
+          <span className="px-3.5 py-1 rounded-full bg-white border border-[#EAD7C2] text-[#D12B79] text-xs font-bold uppercase tracking-wider">
             Giải đáp thắc mắc
           </span>
           <h2 className="text-[28px] sm:text-[36px] font-black text-[#1C1917]">
@@ -413,7 +402,7 @@ export const HowItWorksPage: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="bg-white rounded-2xl border border-[#F1DEC9] overflow-hidden transition-all"
+                className="bg-white rounded-2xl border border-[#EAD7C2] overflow-hidden transition-all shadow-xs"
               >
                 <button
                   type="button"
@@ -428,7 +417,7 @@ export const HowItWorksPage: React.FC = () => {
                   />
                 </button>
                 {isOpen && (
-                  <div className="px-6 pb-5 text-sm text-[#78716C] leading-relaxed border-t border-[#F8EDE2] pt-3">
+                  <div className="px-6 pb-5 text-sm text-[#78716C] leading-relaxed border-t border-[#FEEDDC] pt-3">
                     {faq.a}
                   </div>
                 )}
@@ -440,7 +429,7 @@ export const HowItWorksPage: React.FC = () => {
 
       {/* 7. CTA CUỐI: TRỞ THÀNH GUIDE LOCALBUDDY */}
       <section className="max-w-[1240px] mx-auto px-4 sm:px-6">
-        <div className="bg-white rounded-[32px] p-8 sm:p-12 border border-[#F1DEC9] flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="bg-white rounded-[32px] p-8 sm:p-12 border border-[#EAD7C2] shadow-xs flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center sm:text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-[#1C1917]">
               Bạn là người con Đà Nẵng đam mê chia sẻ văn hóa?
