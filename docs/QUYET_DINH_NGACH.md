@@ -65,3 +65,4 @@ CHUNG: timer tự kích hoạt đúng hạn (NFR 3.4). Lưu UTC, hiển thị gi
  QĐ-15 Ảnh KYC: bucket riêng tư, chỉ chủ hồ sơ + Admin đọc, signed URL ngắn hạn, mã hoá lưu trữ (mặc định Supabase), ghi nhật ký truy cập; khách chỉ thấy cờ xác minh.
  QĐ-16 Seed danh mục: khu vực (Hải Châu, Sơn Trà, Ngũ Hành Sơn, Liên Chiểu, Thanh Khê, Cẩm Lệ, Hòa Vang); chuyên môn (ẩm thực, lịch sử–văn hoá, check-in/chụp ảnh, biển–thiên nhiên, về đêm, mua sắm, gia đình); ngôn ngữ (vi, en, ja, ko, zh, fr).
  QĐ-17 PWA: manifest + icon để cài lên màn hình chính iOS/Android; không cần service worker.
+ QĐ-18 Giao diện giới thiệu & Logo Withlocals: Nền kem đào `#FEEDDC`, điểm nhấn `#D12B79`, logo 2 gương mặt cười liên kết "local buddy", đạt 100% WCAG AA.

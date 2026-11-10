@@ -8,6 +8,7 @@ import { useBookingContext } from '../../context/BookingContext';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useToast } from '../../components/ui/Toast';
+import { Logo } from '../../components/common/Logo';
 
 export const AdminLoginPage: React.FC = () => {
   const { login } = useBookingContext();
@@ -42,11 +43,8 @@ export const AdminLoginPage: React.FC = () => {
         {/* Top Banner */}
         <div className="bg-[var(--lb-surface-2)] px-7 py-6 text-[var(--lb-text)] border-b border-[var(--lb-border)]">
           <div className="flex items-center justify-between mb-3">
-            <Link to="/" className="inline-flex items-center gap-2 text-[var(--lb-text)] font-extrabold text-lg">
-              <span className="w-8 h-8 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] flex items-center justify-center font-black">
-                LB
-              </span>
-              LocalBuddy
+            <Link to="/" className="inline-flex items-center">
+              <Logo size="sm" />
             </Link>
             <span className="px-2.5 py-1 rounded-full bg-[var(--lb-surface)] border border-[var(--lb-border)] text-[var(--lb-accent-text)] text-[11px] font-bold uppercase tracking-wider">
               Admin Portal (UC.04)

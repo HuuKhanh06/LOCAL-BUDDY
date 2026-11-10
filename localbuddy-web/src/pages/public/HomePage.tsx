@@ -15,6 +15,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useBookingContext } from '../../context/BookingContext';
 import { GuideCard } from '../../components/common/GuideCard';
 import { DANANG_AREAS, GUIDE_LANGUAGES } from '../../data/mockData';
+import { Logo } from '../../components/common/Logo';
 
 interface MediaShowcaseItem {
   id: string;
@@ -204,11 +205,14 @@ export const HomePage: React.FC = () => {
 
         <div className="relative z-10 max-w-4xl w-full space-y-6">
           <div className="space-y-2 text-white">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-[12px] font-bold border border-white/30">
-              <span>📍 Đà Nẵng</span>
-              <span className="w-1 h-1 rounded-full bg-[#EB5B38]" />
-              <span>Đặt Thổ địa theo giờ</span>
-            </div>
+            <Link
+              to="/how-it-works"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white text-[12px] font-bold border border-white/30 transition-all group"
+            >
+              <Logo variant="icon" size="sm" />
+              <span>Mô hình Thổ địa theo giờ chuẩn Withlocals</span>
+              <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+            </Link>
             <h1 className="text-[32px] sm:text-[48px] font-black tracking-tight leading-tight text-white drop-shadow-sm">
               Khám phá Đà Nẵng cùng người bản địa
             </h1>
@@ -327,11 +331,11 @@ export const HomePage: React.FC = () => {
               </select>
             </div>
 
-            {/* Nút Tìm kiếm cam chuẩn token --lb-accent */}
+            {/* Nút Tìm kiếm magenta chuẩn Withlocals */}
             <div className="flex items-end">
               <button
                 type="submit"
-                className="w-full py-2.5 px-4 rounded-xl bg-[#EB5B38] hover:bg-[#d64f2e] text-white text-[13px] font-bold shadow-md transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#D12B79] hover:bg-[#B51E63] text-white text-[13px] font-bold shadow-md transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <span>Tìm Thổ địa</span>
                 <span>→</span>
@@ -406,26 +410,26 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. "CÁCH HOẠT ĐỘNG" 3 BƯỚC — KHỐI NỀN CÁT TẠO NHỊP ĐIỆU TƯƠNG PHẢN (Mục [9] & GĐ1) */}
-      <section className="bg-[#E6E4DC] border border-[#D5D2C7] rounded-[26px] p-6 sm:p-10 space-y-8 text-[#272A2D]">
+      {/* 4. "CÁCH HOẠT ĐỘNG" 3 BƯỚC — PHONG CÁCH WITHLOCALS (Mục [9] & GĐ1) */}
+      <section className="bg-[#FEEDDC] border border-[#F1DEC9] rounded-[28px] p-6 sm:p-10 space-y-8 text-[#1C1917]">
         <div className="text-center max-w-xl mx-auto space-y-2">
-          <span className="inline-block px-3 py-1 rounded-full bg-white/80 text-[#272A2D] text-[11px] font-bold">
-            Quy trình 3 bước minh bạch
+          <span className="inline-block px-3.5 py-1 rounded-full bg-white text-[#D12B79] border border-[#F1DEC9] text-[11px] font-bold">
+            Quy trình 3 bước chuẩn Withlocals
           </span>
-          <h2 className="text-[24px] sm:text-[30px] font-black tracking-tight text-[#272A2D]">
+          <h2 className="text-[24px] sm:text-[32px] font-black tracking-tight text-[#1C1917]">
             Cách LocalBuddy hoạt động
           </h2>
-          <p className="text-[13px] sm:text-[14px] text-[#52526B]">
-            Đơn giản, trực tiếp và an tâm tuyệt đối với cơ chế giữ cọc hai chặng
+          <p className="text-[13px] sm:text-[14px] text-[#6E6259]">
+            Đơn giản, trực tiếp và an tâm tuyệt đối với cơ chế giữ cọc hai chặng 30% / 70%
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-[20px] p-6 space-y-3 border border-white/60 shadow-xs">
-            <div className="w-10 h-10 rounded-full bg-[#EB5B38] text-white font-black text-[16px] flex items-center justify-center">
-              01
+          <div className="bg-white rounded-[22px] p-6 space-y-3 border border-[#F1DEC9] shadow-xs">
+            <div className="w-11 h-11 rounded-2xl bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] font-black text-[18px] flex items-center justify-center">
+              1
             </div>
-            <h3 className="text-[17px] font-bold text-[#1C1917]">
+            <h3 className="text-[17px] font-black text-[#1C1917]">
               Chọn Thổ địa & Khung giờ
             </h3>
             <p className="text-[13px] text-[#78716C] leading-relaxed">
@@ -433,11 +437,11 @@ export const HomePage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white rounded-[20px] p-6 space-y-3 border border-white/60 shadow-xs">
-            <div className="w-10 h-10 rounded-full bg-[#EB5B38] text-white font-black text-[16px] flex items-center justify-center">
-              02
+          <div className="bg-white rounded-[22px] p-6 space-y-3 border border-[#F1DEC9] shadow-xs">
+            <div className="w-11 h-11 rounded-2xl bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] font-black text-[18px] flex items-center justify-center">
+              2
             </div>
-            <h3 className="text-[17px] font-bold text-[#1C1917]">
+            <h3 className="text-[17px] font-black text-[#1C1917]">
               Guide nhận đơn & Cọc 30%
             </h3>
             <p className="text-[13px] text-[#78716C] leading-relaxed">
@@ -445,17 +449,27 @@ export const HomePage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white rounded-[20px] p-6 space-y-3 border border-white/60 shadow-xs">
-            <div className="w-10 h-10 rounded-full bg-[#EB5B38] text-white font-black text-[16px] flex items-center justify-center">
-              03
+          <div className="bg-white rounded-[22px] p-6 space-y-3 border border-[#F1DEC9] shadow-xs">
+            <div className="w-11 h-11 rounded-2xl bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] font-black text-[18px] flex items-center justify-center">
+              3
             </div>
-            <h3 className="text-[17px] font-bold text-[#1C1917]">
+            <h3 className="text-[17px] font-black text-[#1C1917]">
               Đồng hành & Tất toán 70%
             </h3>
             <p className="text-[13px] text-[#78716C] leading-relaxed">
               Gặp gỡ tại điểm hẹn Đà Nẵng, tận hưởng chuyến đi riêng tư. Kết thúc tour, bấm xác nhận hoàn thành và thanh toán 70% còn lại (Online hoặc Tiền mặt).
             </p>
           </div>
+        </div>
+
+        <div className="text-center pt-2">
+          <Link
+            to="/how-it-works"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-[#FDF6ED] border border-[#F1DEC9] text-[#D12B79] font-bold text-[13px] shadow-xs transition-all"
+          >
+            <span>Xem hướng dẫn chi tiết & Mô hình vận hành chuẩn Withlocals</span>
+            <span>→</span>
+          </Link>
         </div>
       </section>
 
@@ -698,7 +712,7 @@ export const HomePage: React.FC = () => {
         <div className="z-10 shrink-0">
           <Link
             to="/dang-ky?role=guide"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#EB5B38] hover:bg-[#d64f2e] text-white text-[14px] font-bold shadow-lg transition-all transform hover:scale-105"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#D12B79] hover:bg-[#B51E63] text-white text-[14px] font-bold shadow-lg transition-all transform hover:scale-105"
           >
             <span>Đăng ký làm Thổ địa ngay</span>
             <span>→</span>

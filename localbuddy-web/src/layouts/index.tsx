@@ -2,7 +2,7 @@
 // Bảng màu chuẩn: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState } from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Bell, Menu, Search } from 'lucide-react';
 import {
   Header,
@@ -12,44 +12,43 @@ import {
 } from '../components/layout/Header';
 import { useBookingContext } from '../context/BookingContext';
 import { formatMoney } from '../utils/money';
+import { Logo } from '../components/common/Logo';
 
-const CommercialFooter: React.FC = () => {
+const CommercialFooter: React.FC<{ isWarm?: boolean }> = ({ isWarm }) => {
   return (
-    <footer className="bg-[var(--lb-surface)] text-[var(--lb-muted)] border-t border-[var(--lb-border)] mt-16 py-8">
+    <footer className={isWarm ? "bg-[#F5E6D3] text-[#6E6259] border-t border-[#E8D4C1] mt-16 py-8" : "bg-[var(--lb-surface)] text-[var(--lb-muted)] border-t border-[var(--lb-border)] mt-16 py-8"}>
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] flex items-center justify-center font-black text-[13px]">
-            LB
-          </div>
+          <Logo size="sm" />
           <div>
-            <span className="text-[15px] font-bold text-[var(--lb-text)] block">
+            <span className={`text-[14px] font-bold block ${isWarm ? "text-[#1C1917]" : "text-[var(--lb-text)]"}`}>
               LocalBuddy Đà Nẵng
             </span>
-            <span className="text-[12px] text-[var(--lb-muted)]">
+            <span className={`text-[11px] ${isWarm ? "text-[#78716C]" : "text-[var(--lb-muted)]"}`}>
               Đặt Hướng dẫn viên bản địa theo giờ • Cọc 30% • Hoàn 100% trước 48h
             </span>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 text-[13px] font-medium text-[var(--lb-muted)]">
-          <Link to="/how-it-works" className="hover:text-[var(--lb-text)]">
+        <div className={`flex flex-wrap items-center gap-4 text-[13px] font-medium ${isWarm ? "text-[#6E6259]" : "text-[var(--lb-muted)]"}`}>
+          <Link to="/how-it-works" className={isWarm ? "hover:text-[#D12B79]" : "hover:text-[var(--lb-text)]"}>
             Cách hoạt động
           </Link>
-          <Link to="/become-a-guide" className="hover:text-[var(--lb-text)]">
+          <Link to="/become-a-guide" className={isWarm ? "hover:text-[#D12B79]" : "hover:text-[var(--lb-text)]"}>
             Trở thành Guide
           </Link>
-          <Link to="/cancellation-policy" className="hover:text-[var(--lb-text)]">
+          <Link to="/cancellation-policy" className={isWarm ? "hover:text-[#D12B79]" : "hover:text-[var(--lb-text)]"}>
             Chính sách hủy
           </Link>
-          <Link to="/safety" className="hover:text-[var(--lb-text)]">
+          <Link to="/safety" className={isWarm ? "hover:text-[#D12B79]" : "hover:text-[var(--lb-text)]"}>
             An toàn
           </Link>
-          <Link to="/faq" className="hover:text-[var(--lb-text)]">
+          <Link to="/faq" className={isWarm ? "hover:text-[#D12B79]" : "hover:text-[var(--lb-text)]"}>
             Hỏi đáp
           </Link>
         </div>
       </div>
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 mt-6 pt-4 border-t border-[var(--lb-border)]/50 text-center text-[11px] text-[var(--lb-muted)]">
+      <div className={`max-w-[1320px] mx-auto px-4 sm:px-6 mt-6 pt-4 border-t text-center text-[11px] ${isWarm ? "border-[#E8D4C1] text-[#78716C]" : "border-[var(--lb-border)]/50 text-[var(--lb-muted)]"}`}>
         Dự án học phần Phân tích & Thiết kế Hệ thống Nâng cao — dữ liệu minh hoạ.
       </div>
     </footer>
@@ -57,13 +56,16 @@ const CommercialFooter: React.FC = () => {
 };
 
 export const PublicLayout: React.FC = () => {
+  const location = useLocation();
+  const isWarm = location.pathname === '/how-it-works';
+
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--lb-bg)] text-[var(--lb-text)] pb-16 lg:pb-0">
+    <div className={`min-h-screen flex flex-col pb-16 lg:pb-0 transition-colors ${isWarm ? 'bg-[#FEEDDC] text-[#1C1917]' : 'bg-[var(--lb-bg)] text-[var(--lb-text)]'}`}>
       <Header role="tourist" />
-      <main className="flex-1 max-w-[1320px] w-full mx-auto px-4 sm:px-6 py-6">
+      <main className={`flex-1 w-full mx-auto ${isWarm ? 'max-w-full p-0' : 'max-w-[1320px] px-4 sm:px-6 py-6'}`}>
         <Outlet />
       </main>
-      <CommercialFooter />
+      <CommercialFooter isWarm={isWarm} />
       <TouristBottomNav />
     </div>
   );

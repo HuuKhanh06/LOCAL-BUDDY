@@ -1,51 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-export const HowItWorksPage: React.FC = () => (
-  <div className="max-w-4xl mx-auto py-12 px-4 space-y-8">
-    <div className="text-center space-y-3">
-      <span className="px-3 py-1 rounded-full bg-[var(--lb-surface-2)] text-[var(--lb-accent-text)] text-xs font-bold uppercase tracking-wider">
-        Hướng dẫn sử dụng
-      </span>
-      <h1 className="text-3xl font-black text-[var(--lb-text)]">Cách thức hoạt động của LocalBuddy</h1>
-      <p className="text-[var(--lb-muted)] text-sm max-w-xl mx-auto">
-        Trải nghiệm du lịch bản địa linh hoạt theo giờ tại Đà Nẵng với 3 bước đơn giản và bảo đảm an toàn 100%.
-      </p>
-    </div>
-
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
-      <div className="bg-[var(--lb-surface)] border border-[var(--lb-border)] rounded-[20px] p-6 space-y-3">
-        <div className="w-10 h-10 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] flex items-center justify-center font-bold text-lg">
-          1
-        </div>
-        <h3 className="text-lg font-bold text-[var(--lb-text)]">Chọn Guide & Khung giờ</h3>
-        <p className="text-xs text-[var(--lb-muted)] leading-relaxed">
-          Tìm kiếm Guide theo chuyên môn ẩm thực, nhiếp ảnh hoặc khám phá Sơn Trà. Chọn ngày giờ rảnh theo block 1 giờ linh hoạt.
-        </p>
-      </div>
-
-      <div className="bg-[var(--lb-surface)] border border-[var(--lb-border)] rounded-[20px] p-6 space-y-3">
-        <div className="w-10 h-10 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] flex items-center justify-center font-bold text-lg">
-          2
-        </div>
-        <h3 className="text-lg font-bold text-[var(--lb-text)]">Guide chấp nhận & Đặt cọc 30%</h3>
-        <p className="text-xs text-[var(--lb-muted)] leading-relaxed">
-          Guide có 24h để phản hồi. Khi Guide đồng ý, bạn thanh toán cọc 30% trong 15 phút để khóa khung giờ chính thức.
-        </p>
-      </div>
-
-      <div className="bg-[var(--lb-surface)] border border-[var(--lb-border)] rounded-[20px] p-6 space-y-3">
-        <div className="w-10 h-10 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] flex items-center justify-center font-bold text-lg">
-          3
-        </div>
-        <h3 className="text-lg font-bold text-[var(--lb-text)]">Trải nghiệm & Quyết toán 70%</h3>
-        <p className="text-xs text-[var(--lb-muted)] leading-relaxed">
-          Gặp mặt tại điểm hẹn, đồng hành trọn vẹn. Sau khi hoàn tất tour, thanh toán 70% còn lại qua Online hoặc Tiền mặt trực tiếp.
-        </p>
-      </div>
-    </div>
-  </div>
-);
+export { HowItWorksPage } from './HowItWorksPage';
 
 export const BecomeGuidePage: React.FC = () => (
   <div className="max-w-3xl mx-auto py-12 px-4 space-y-8 text-center">

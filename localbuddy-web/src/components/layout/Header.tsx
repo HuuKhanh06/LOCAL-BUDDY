@@ -9,9 +9,11 @@ import { useTranslation } from 'react-i18next';
 import { UserRole } from '../../types';
 import { useBookingContext } from '../../context/BookingContext';
 import { useToast } from '../ui/Toast';
+import { Logo } from '../common/Logo';
 
 export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role: propRole }) => {
   const location = useLocation();
+  const isWarm = location.pathname === '/how-it-works';
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { t, i18n } = useTranslation();
@@ -60,31 +62,39 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[var(--lb-surface)]/95 backdrop-blur-md text-[var(--lb-text)] border-b border-[var(--lb-border)]">
+    <header className={clsx(
+      "sticky top-0 z-40 backdrop-blur-md border-b transition-colors",
+      isWarm
+        ? "bg-[#FEEDDC]/95 border-[#E8D4C1] text-[#1C1917]"
+        : "bg-[var(--lb-surface)]/95 text-[var(--lb-text)] border-[var(--lb-border)]"
+    )}>
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="w-9 h-9 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] flex items-center justify-center font-black text-[14px]">
-            LB
-          </div>
-          <span className="text-[18px] font-black tracking-tight text-[var(--lb-text)]">
-            LocalBuddy
-          </span>
+        {/* Logo Withlocals style */}
+        <Link to="/" className="flex items-center shrink-0">
+          <Logo size="md" />
         </Link>
 
         {/* Ô tìm nhanh */}
         <form
           onSubmit={handleQuickSearchSubmit}
-          className="hidden md:flex items-center bg-[var(--lb-surface-2)] border border-[var(--lb-border)] focus-within:border-[var(--lb-blue)] rounded-full px-3.5 h-9 w-52 lg:w-64 transition-all"
+          className={clsx(
+            "hidden md:flex items-center border rounded-full px-3.5 h-9 w-52 lg:w-64 transition-all",
+            isWarm
+              ? "bg-white/80 border-[#E8D4C1] focus-within:border-[#D12B79]"
+              : "bg-[var(--lb-surface-2)] border-[var(--lb-border)] focus-within:border-[var(--lb-blue)]"
+          )}
         >
-          <Search className="w-3.5 h-3.5 text-[var(--lb-muted)] shrink-0 mr-2" />
+          <Search className={clsx("w-3.5 h-3.5 shrink-0 mr-2", isWarm ? "text-[#78716C]" : "text-[var(--lb-muted)]")} />
           <input
             type="text"
             value={quickQuery}
             onChange={(e) => setQuickQuery(e.target.value)}
             placeholder="Sơn Trà, Hội An..."
             aria-label="Tìm nhanh"
-            className="bg-transparent text-[13px] text-[var(--lb-text)] placeholder:text-[var(--lb-muted)] w-full focus:outline-none"
+            className={clsx(
+              "bg-transparent text-[13px] w-full focus:outline-none",
+              isWarm ? "text-[#1C1917] placeholder:text-[#78716C]" : "text-[var(--lb-text)] placeholder:text-[var(--lb-muted)]"
+            )}
           />
         </form>
 
@@ -95,19 +105,30 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
             className={clsx(
               'px-3.5 py-1.5 rounded-full transition-colors',
               location.pathname === '/'
-                ? 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-semibold'
-                : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]'
+                ? (isWarm ? 'bg-[#D12B79] text-white font-semibold' : 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-semibold')
+                : (isWarm ? 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3E2CF]' : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]')
             )}
           >
             {t('nav_home')}
+          </Link>
+          <Link
+            to="/how-it-works"
+            className={clsx(
+              'px-3.5 py-1.5 rounded-full transition-colors',
+              location.pathname.startsWith('/how-it-works')
+                ? (isWarm ? 'bg-[#D12B79] text-white font-semibold' : 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-semibold')
+                : (isWarm ? 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3E2CF]' : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]')
+            )}
+          >
+            Giới thiệu
           </Link>
           <Link
             to="/guides"
             className={clsx(
               'px-3.5 py-1.5 rounded-full transition-colors',
               location.pathname.startsWith('/guides')
-                ? 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-semibold'
-                : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]'
+                ? (isWarm ? 'bg-[#D12B79] text-white font-semibold' : 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-semibold')
+                : (isWarm ? 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3E2CF]' : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]')
             )}
           >
             {t('nav_guides')}
@@ -117,8 +138,8 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
             className={clsx(
               'px-3.5 py-1.5 rounded-full transition-colors',
               location.pathname.startsWith('/don')
-                ? 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-semibold'
-                : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]'
+                ? (isWarm ? 'bg-[#D12B79] text-white font-semibold' : 'bg-[var(--lb-accent)] text-[var(--lb-on-accent)] font-semibold')
+                : (isWarm ? 'text-[#6E6259] hover:text-[#1C1917] hover:bg-[#F3E2CF]' : 'text-[var(--lb-muted)] hover:text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]')
             )}
           >
             Lịch đặt
@@ -241,6 +262,23 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
 
       {mobileMenuOpen && (
         <div className="lg:hidden bg-[var(--lb-surface)] border-t border-[var(--lb-border)] px-4 py-3 space-y-2.5">
+          <div className="flex flex-col gap-1 pb-2 border-b border-[var(--lb-border)] text-[13px]">
+            <Link
+              to="/how-it-works"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-lg font-semibold text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)] flex items-center justify-between"
+            >
+              <span>🌟 Giới thiệu & Mô hình hoạt động</span>
+              <span className="text-xs text-[var(--lb-muted)]">Withlocals →</span>
+            </Link>
+            <Link
+              to="/guides"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-lg font-semibold text-[var(--lb-text)] hover:bg-[var(--lb-surface-2)]"
+            >
+              🔍 Tìm Hướng dẫn viên
+            </Link>
+          </div>
           <div className="flex items-center gap-1.5">
             <button
               type="button"
@@ -359,19 +397,14 @@ export const DashboardSidebarContent: React.FC<{
           <Link
             to="/"
             onClick={onCloseDrawer}
-            className="flex items-center gap-2.5"
+            className="flex items-center gap-2"
           >
-            <div className="w-8 h-8 rounded-full bg-[var(--lb-accent)] text-[var(--lb-on-accent)] flex items-center justify-center font-black text-[13px]">
-              LB
-            </div>
-            <div>
-              <span className="font-bold text-[15px] text-[var(--lb-text)] block leading-tight">
-                LocalBuddy
-              </span>
-              <span className="text-[10px] text-[var(--lb-muted)] uppercase font-semibold">
+            <Logo size="sm" />
+            {portalTitle && (
+              <span className="text-[10px] text-[var(--lb-muted)] uppercase font-semibold px-2 py-0.5 rounded-full bg-[var(--lb-surface-2)]">
                 {portalTitle}
               </span>
-            </div>
+            )}
           </Link>
           {onCloseDrawer && (
             <button
