@@ -1,10 +1,10 @@
 // pages/tourist/BookingDetailPage.tsx
-// Màn hình trung tâm điều phối toàn bộ vòng đời đơn đặt lịch của Du khách:
-// - Đồng hồ đếm ngược 24h chờ HDV phản hồi (PENDING - BR-03) + nút Giả lập hết 24h
-// - Đồng hồ đếm ngược 15p giữ chỗ nguyên tử (WAITING_PAYMENT - BR-05) + nút Đặt cọc 30%
-// - Cửa sổ 24h sau khi HDV bấm Yêu cầu hoàn thành (UC.17 → UC.18 Xác nhận hoàn thành / UC.19 Gửi khiếu nại) + nút Giả lập trôi qua 24h
-// - Modal Hủy đơn (UC.24) có Bảng tính phạt/hoàn theo ΔT (>48h: 0%, 24-48h: 50%, <24h: 100%) + nút thử 3 mốc ΔT + bắt buộc nhập Lý do hủy (CANCELLATION_RECORD.lyDo NOT NULL)
-// - Modal Đánh giá 1–5 sao (UC.26) khi COMPLETED + PAID
+// Màn hình chi tiết đơn đặt lịch của Du khách theo Mục [9] THAM KHẢO UI:
+// - Timeline dọc truy vết tiến trình (BOOKING_LOG)
+// - Đồng hồ đếm ngược theo từng trạng thái (24h chờ duyệt, 15p giữ chỗ, 24h xác nhận/khiếu nại)
+// - MỘT hành động chính nổi bật cho mỗi trạng thái
+// - Hiển thị liên hệ trực tiếp SĐT/Email sau khi cọc 30% thành công (không chat nội bộ)
+// - Chuẩn tokens thương hiệu: --lb-bg (#272A2D), --lb-accent (#EB5B38), --lb-sand (#E6E4DC), --lb-blue (#347CCB)
 
 import React, { useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
@@ -88,7 +88,7 @@ export const BookingDetailPage: React.FC = () => {
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
-  // Cancel modal state (Cho phép giả lập ΔT để kiểm thử đủ 3 bậc phạt BR-06)
+  // Cancel modal state (Giả lập ΔT kiểm thử đủ 3 bậc phạt BR-06)
   const realDelta = booking
     ? Math.max(1, calcDeltaHours(booking.date, booking.startTime))
     : 56;
@@ -106,10 +106,10 @@ export const BookingDetailPage: React.FC = () => {
     'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&auto=format&fit=crop&q=80'
   );
 
-  // Review modal state
+  // Review modal state (chỉ Du khách đánh giá Thổ địa, không đánh giá hai chiều)
   const [reviewStars, setReviewStars] = useState<number>(5);
   const [reviewComment, setReviewComment] = useState<string>(
-    'Hướng dẫn viên rất nhiệt tình, đúng giờ và am hiểu sâu sắc văn hóa ẩm thực Đà Nẵng!'
+    'Thổ địa rất nhiệt tình, đúng giờ và am hiểu sâu sắc văn hóa ẩm thực Đà Nẵng!'
   );
 
   if (!booking) {
@@ -132,7 +132,6 @@ export const BookingDetailPage: React.FC = () => {
     deltaHours: simulatedDelta,
   });
 
-  // Tính xem trước tiền phạt/hoàn theo simulatedDelta
   const isDeposited = booking.paymentStatus === 'DEPOSITED';
   const previewSplit = isDeposited
     ? calcPenaltySplit(booking.depositAmount, simulatedDelta, booking.feeRate)
@@ -207,46 +206,54 @@ export const BookingDetailPage: React.FC = () => {
     showToast(res.message, 'success');
   };
 
+  const isDepositPaid =
+    booking.paymentStatus !== 'UNPAID' &&
+    booking.paymentStatus !== 'WAITING_DEPOSIT';
+
   return (
     <div className="max-w-4xl mx-auto py-4 space-y-6">
-      {/* Nút điều hướng đầu trang */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
+      {/* Nút điều hướng & Thẻ liên hệ trực tiếp SĐT/Email (Thay thế chat) */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <Button variant="ghost" size="sm" onClick={() => navigate('/don-cua-toi')}>
           ← Quay lại danh sách đơn của tôi
         </Button>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => navigate(`/tin-nhan?partner=${booking.guideId}&bookingId=${booking.id}`)}
-          >
-            💬 Nhắn tin với HDV ({guideItem?.user.fullName || 'Đà Nẵng'})
-          </Button>
+        <div>
+          {isDepositPaid ? (
+            <div className="flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-[12px] font-semibold text-emerald-900 shadow-xs">
+              <span>📞 SĐT Thổ địa: <strong>{guideItem?.user.phone || '0905678910'}</strong></span>
+              <span>•</span>
+              <span>✉️ {guideItem?.user.email || 'khanh.nguyen.dn@gmail.com'}</span>
+            </div>
+          ) : (
+            <span className="text-[12px] text-[#78716C] bg-[#F3F1EC] px-3.5 py-1.5 rounded-full border border-[#E7E5E4]">
+              🔒 SĐT & Email Thổ địa sẽ hiển thị ngay sau khi cọc 30%
+            </span>
+          )}
         </div>
       </div>
 
-      {/* 1. KHỐI HEADER ĐƠN & TRẠNG THÁI SONG SONG (BookingStatus + PaymentStatus) */}
-      <div className="bg-white border border-[#E4C3CC] rounded-[16px] p-6 sm:p-8 shadow-sm space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E4C3CC] pb-5">
+      {/* 1. KHỐI HEADER ĐƠN & TRẠNG THÁI SONG SONG */}
+      <div className="bg-white border border-[#E7E5E4] rounded-[22px] p-6 sm:p-8 shadow-xs space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E7E5E4] pb-5">
           <div className="flex items-center gap-4">
             {guideItem?.profile.avatarUrl && (
               <img
                 src={guideItem.profile.avatarUrl}
                 alt={guideItem.user.fullName}
-                className="w-16 h-16 rounded-full object-cover border-2 border-[#1EC1CB] shrink-0"
+                className="w-16 h-16 rounded-full object-cover border-2 border-[#E7E5E4] shadow-xs shrink-0"
               />
             )}
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-2.5 py-0.5 rounded bg-[#1A0A0F] text-[#F6E6EA] text-[12px] font-black tracking-wider">
+                <span className="px-2.5 py-0.5 rounded bg-[#272A2D] text-white text-[12px] font-bold tracking-wider">
                   {booking.id}
                 </span>
-                <span className="text-[12px] text-[#52526B]">
+                <span className="text-[12px] text-[#78716C]">
                   Tạo lúc: {formatDateTime(booking.createdAt)}
                 </span>
               </div>
-              <h1 className="text-[22px] sm:text-[26px] font-extrabold text-[#1A0A0F] mt-1">
-                Hành trình Đà Nẵng cùng HDV {guideItem?.user.fullName || 'Nguyễn Hữu Khanh'}
+              <h1 className="text-[20px] sm:text-[24px] font-black text-[#1C1917] mt-1">
+                Chuyến đi cùng Thổ địa {guideItem?.user.fullName || 'Nguyễn Hữu Khanh'}
               </h1>
             </div>
           </div>
@@ -257,15 +264,15 @@ export const BookingDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 2. BANNER ĐẾM NGƯỢC & TÁC VỤ TỰ ĐỘNG THEO TỪNG GIAI ĐOẠN (Automation 1, 2, 3) */}
+        {/* 2. ĐẾM NGƯỢC THEO TRẠNG THÁI THEO MỤC [9] */}
         {booking.bookingStatus === 'PENDING' && (
-          <div className="p-4 rounded-[12px] bg-[#FEF1DC] border border-[#F8CA84] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="space-y-0.5">
-              <strong className="text-[14px] text-[#8C4A08] block">
-                ⏳ Đang chờ Hướng dẫn viên phản hồi trong 24 giờ (BR-03)
+              <strong className="text-[14px] text-amber-900 block">
+                ⏳ Đang chờ Thổ địa phản hồi trong 24 giờ (BR-03)
               </strong>
-              <span className="text-[13px] text-[#1C1C28]">
-                Khung giờ trên lịch vẫn đang mở (AVAILABLE) cho đến khi HDV bấm Chấp nhận (BR-04).
+              <span className="text-[13px] text-amber-800">
+                Khung giờ trên lịch vẫn mở (AVAILABLE) cho đến khi Thổ địa chấp nhận.
               </span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
@@ -280,7 +287,7 @@ export const BookingDetailPage: React.FC = () => {
                   expirePendingBooking(booking.id);
                   showToast('Đã giả lập quá hạn 24h HDV không phản hồi -> Đơn tự động hủy!', 'warning');
                 }}
-                className="px-2.5 py-1.5 rounded-[8px] bg-[#1C1C28] text-[#1EC1CB] text-[11px] font-bold cursor-pointer"
+                className="px-2.5 py-1.5 rounded-xl bg-[#272A2D] text-white text-[11px] font-bold cursor-pointer hover:bg-black transition-colors"
               >
                 ⚡ Tua hết 24h
               </button>
@@ -289,13 +296,13 @@ export const BookingDetailPage: React.FC = () => {
         )}
 
         {booking.bookingStatus === 'WAITING_PAYMENT' && (
-          <div className="p-4 rounded-[12px] bg-[#FEF1DC] border-2 border-[#F8CA84] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-4 rounded-2xl bg-orange-50 border-2 border-[#EB5B38] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
             <div className="space-y-0.5">
-              <strong className="text-[14px] text-[#8C4A08] block">
-                ⏱ Khung giờ đang được khóa nguyên tử (HOLD) trong 15 phút!
+              <strong className="text-[14px] text-[#EB5B38] block">
+                ⏱ Khung giờ đang được giữ chỗ nguyên tử (HOLD) trong 15 phút!
               </strong>
-              <span className="text-[13px] text-[#1C1C28]">
-                Vui lòng thanh toán đặt cọc 30% ({formatMoney(booking.depositAmount)}) trước khi hết giờ.
+              <span className="text-[13px] text-[#1C1917]">
+                Thổ địa đã chấp nhận. Vui lòng thanh toán cọc 30% ({formatMoney(booking.depositAmount)}) trước khi hết hạn.
               </span>
             </div>
             <div className="flex items-center gap-2 shrink-0 flex-wrap">
@@ -308,6 +315,7 @@ export const BookingDetailPage: React.FC = () => {
                 size="sm"
                 variant="primary"
                 onClick={() => navigate(`/don/${booking.id}/dat-coc`)}
+                className="bg-[#EB5B38] hover:bg-[#d64f2e] text-white font-bold"
               >
                 💳 Đặt cọc 30% ngay
               </Button>
@@ -315,109 +323,109 @@ export const BookingDetailPage: React.FC = () => {
           </div>
         )}
 
-        {/* Cửa sổ 24 giờ sau khi HDV bấm Yêu cầu hoàn thành (UC.17 → UC.18 / UC.19) */}
+        {/* Cửa sổ 24 giờ sau khi HDV bấm Yêu cầu hoàn thành */}
         {booking.bookingStatus === 'CONFIRMED' && booking.guideRequestedCompletion && (
-          <div className="p-5 rounded-[14px] bg-[#E5F8F9] border-2 border-[#1EC1CB] space-y-3">
+          <div className="p-5 rounded-2xl bg-sky-50 border-2 border-sky-300 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="text-[11px] font-extrabold uppercase tracking-wider bg-[#1C1C28] text-[#1EC1CB] px-2.5 py-0.5 rounded">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider bg-[#272A2D] text-white px-2.5 py-0.5 rounded">
                   UC.17 → UC.18 / UC.19 • Cửa sổ xác nhận 24 giờ (BR-08, BR-12)
                 </span>
-                <h3 className="text-[16px] font-extrabold text-[#1A0A0F] mt-1">
-                  HDV {guideItem?.user.fullName} đã gửi yêu cầu xác nhận hoàn thành tour!
+                <h3 className="text-[16px] font-bold text-[#1C1917] mt-1">
+                  Thổ địa {guideItem?.user.fullName} đã gửi yêu cầu xác nhận hoàn thành tour!
                 </h3>
-                <p className="text-[13px] text-[#1C1C28]">
-                  Bạn có <strong>24 giờ</strong> để bấm <strong>Xác nhận hoàn thành</strong> (chuyển sang tất toán 70%) hoặc bấm <strong>Gửi khiếu nại</strong> nếu có sự cố. Một khi đã hoàn thành (COMPLETED), quyền khiếu nại sẽ tự động khóa theo BR-12.
+                <p className="text-[13px] text-[#57534E]">
+                  Bạn có <strong>24 giờ</strong> để bấm <strong>Xác nhận hoàn thành</strong> (chuyển sang tất toán 70%) hoặc <strong>Gửi khiếu nại</strong> nếu có sự cố. Khi đã hoàn thành (COMPLETED), quyền khiếu nại sẽ khóa lại.
                 </p>
               </div>
               <div className="flex flex-col items-end gap-1.5 shrink-0">
                 <Countdown
                   seconds={getSecondsUntil(booking.completionAutoConfirmAt, 79200)}
                   onExpire={() => autoConfirmCompletionTimeout(booking.id)}
-                  label="Tự động chốt sau"
+                  label="Tự chốt sau"
                 />
                 <button
                   type="button"
                   onClick={() => {
                     autoConfirmCompletionTimeout(booking.id);
                     showToast(
-                      'Đã giả lập trôi qua 24h không có khiếu nại -> Tự động chuyển COMPLETED + WAITING_FINAL (BR-08)!',
+                      'Đã giả lập trôi qua 24h không có khiếu nại -> Tự động chuyển COMPLETED (BR-08)!',
                       'success'
                     );
                   }}
-                  className="text-[11px] font-bold text-[#1A0A0F] underline cursor-pointer"
+                  className="text-[11px] font-bold text-[#1C1917] underline cursor-pointer"
                 >
-                  ⚡ Giả lập trôi qua 24h (Auto-Complete)
+                  ⚡ Giả lập trôi 24h
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Thông báo chờ HDV xác nhận tiền mặt 70% (WAITING_RECONCILE - UC.21) */}
+        {/* Chờ HDV xác nhận 70% tiền mặt */}
         {booking.bookingStatus === 'COMPLETED' &&
           booking.paymentStatus === 'WAITING_RECONCILE' && (
-            <div className="p-4 rounded-[12px] bg-[#FEF1DC] border border-[#F8CA84] text-[13px] text-[#8C4A08]">
-              💵 <strong>Đang chờ HDV xác nhận đã thu 70% tiền mặt ({formatMoney(booking.remainingAmount)}):</strong> Bạn đã chọn trả tiền mặt trực tiếp. Ngay khi HDV bấm <em>“Xác nhận đã thu đủ 70% tiền mặt”</em> (UC.21), đơn sẽ chuyển sang <strong>Đã thanh toán 100% (PAID)</strong>.
+            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-[13px] text-amber-900">
+              💵 <strong>Đang chờ Thổ địa xác nhận thu 70% tiền mặt ({formatMoney(booking.remainingAmount)}):</strong> Bạn đã chọn thanh toán trực tiếp. Khi Thổ địa bấm xác nhận, đơn sẽ chuyển sang <strong>Đã thanh toán 100% (PAID)</strong>.
             </div>
           )}
 
         {/* Thông tin chi tiết lịch trình */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#FBF4F6] p-5 rounded-[12px] border border-[#E4C3CC] text-[14px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#F3F1EC] p-5 rounded-2xl border border-[#E7E5E4] text-[13px]">
           <div className="space-y-2">
             <div>
-              <span className="text-[#52526B]">📅 Ngày khởi hành: </span>
-              <strong className="text-[#1A0A0F]">{formatDate(booking.date)}</strong>
+              <span className="text-[#78716C]">📅 Ngày khởi hành: </span>
+              <strong className="text-[#1C1917]">{formatDate(booking.date)}</strong>
             </div>
             <div>
-              <span className="text-[#52526B]">⏰ Khung giờ: </span>
-              <strong className="text-[#1A0A0F]">
+              <span className="text-[#78716C]">⏰ Khung giờ: </span>
+              <strong className="text-[#1C1917]">
                 {formatTimeRange(booking.startTime, booking.endTime)} ({booking.hours} giờ)
               </strong>
             </div>
             <div>
-              <span className="text-[#52526B]">👥 Số lượng khách: </span>
-              <strong className="text-[#1A0A0F]">{booking.guestCount} khách</strong>
+              <span className="text-[#78716C]">👥 Số lượng khách: </span>
+              <strong className="text-[#1C1917]">{booking.guestCount} khách</strong>
             </div>
           </div>
 
           <div className="space-y-2">
             <div>
-              <span className="text-[#52526B]">📍 Địa điểm hẹn tại Đà Nẵng: </span>
-              <strong className="text-[#1A0A0F]">{booking.meetingLocation}</strong>
+              <span className="text-[#78716C]">📍 Điểm hẹn tại Đà Nẵng: </span>
+              <strong className="text-[#1C1917]">{booking.meetingLocation}</strong>
             </div>
             <div>
-              <span className="text-[#52526B]">📝 Ghi chú lịch trình (Booking Notes): </span>
-              <p className="text-[#1C1C28] italic mt-0.5">“{booking.specialRequests}”</p>
+              <span className="text-[#78716C]">📝 Ghi chú yêu cầu: </span>
+              <p className="text-[#1C1917] italic mt-0.5">“{booking.specialRequests}”</p>
             </div>
           </div>
         </div>
 
-        {/* Nếu đơn đang DISPUTED hoặc đã xử lý tranh chấp, hiển thị chi tiết hồ sơ tranh chấp */}
+        {/* Hồ sơ tranh chấp nếu có */}
         {(booking.bookingStatus === 'DISPUTED' || disputeRecord) && (
-          <div className="p-5 rounded-[12px] bg-[#FCE8EB]/70 border border-[#F5B2BA] space-y-2 text-[14px]">
+          <div className="p-5 rounded-2xl bg-red-50 border border-red-200 space-y-2 text-[13px]">
             <div className="flex items-center justify-between">
-              <h3 className="font-extrabold text-[#A61B2B]">
-                ⚖️ Hồ sơ Khiếu nại & Tranh chấp ({disputeRecord?.id || 'Đang thẩm định'})
+              <h3 className="font-bold text-red-900">
+                ⚖️ Hồ sơ Khiếu nại ({disputeRecord?.id || 'Đang thẩm định'})
               </h3>
-              <span className="text-[12px] font-bold px-2.5 py-0.5 rounded-full bg-white text-[#A61B2B] border border-[#F5B2BA]">
-                {disputeRecord?.status === 'RESOLVED' ? 'Đã có phán quyết của Admin' : 'Chờ Admin phán quyết (UC.27)'}
+              <span className="text-[12px] font-bold px-2.5 py-0.5 rounded-full bg-white text-red-800 border border-red-200">
+                {disputeRecord?.status === 'RESOLVED' ? 'Đã có phán quyết Admin' : 'Chờ Admin xử lý (UC.27)'}
               </span>
             </div>
             {disputeRecord && (
               <>
-                <p className="text-[#1C1C28]">
+                <p className="text-red-950">
                   <strong>Hạng mục:</strong> {disputeRecord.reasonCategory}
                 </p>
-                <p className="text-[#1C1C28]">
-                  <strong>Mô tả sự việc:</strong> {disputeRecord.description}
+                <p className="text-red-950">
+                  <strong>Mô tả:</strong> {disputeRecord.description}
                 </p>
                 {disputeRecord.resolutionNote && (
-                  <div className="p-3 bg-white rounded-[10px] border border-[#E4C3CC] mt-2">
-                    <strong className="text-[#1A0A0F] block">
+                  <div className="p-3 bg-white rounded-xl border border-red-200 mt-2">
+                    <strong className="text-[#1C1917] block">
                       Biên bản phán quyết của Admin:
                     </strong>
-                    <p className="text-[#1C1C28] mt-0.5">{disputeRecord.resolutionNote}</p>
+                    <p className="text-[#57534E] mt-0.5">{disputeRecord.resolutionNote}</p>
                   </div>
                 )}
               </>
@@ -426,38 +434,38 @@ export const BookingDetailPage: React.FC = () => {
         )}
       </div>
 
-      {/* 3. KHỐI THÔNG TIN THANH TOÁN / QUYẾT TOÁN HỦY ĐƠN */}
-      <div className="bg-white border border-[#E4C3CC] rounded-[16px] p-6 sm:p-8 shadow-sm space-y-4">
+      {/* 3. KHỐI TÀI CHÍNH / QUYẾT TOÁN HỦY */}
+      <div className="bg-white border border-[#E7E5E4] rounded-[22px] p-6 sm:p-8 shadow-xs space-y-4">
         {booking.bookingStatus === 'CANCELLED' ? (
           <div className="space-y-4">
-            <h2 className="text-[18px] font-extrabold text-[#A61B2B]">
+            <h2 className="text-[18px] font-bold text-red-700">
               Biên bản quyết toán đơn đã hủy ({booking.id})
             </h2>
-            <div className="bg-[#FBF4F6] border border-[#E4C3CC] rounded-[12px] p-5 space-y-2.5 text-[14px]">
+            <div className="bg-[#F3F1EC] border border-[#E7E5E4] rounded-2xl p-5 space-y-2.5 text-[13px]">
               <div className="flex justify-between">
-                <span className="text-[#52526B]">Lý do hủy đã ghi nhận:</span>
-                <strong className="text-[#1A0A0F] text-right max-w-md">
+                <span className="text-[#78716C]">Lý do hủy:</span>
+                <strong className="text-[#1C1917] text-right max-w-md">
                   {booking.cancelReason || 'Đã hủy theo yêu cầu'}
                 </strong>
               </div>
               {booking.deltaHours !== undefined && (
                 <div className="flex justify-between">
-                  <span className="text-[#52526B]">Khoảng cách thời gian trước giờ hẹn (ΔT):</span>
-                  <strong className="text-[#1C1C28] tabular-nums">{booking.deltaHours} giờ</strong>
+                  <span className="text-[#78716C]">Khoảng cách trước giờ hẹn (ΔT):</span>
+                  <strong className="text-[#1C1917] tabular-nums">{booking.deltaHours} giờ</strong>
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="text-[#52526B]">Tiền đặt cọc 30% ban đầu (D):</span>
-                <strong className="text-[#1C1C28] tabular-nums">
+                <span className="text-[#78716C]">Tiền cọc 30% ban đầu:</span>
+                <strong className="text-[#1C1917] tabular-nums">
                   {formatMoney(booking.depositAmount)}
                 </strong>
               </div>
-              <div className="flex justify-between text-[#A61B2B]">
-                <span>Tiền phạt cọc theo quy tắc BR-06:</span>
+              <div className="flex justify-between text-red-700">
+                <span>Mức phạt áp dụng (BR-06):</span>
                 <strong className="tabular-nums">−{formatMoney(booking.penalty || 0)}</strong>
               </div>
-              <div className="flex justify-between text-[#0F6E4B] border-t border-[#E4C3CC] pt-2.5 text-[15px] font-extrabold">
-                <span>Số tiền hoàn trả về tài khoản Du khách:</span>
+              <div className="flex justify-between text-emerald-700 border-t border-[#E7E5E4] pt-2.5 text-[15px] font-bold">
+                <span>Số tiền hoàn trả về tài khoản:</span>
                 <span className="tabular-nums">+{formatMoney(booking.refund || 0)}</span>
               </div>
             </div>
@@ -474,172 +482,150 @@ export const BookingDetailPage: React.FC = () => {
         )}
       </div>
 
-      {/* Nếu đã đánh giá, hiển thị đánh giá hai chiều của khách và HDV */}
+      {/* Đánh giá chuyến đi (chỉ Du khách đánh giá Thổ địa) */}
       {existingReview && (
-        <div className="bg-white border border-[#E4C3CC] rounded-[16px] p-6 space-y-3">
+        <div className="bg-white border border-[#E7E5E4] rounded-[22px] p-6 space-y-3 shadow-xs">
           <div className="flex items-center justify-between">
-            <h3 className="text-[16px] font-bold text-[#1A0A0F]">
-              Đánh giá hai chiều cho chuyến đi này (UC.26)
+            <h3 className="text-[16px] font-bold text-[#1C1917]">
+              Đánh giá của bạn cho chuyến đi này (UC.26)
             </h3>
             <span className="text-amber-500 font-bold">
-              {'★'.repeat(existingReview.stars)} ({existingReview.stars}/5)
+              {'★'.repeat(existingReview.stars)} ({existingReview.stars}/5 sao)
             </span>
           </div>
-          <p className="text-[14px] text-[#1C1C28] italic">“{existingReview.comment}”</p>
-          {existingReview.guideReply ? (
-            <div className="p-3.5 rounded-[12px] bg-[#FBF4F6] border-l-3 border-[#1EC1CB] space-y-1">
-              <div className="flex items-center justify-between text-[12px]">
-                <strong className="text-[#1A0A0F]">
-                  ↳ Phản hồi từ HDV {guideItem?.user.fullName || 'Đà Nẵng'}:
-                </strong>
-                {existingReview.touristRating && (
-                  <span className="font-bold text-[#0F6E4B]">
-                    HDV đánh giá bạn: {'★'.repeat(existingReview.touristRating)} ({existingReview.touristRating}/5)
-                  </span>
-                )}
-              </div>
-              <p className="text-[13px] text-[#1C1C28]">{existingReview.guideReply}</p>
+          <p className="text-[14px] text-[#57534E] italic">“{existingReview.comment}”</p>
+          {existingReview.guideReply && (
+            <div className="p-3.5 rounded-2xl bg-[#F3F1EC] border-l-4 border-[#EB5B38] space-y-1">
+              <strong className="text-[12px] text-[#1C1917] block">
+                ↳ Phản hồi từ Thổ địa {guideItem?.user.fullName || 'Đà Nẵng'}:
+              </strong>
+              <p className="text-[13px] text-[#57534E]">{existingReview.guideReply}</p>
             </div>
-          ) : (
-            <p className="text-[12px] text-[#52526B]">
-              ⏳ Đang chờ Hướng dẫn viên gửi phản hồi đánh giá hai chiều.
-            </p>
           )}
         </div>
       )}
 
-      {/* 3B. THỎA THUẬN DỊCH VỤ ĐIỆN TỬ (SERVICE_AGREEMENT - BR-10) & NHẬT KÝ SỰ KIỆN ĐƠN (BOOKING_LOG - BR-11) */}
+      {/* 4. THỎA THUẬN ĐIỆN TỬ & TIMELINE DỌC (BOOKING_LOG theo Mục [9]) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Thỏa thuận dịch vụ điện tử (BR-10) */}
-        <div className="bg-white border border-[#E4C3CC] rounded-[16px] p-6 shadow-xs space-y-3">
-          <div className="flex items-center justify-between border-b border-[#E4C3CC] pb-3">
+        {/* Thỏa thuận dịch vụ điện tử */}
+        <div className="bg-white border border-[#E7E5E4] rounded-[22px] p-6 shadow-xs space-y-3">
+          <div className="flex items-center justify-between border-b border-[#E7E5E4] pb-3">
             <div>
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#118B93]">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#347CCB]">
                 SERVICE_AGREEMENT • BR-10
               </span>
-              <h3 className="text-[16px] font-extrabold text-[#1A0A0F]">
-                Thỏa thuận dịch vụ điện tử Đà Nẵng
+              <h3 className="text-[16px] font-bold text-[#1C1917]">
+                Thỏa thuận dịch vụ điện tử
               </h3>
             </div>
             <span
               className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                booking.paymentStatus !== 'UNPAID' &&
-                booking.paymentStatus !== 'WAITING_DEPOSIT'
-                  ? 'bg-[#E6F7F0] text-[#146C43] border border-[#B2E5D0]'
-                  : 'bg-[#FFF5E5] text-[#9A5B06] border border-[#F8D39A]'
+                isDepositPaid
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  : 'bg-amber-50 text-amber-800 border border-amber-200'
               }`}
             >
-              {booking.paymentStatus !== 'UNPAID' &&
-              booking.paymentStatus !== 'WAITING_DEPOSIT'
-                ? '✓ Cả hai bên đã ký số'
-                : '⏳ Khởi tạo sau khi đặt cọc 30%'}
+              {isDepositPaid ? '✓ Đã kích hoạt' : '⏳ Kích hoạt sau khi cọc'}
             </span>
           </div>
 
-          <div className="bg-[#FDF7F9] border border-[#E8CED5] rounded-[12px] p-4 text-[13px] text-[#1C1C28] space-y-2 leading-relaxed">
+          <div className="bg-[#F3F1EC] border border-[#E7E5E4] rounded-2xl p-4 text-[13px] text-[#57534E] space-y-2 leading-relaxed">
             <p>
               <strong>Bên A (Du khách):</strong> {touristUser?.fullName || 'Dương Đăng Huân'} •{' '}
-              <strong>Bên B (HDV bản địa):</strong> {guideItem?.user.fullName || 'Nguyễn Hữu Khanh'}
+              <strong>Bên B (Thổ địa):</strong> {guideItem?.user.fullName || 'Nguyễn Hữu Khanh'}
             </p>
             <p>
-              • <strong>Phạm vi dịch vụ:</strong> Hướng dẫn du lịch theo giờ tại{' '}
-              <strong>{booking.meetingLocation}</strong> vào ngày{' '}
-              <strong>{formatDate(booking.date)}</strong> ({booking.startTime} – {booking.endTime},{' '}
-              {booking.hours} giờ).
+              • <strong>Địa điểm:</strong> {booking.meetingLocation} vào ngày {formatDate(booking.date)} ({booking.startTime} – {booking.endTime}).
             </p>
             <p>
-              • <strong>Điều khoản tài chính (BR-05, BR-13):</strong> Tổng giá trị{' '}
-              <strong>{formatMoney(booking.totalAmount)}</strong> (Đặt cọc 30%:{' '}
-              <strong>{formatMoney(booking.depositAmount)}</strong>, Tất toán 70% còn lại sau tour:{' '}
-              <strong>{formatMoney(booking.remainingAmount)}</strong>).
+              • <strong>Thanh toán:</strong> Tổng giá trị {formatMoney(booking.totalAmount)} (Cọc 30%: {formatMoney(booking.depositAmount)}, Tất toán 70%: {formatMoney(booking.remainingAmount)}).
             </p>
             <p>
-              • <strong>Chính sách hủy theo ΔT (BR-06):</strong> Hủy trước &gt;48h hoàn 100% cọc; từ
-              24h–48h phạt 50% cọc; dưới 24h phạt 100% cọc. Nếu HDV hủy đơn, hoàn 100% cọc cho khách.
+              • <strong>Chính sách hủy:</strong> Hủy trước &gt;48h hoàn 100% cọc; từ 24h–48h hoàn 50% cọc; dưới 24h phạt 100% cọc. Nếu Thổ địa hủy, hoàn 100% cọc.
             </p>
           </div>
         </div>
 
-        {/* Nhật ký sự kiện đơn đặt lịch (BOOKING_LOG - BR-11) */}
-        <div className="bg-white border border-[#E4C3CC] rounded-[16px] p-6 shadow-xs space-y-3">
-          <div className="flex items-center justify-between border-b border-[#E4C3CC] pb-3">
+        {/* TIMELINE DỌC (BOOKING_LOG THEO MỤC [9]) */}
+        <div className="bg-white border border-[#E7E5E4] rounded-[22px] p-6 shadow-xs space-y-3">
+          <div className="flex items-center justify-between border-b border-[#E7E5E4] pb-3">
             <div>
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#118B93]">
-                BOOKING_LOG • BR-11
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#347CCB]">
+                BOOKING_LOG • Tiến trình đơn
               </span>
-              <h3 className="text-[16px] font-extrabold text-[#1A0A0F]">
-                Nhật ký truy vết trạng thái đơn
+              <h3 className="text-[16px] font-bold text-[#1C1917]">
+                Nhật ký truy vết thời gian thực
               </h3>
             </div>
-            <span className="text-[11px] font-bold text-[#52526B]">Audit Trail</span>
+            <span className="text-[11px] font-bold text-[#78716C]">Audit Trail</span>
           </div>
 
-          <ol className="relative border-l-2 border-[#1EC1CB] ml-3 space-y-3 text-[13px]">
-            <li className="ml-4">
-              <div className="absolute w-2.5 h-2.5 bg-[#1EC1CB] rounded-full -left-[6px] mt-1.5" />
-              <div className="font-bold text-[#1A0A0F]">
+          <ol className="relative border-l-2 border-[#EB5B38] ml-3 space-y-4 text-[13px] py-1">
+            <li className="ml-5">
+              <div className="absolute w-3 h-3 bg-[#EB5B38] rounded-full -left-[7px] mt-1 ring-4 ring-orange-100" />
+              <div className="font-bold text-[#1C1917]">
                 Khởi tạo yêu cầu đặt lịch (PENDING)
               </div>
-              <div className="text-[12px] text-[#52526B]">
-                {formatDateTime(booking.createdAt)} • Khung giờ vẫn mở (AVAILABLE) chờ HDV duyệt (BR-04)
+              <div className="text-[12px] text-[#78716C]">
+                {formatDateTime(booking.createdAt)} • Chờ Thổ địa phản hồi trong 24 giờ
               </div>
             </li>
 
             {booking.acceptedAt && (
-              <li className="ml-4">
-                <div className="absolute w-2.5 h-2.5 bg-[#1EC1CB] rounded-full -left-[6px] mt-1.5" />
-                <div className="font-bold text-[#1A0A0F]">
-                  HDV chấp nhận đơn & Khóa nguyên tử khung giờ 15 phút (WAITING_PAYMENT)
+              <li className="ml-5">
+                <div className="absolute w-3 h-3 bg-[#347CCB] rounded-full -left-[7px] mt-1 ring-4 ring-sky-100" />
+                <div className="font-bold text-[#1C1917]">
+                  Thổ địa chấp nhận & Giữ chỗ nguyên tử (WAITING_PAYMENT)
                 </div>
-                <div className="text-[12px] text-[#52526B]">
-                  {formatDateTime(booking.acceptedAt)} • Slot chuyển sang HOLD 15 phút (BR-05)
+                <div className="text-[12px] text-[#78716C]">
+                  {formatDateTime(booking.acceptedAt)} • Khóa lịch HOLD 15 phút để cọc 30%
                 </div>
               </li>
             )}
 
             {booking.confirmedAt && (
-              <li className="ml-4">
-                <div className="absolute w-2.5 h-2.5 bg-[#1B8A5A] rounded-full -left-[6px] mt-1.5" />
-                <div className="font-bold text-[#146C43]">
-                  Thanh toán đặt cọc 30% ({formatMoney(booking.depositAmount)}) thành công (CONFIRMED)
+              <li className="ml-5">
+                <div className="absolute w-3 h-3 bg-emerald-600 rounded-full -left-[7px] mt-1 ring-4 ring-emerald-100" />
+                <div className="font-bold text-emerald-800">
+                  Đặt cọc 30% thành công ({formatMoney(booking.depositAmount)}) (CONFIRMED)
                 </div>
-                <div className="text-[12px] text-[#52526B]">
-                  {formatDateTime(booking.confirmedAt)} • Khởi tạo SERVICE_AGREEMENT (BR-10)
+                <div className="text-[12px] text-[#78716C]">
+                  {formatDateTime(booking.confirmedAt)} • Khởi tạo SERVICE_AGREEMENT điện tử
                 </div>
               </li>
             )}
 
             {booking.completionRequestedAt && (
-              <li className="ml-4">
-                <div className="absolute w-2.5 h-2.5 bg-[#1EC1CB] rounded-full -left-[6px] mt-1.5" />
-                <div className="font-bold text-[#1A0A0F]">
-                  HDV gửi yêu cầu xác nhận hoàn thành tour (UC.17)
+              <li className="ml-5">
+                <div className="absolute w-3 h-3 bg-[#347CCB] rounded-full -left-[7px] mt-1 ring-4 ring-sky-100" />
+                <div className="font-bold text-[#1C1917]">
+                  Thổ địa gửi yêu cầu xác nhận hoàn thành tour (UC.17)
                 </div>
-                <div className="text-[12px] text-[#52526B]">
-                  {formatDateTime(booking.completionRequestedAt)} • Mở cửa sổ 24 giờ xác nhận/khiếu nại (BR-08)
+                <div className="text-[12px] text-[#78716C]">
+                  {formatDateTime(booking.completionRequestedAt)} • Mở cửa sổ 24 giờ xác nhận hoặc khiếu nại
                 </div>
               </li>
             )}
 
             {booking.completedAt && (
-              <li className="ml-4">
-                <div className="absolute w-2.5 h-2.5 bg-[#1B8A5A] rounded-full -left-[6px] mt-1.5" />
-                <div className="font-bold text-[#146C43]">
-                  Hoàn thành chuyến đi & Chốt thanh toán 70% cuối (COMPLETED)
+              <li className="ml-5">
+                <div className="absolute w-3 h-3 bg-emerald-600 rounded-full -left-[7px] mt-1 ring-4 ring-emerald-100" />
+                <div className="font-bold text-emerald-800">
+                  Hoàn thành chuyến đi & Tất toán 70% (COMPLETED)
                 </div>
-                <div className="text-[12px] text-[#52526B]">
+                <div className="text-[12px] text-[#78716C]">
                   {formatDateTime(booking.completedAt)} • Trạng thái thanh toán: {booking.paymentStatus}
                 </div>
               </li>
             )}
 
             {booking.cancelledAt && (
-              <li className="ml-4">
-                <div className="absolute w-2.5 h-2.5 bg-[#C93B3B] rounded-full -left-[6px] mt-1.5" />
-                <div className="font-bold text-[#A61B2B]">
+              <li className="ml-5">
+                <div className="absolute w-3 h-3 bg-red-600 rounded-full -left-[7px] mt-1 ring-4 ring-red-100" />
+                <div className="font-bold text-red-800">
                   Đơn đặt lịch đã hủy (CANCELLED)
                 </div>
-                <div className="text-[12px] text-[#52526B]">
+                <div className="text-[12px] text-[#78716C]">
                   {formatDateTime(booking.cancelledAt)} • Lý do: {booking.cancelReason}
                 </div>
               </li>
@@ -648,10 +634,10 @@ export const BookingDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 4. THANH NÚT HÀNH ĐỘNG CHÍNH XÁC THEO MA TRẬN TRẠNG THÁI */}
+      {/* 5. MỘT HÀNH ĐỘNG CHÍNH NỔI BẬT THEO MỤC [9] */}
       {actions.length > 0 && (
-        <div className="bg-white border-2 border-[#1EC1CB] rounded-[16px] p-5 shadow-md flex flex-wrap gap-3 items-center justify-between">
-          <span className="text-[13px] font-bold text-[#1A0A0F]">
+        <div className="bg-white border-2 border-[#EB5B38] rounded-[22px] p-5 shadow-md flex flex-wrap gap-3 items-center justify-between">
+          <span className="text-[13px] font-bold text-[#1C1917]">
             Thao tác khả dụng cho đơn {booking.id}:
           </span>
           <div className="flex flex-wrap gap-3">
@@ -661,12 +647,12 @@ export const BookingDetailPage: React.FC = () => {
                 onClick={() => {
                   setDisputeCategory(DISPUTE_CATEGORY_PRESETS[0]);
                   setDisputeDescription(
-                    'Đã quá giờ hẹn 30 phút tại điểm đón nhưng Hướng dẫn viên không có mặt (No-show).'
+                    'Đã quá giờ hẹn 30 phút tại điểm đón nhưng Thổ địa không có mặt (No-show).'
                   );
                   setIsDisputeModalOpen(true);
                 }}
               >
-                ⚠️ Báo HDV vắng mặt (No-show)
+                ⚠️ Báo Thổ địa vắng mặt (No-show)
               </Button>
             )}
             {actions.map((act) => (
@@ -674,6 +660,11 @@ export const BookingDetailPage: React.FC = () => {
                 key={act.key}
                 variant={act.variant}
                 onClick={() => handleActionClick(act.key)}
+                className={
+                  act.variant === 'primary'
+                    ? 'bg-[#EB5B38] hover:bg-[#d64f2e] text-white font-bold'
+                    : ''
+                }
               >
                 {act.label}
               </Button>
@@ -682,7 +673,7 @@ export const BookingDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* MODAL 1: HỦY ĐƠN & BẢNG XEM TRƯỚC PHẠT/HOÀN THEO ΔT + LÝ DO BẮT BUỘC (UC.24, BR-06, BR-07) */}
+      {/* MODAL 1: HỦY ĐƠN (UC.24, BR-06) */}
       <Modal
         isOpen={isCancelModalOpen}
         onClose={() => setIsCancelModalOpen(false)}
@@ -702,9 +693,9 @@ export const BookingDetailPage: React.FC = () => {
         <div className="space-y-4">
           {isDeposited ? (
             <>
-              <div className="bg-[#FBF4F6] border border-[#E4C3CC] rounded-[12px] p-3.5 space-y-2">
+              <div className="bg-[#F3F1EC] border border-[#E7E5E4] rounded-2xl p-3.5 space-y-2">
                 <div className="flex items-center justify-between flex-wrap gap-2">
-                  <span className="text-[12px] font-bold text-[#1A0A0F]">
+                  <span className="text-[12px] font-bold text-[#1C1917]">
                     ⚡ Chọn mốc thời gian ΔT để kiểm thử 3 bậc phạt của BR-06:
                   </span>
                   <div className="flex gap-1.5">
@@ -719,8 +710,8 @@ export const BookingDetailPage: React.FC = () => {
                         onClick={() => setSimulatedDelta(opt.val)}
                         className={`px-2.5 py-1 rounded-full text-[11px] font-bold border cursor-pointer ${
                           simulatedDelta === opt.val
-                            ? 'bg-[#1EC1CB] text-[#1C1C28] border-[#1C1C28]'
-                            : 'bg-white text-[#1C1C28] border-[#E4C3CC]'
+                            ? 'bg-[#272A2D] text-white border-[#272A2D]'
+                            : 'bg-white text-[#1C1917] border-[#E7E5E4]'
                         }`}
                       >
                         {opt.label}
@@ -730,18 +721,18 @@ export const BookingDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-[#F6E6EA]/60 border border-[#E4C3CC] rounded-[12px] p-4 text-[14px] space-y-2">
+              <div className="bg-orange-50/60 border border-orange-200 rounded-2xl p-4 text-[13px] space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-[#52526B]">Khoảng cách đến giờ khởi hành (ΔT):</span>
-                  <strong className="text-[#1A0A0F] tabular-nums">{simulatedDelta} giờ</strong>
+                  <span className="text-[#78716C]">Khoảng cách đến giờ hẹn (ΔT):</span>
+                  <strong className="text-[#1C1917] tabular-nums">{simulatedDelta} giờ</strong>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#52526B]">Tiền đặt cọc 30% đã đóng (D):</span>
-                  <strong className="text-[#1C1C28] tabular-nums">
+                  <span className="text-[#78716C]">Tiền cọc 30% đã đóng:</span>
+                  <strong className="text-[#1C1917] tabular-nums">
                     {formatMoney(booking.depositAmount)}
                   </strong>
                 </div>
-                <div className="flex justify-between text-[#A61B2B]">
+                <div className="flex justify-between text-red-700">
                   <span>
                     Mức phạt áp dụng ({(previewSplit.penaltyRate * 100).toFixed(0)}% tiền cọc):
                   </span>
@@ -749,7 +740,7 @@ export const BookingDetailPage: React.FC = () => {
                     −{formatMoney(previewSplit.penaltyAmount)}
                   </strong>
                 </div>
-                <div className="flex justify-between text-[#0F6E4B] border-t border-[#E4C3CC] pt-2 font-extrabold text-[15px]">
+                <div className="flex justify-between text-emerald-700 border-t border-orange-200 pt-2 font-bold text-[14px]">
                   <span>Số tiền hoàn trả cho bạn (Refund):</span>
                   <span className="tabular-nums">
                     +{formatMoney(previewSplit.refundToTourist)}
@@ -758,15 +749,15 @@ export const BookingDetailPage: React.FC = () => {
               </div>
             </>
           ) : (
-            <div className="p-3.5 bg-[#E3F7EF] border border-[#99E2C4] rounded-[12px] text-[13px] text-[#0F6E4B] font-semibold">
+            <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-[13px] text-emerald-800 font-semibold">
               ✓ Đơn này chưa thanh toán tiền cọc nên bạn được hủy miễn phí (Phí phạt: 0 ₫).
             </div>
           )}
 
-          {/* Lý do hủy bắt buộc (CANCELLATION_RECORD.lyDo NOT NULL) */}
+          {/* Lý do hủy bắt buộc */}
           <div className="space-y-2">
-            <label className="text-[13px] font-bold text-[#1A0A0F] block">
-              Chọn nhanh hoặc nhập Lý do hủy đơn * (Bắt buộc lưu vào CSDL):
+            <label className="text-[13px] font-bold text-[#1C1917] block">
+              Chọn nhanh hoặc nhập Lý do hủy đơn * (Bắt buộc):
             </label>
             <div className="flex flex-wrap gap-1.5">
               {CANCEL_REASON_PRESETS.map((preset) => (
@@ -776,8 +767,8 @@ export const BookingDetailPage: React.FC = () => {
                   onClick={() => setCancelReason(preset)}
                   className={`px-2.5 py-1 rounded-full text-[12px] font-semibold border cursor-pointer ${
                     cancelReason === preset
-                      ? 'bg-[#1EC1CB] text-[#1C1C28] border-[#1C1C28]'
-                      : 'bg-[#FBF4F6] text-[#1C1C28] border-[#E4C3CC]'
+                      ? 'bg-[#272A2D] text-white border-[#272A2D]'
+                      : 'bg-[#F3F1EC] text-[#1C1917] border-[#E7E5E4]'
                   }`}
                 >
                   {preset}
@@ -794,7 +785,7 @@ export const BookingDetailPage: React.FC = () => {
         </div>
       </Modal>
 
-      {/* MODAL 2: GỬI KHIẾU NẠI TRONG CỬA SỔ 24 GIỜ (UC.19, BR-12) */}
+      {/* MODAL 2: GỬI KHIẾU NẠI (UC.19, BR-12) */}
       <Modal
         isOpen={isDisputeModalOpen}
         onClose={() => setIsDisputeModalOpen(false)}
@@ -812,18 +803,18 @@ export const BookingDetailPage: React.FC = () => {
         }
       >
         <div className="space-y-4">
-          <p className="text-[13px] text-[#52526B]">
+          <p className="text-[13px] text-[#78716C]">
             Khi gửi khiếu nại, đơn sẽ chuyển sang trạng thái <strong>Đang khiếu nại (DISPUTED)</strong> và tạm dừng thu 70% còn lại cho đến khi Quản trị viên đưa ra phán quyết (UC.27).
           </p>
 
           <div>
-            <label className="text-[13px] font-bold text-[#1A0A0F] block mb-1.5">
+            <label className="text-[13px] font-bold text-[#1C1917] block mb-1.5">
               Hạng mục sự cố *:
             </label>
             <select
               value={disputeCategory}
               onChange={(e) => setDisputeCategory(e.target.value)}
-              className="w-full px-3.5 min-h-[44px] rounded-[12px] border border-[#E4C3CC] text-[14px] text-[#1C1C28] bg-white"
+              className="w-full px-3.5 min-h-[44px] rounded-2xl border border-[#E7E5E4] text-[13px] text-[#1C1917] bg-white focus:outline-none"
             >
               {DISPUTE_CATEGORY_PRESETS.map((cat) => (
                 <option key={cat} value={cat}>
@@ -835,24 +826,24 @@ export const BookingDetailPage: React.FC = () => {
 
           <Textarea
             label="Mô tả chi tiết sự việc & yêu cầu giải quyết *"
-            placeholder="Nêu rõ thời gian, địa điểm và chi tiết sự việc để Admin đối soát với HDV..."
+            placeholder="Nêu rõ thời gian, địa điểm và chi tiết sự việc để Admin đối soát..."
             value={disputeDescription}
             onChange={(e) => setDisputeDescription(e.target.value)}
             rows={4}
           />
 
           <div className="space-y-1.5">
-            <label className="text-[13px] font-bold text-[#1A0A0F] block mb-1">
-              Hình ảnh / Minh chứng đính kèm (URL hoặc tải tệp):
+            <label className="text-[13px] font-bold text-[#1C1917] block mb-1">
+              Hình ảnh / Minh chứng đính kèm:
             </label>
             <input
               type="text"
               value={disputeEvidenceUrl}
               onChange={(e) => setDisputeEvidenceUrl(e.target.value)}
-              className="w-full px-3.5 min-h-[42px] rounded-[12px] border border-[#E4C3CC] text-[13px] text-[#1C1C28]"
+              className="w-full px-3.5 min-h-[42px] rounded-2xl border border-[#E7E5E4] text-[13px] text-[#1C1917] focus:outline-none"
             />
-            <label className="inline-flex items-center gap-1.5 text-xs font-bold text-[#118B93] hover:text-[#1A0A0F] cursor-pointer pt-1">
-              <span>📤 Tải tệp bằng chứng khiếu nại từ máy (Supabase Storage: complaint-evidences)</span>
+            <label className="inline-flex items-center gap-1.5 text-xs font-bold text-[#347CCB] hover:text-[#1C1917] cursor-pointer pt-1">
+              <span>📤 Tải tệp bằng chứng khiếu nại (Storage: complaint-evidences)</span>
               <input
                 type="file"
                 accept="image/*,.pdf"
@@ -864,17 +855,21 @@ export const BookingDetailPage: React.FC = () => {
         </div>
       </Modal>
 
-      {/* MODAL 3: ĐÁNH GIÁ HƯỚNG DẪN VIÊN (UC.26, BR-09) */}
+      {/* MODAL 3: ĐÁNH GIÁ THỔ ĐỊA (UC.26, BR-09) */}
       <Modal
         isOpen={isReviewModalOpen}
         onClose={() => setIsReviewModalOpen(false)}
-        title={`Đánh giá HDV ${guideItem?.user.fullName || ''} (UC.26)`}
+        title={`Đánh giá Thổ địa ${guideItem?.user.fullName || ''} (UC.26)`}
         footer={
           <>
             <Button variant="ghost" onClick={() => setIsReviewModalOpen(false)}>
               Để sau
             </Button>
-            <Button variant="primary" onClick={handleConfirmReview}>
+            <Button
+              variant="primary"
+              onClick={handleConfirmReview}
+              className="bg-[#EB5B38] hover:bg-[#d64f2e] text-white font-bold"
+            >
               Gửi đánh giá xác thực
             </Button>
           </>
@@ -882,7 +877,7 @@ export const BookingDetailPage: React.FC = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="text-[14px] font-bold text-[#1A0A0F] block mb-2">
+            <label className="text-[14px] font-bold text-[#1C1917] block mb-2">
               Mức độ hài lòng của bạn (1 – 5 sao):
             </label>
             <div className="flex items-center gap-2">
@@ -891,16 +886,16 @@ export const BookingDetailPage: React.FC = () => {
                   key={s}
                   type="button"
                   onClick={() => setReviewStars(s)}
-                  className={`w-11 h-11 rounded-[10px] text-xl font-bold border transition-all cursor-pointer ${
+                  className={`w-11 h-11 rounded-2xl text-xl font-bold border transition-all cursor-pointer ${
                     s <= reviewStars
-                      ? 'bg-[#1EC1CB] text-[#1C1C28] border-[#1C1C28]'
-                      : 'bg-[#FBF4F6] text-gray-400 border-[#E4C3CC]'
+                      ? 'bg-[#EB5B38] text-white border-[#EB5B38]'
+                      : 'bg-[#F3F1EC] text-gray-400 border-[#E7E5E4]'
                   }`}
                 >
                   ★
                 </button>
               ))}
-              <span className="ml-2 text-[14px] font-bold text-[#1A0A0F]">
+              <span className="ml-2 text-[14px] font-bold text-[#1C1917]">
                 {reviewStars} / 5 sao
               </span>
             </div>

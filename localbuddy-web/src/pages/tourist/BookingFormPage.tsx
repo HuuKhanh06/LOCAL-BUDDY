@@ -1,7 +1,11 @@
 // pages/tourist/BookingFormPage.tsx (UC.12: Đặt lịch Hướng dẫn viên theo giờ)
-// Tuân thủ chốt Câu hỏi 2 & 3:
-// - Bắt buộc nhập cả Địa điểm hẹn (diaDiemHen) và Ghi chú yêu cầu (ghiChuYeuCau) + có chip gợi ý điểm đón Đà Nẵng (NB-05).
-// - Khi gửi yêu cầu (PENDING), khung giờ VẪN GIỮ LÀ AVAILABLE (BR-04), chỉ khóa HOLD khi HDV bấm Chấp nhận (UC.13).
+// Thiết kế theo Mục [9] THAM KHẢO UI:
+// Gửi yêu cầu: chọn ngày → lưới giờ rảnh → số giờ → địa điểm hẹn → số khách → ghi chú → tóm tắt tiền →
+// "Gửi yêu cầu đặt lịch (chưa tính phí cho đến khi Guide chấp nhận)"
+// Tuân thủ:
+// - Bắt buộc nhập cả Địa điểm hẹn và Ghi chú yêu cầu + chip gợi ý điểm đón Đà Nẵng
+// - Khung giờ VẪN GIỮ LÀ AVAILABLE (BR-04) khi PENDING, chỉ HOLD 15 phút khi HDV Chấp nhận (UC.13)
+// - Tourist mode: Tuyệt đối không bao giờ hiển thị phí sàn
 
 import React, { useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
@@ -63,7 +67,11 @@ export const BookingFormPage: React.FC = () => {
 
     if (!currentUser) {
       showToast('Vui lòng đăng ký hoặc đăng nhập tài khoản để đặt lịch!', 'info');
-      navigate(`/dang-nhap?returnTo=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      navigate(
+        `/dang-nhap?returnTo=${encodeURIComponent(
+          window.location.pathname + window.location.search
+        )}`
+      );
       return;
     }
 
@@ -81,7 +89,7 @@ export const BookingFormPage: React.FC = () => {
 
     if (!specialRequests.trim()) {
       setErrorMsg(
-        'Theo quy định FR 4.1 (UC.12), vui lòng nhập Ghi chú yêu cầu / Lịch trình mong muốn để HDV chuẩn bị.'
+        'Theo quy định FR 4.1 (UC.12), vui lòng nhập Ghi chú yêu cầu / Lịch trình mong muốn để Thổ địa chuẩn bị.'
       );
       return;
     }
@@ -116,21 +124,22 @@ export const BookingFormPage: React.FC = () => {
     });
 
     showToast(
-      `Đã tạo yêu cầu đặt lịch ${newBooking.id}! Hướng dẫn viên có 24 giờ để phản hồi (BR-03).`,
+      `Đã tạo yêu cầu đặt lịch ${newBooking.id}! Thổ địa có 24 giờ để phản hồi (BR-03).`,
       'success'
     );
     navigate(`/don/${newBooking.id}`);
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-4 space-y-6">
+    <div className="max-w-3xl mx-auto py-6 space-y-6">
+      {/* Tiêu đề trang */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <span className="text-[12px] font-bold uppercase tracking-wider text-[#1A0A0F] bg-[#F6E6EA] px-3 py-1 rounded-full">
-            UC.12 • Gửi yêu cầu đặt lịch theo giờ
+          <span className="text-[12px] font-bold uppercase tracking-wider text-[#EB5B38] bg-orange-50 border border-orange-200 px-3 py-1 rounded-full">
+            Bước xác nhận chuyến đi • UC.12
           </span>
-          <h1 className="text-[26px] font-extrabold text-[#1A0A0F] mt-2">
-            Xác nhận thông tin chuyến đi tại Đà Nẵng
+          <h1 className="text-[24px] sm:text-[28px] font-black text-[#1C1917] mt-2">
+            Gửi yêu cầu đặt Thổ địa Đà Nẵng
           </h1>
         </div>
         <Button variant="ghost" onClick={() => navigate(`/guides/${user.id}`)}>
@@ -139,46 +148,37 @@ export const BookingFormPage: React.FC = () => {
       </div>
 
       {/* Thẻ tóm tắt HDV & Ca đã chọn */}
-      <div className="bg-[#1C1C28] text-white rounded-[16px] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md">
+      <div className="bg-[#272A2D] text-white rounded-[22px] p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md">
         <div className="flex items-center gap-4">
           <img
             src={profile.avatarUrl}
             alt={user.fullName}
-            className="w-16 h-16 rounded-full object-cover border-2 border-[#1EC1CB]"
+            className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-xs shrink-0"
           />
           <div>
-            <span className="text-[11px] font-bold text-[#1EC1CB] uppercase tracking-wider">
-              Hướng dẫn viên đồng hành
+            <span className="text-[11px] font-bold text-[#EB5B38] uppercase tracking-wider">
+              Thổ địa đồng hành
             </span>
-            <h3 className="text-[19px] font-extrabold text-white">{user.fullName}</h3>
-            <p className="text-[13px] text-[#F6E6EA]/90 mt-0.5">
-              📅 Ngày {formatDate(date)} • ⏰ Khung giờ {startTime} – {endTime} ({hours} giờ)
+            <h3 className="text-[20px] font-black text-white">{user.fullName}</h3>
+            <p className="text-[13px] text-white/80 mt-0.5">
+              📅 Ngày {formatDate(date)} • ⏰ Khung {startTime} – {endTime} ({hours} giờ)
             </p>
           </div>
         </div>
-        <div className="sm:text-right bg-white/10 px-4 py-2.5 rounded-[12px]">
-          <span className="text-[11px] text-[#F6E6EA]/80 block">Đơn giá áp dụng</span>
-          <span className="text-[18px] font-black text-[#1EC1CB] tabular-nums">
+        <div className="sm:text-right bg-white/10 px-4 py-2.5 rounded-2xl border border-white/15">
+          <span className="text-[11px] text-white/70 block">Đơn giá niêm yết</span>
+          <span className="text-[18px] font-black text-white tabular-nums">
             {profile.hourlyRate.toLocaleString('vi-VN')} ₫ / giờ
           </span>
         </div>
       </div>
 
+      {/* Form quy trình gửi yêu cầu theo Mục [9] */}
       <form
         onSubmit={handleSubmit}
-        className="bg-white border border-[#E4C3CC] rounded-[16px] p-6 sm:p-8 shadow-xs space-y-6"
+        className="bg-white border border-[#E7E5E4] rounded-[24px] p-6 sm:p-8 shadow-xs space-y-6"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input
-            label="Số lượng khách tham gia * (1 – 20 người)"
-            type="number"
-            min={1}
-            max={20}
-            value={guestCount}
-            onChange={(e) => setGuestCount(Number(e.target.value))}
-            hint="Giá thuê tính theo giờ của HDV, không phụ thu theo đầu người"
-          />
-
           <Input
             label="Số giờ thuê trong ca *"
             type="number"
@@ -188,9 +188,19 @@ export const BookingFormPage: React.FC = () => {
             onChange={(e) => setHours(Math.max(1, Math.min(10, Number(e.target.value))))}
             hint={`Khung giờ gốc: ${startTime} – ${endTime}`}
           />
+
+          <Input
+            label="Số lượng khách tham gia * (1 – 20 người)"
+            type="number"
+            min={1}
+            max={20}
+            value={guestCount}
+            onChange={(e) => setGuestCount(Number(e.target.value))}
+            hint="Đơn giá tính theo giờ, không phụ thu theo đầu người"
+          />
         </div>
 
-        {/* Địa điểm hẹn bắt buộc + Chip chọn nhanh địa danh Đà Nẵng (NB-05) */}
+        {/* Địa điểm hẹn bắt buộc + Chip gợi ý điểm đón Đà Nẵng */}
         <div className="space-y-2">
           <Input
             label="Địa điểm hẹn đón khách tại Đà Nẵng * (Bắt buộc - FR 4.1)"
@@ -199,8 +209,8 @@ export const BookingFormPage: React.FC = () => {
             onChange={(e) => setMeetingLocation(e.target.value)}
           />
           <div>
-            <span className="text-[12px] font-semibold text-[#52526B] block mb-1.5">
-              📍 Chọn nhanh điểm hẹn phổ biến tại Đà Nẵng:
+            <span className="text-[12px] font-semibold text-[#78716C] block mb-1.5">
+              📍 Gợi ý điểm hẹn phổ biến tại Đà Nẵng:
             </span>
             <div className="flex flex-wrap gap-1.5">
               {DANANG_MEETING_SPOTS.map((spot) => (
@@ -208,10 +218,10 @@ export const BookingFormPage: React.FC = () => {
                   key={spot}
                   type="button"
                   onClick={() => setMeetingLocation(spot)}
-                  className={`px-3 py-1 rounded-full text-[12px] font-semibold border transition-colors cursor-pointer ${
+                  className={`px-3 py-1 rounded-full text-[12px] font-medium border transition-colors cursor-pointer ${
                     meetingLocation === spot
-                      ? 'bg-[#1EC1CB] text-[#1C1C28] border-[#1C1C28]'
-                      : 'bg-[#FBF4F6] text-[#1C1C28] border-[#E4C3CC] hover:border-[#1EC1CB]'
+                      ? 'bg-[#272A2D] text-white border-[#272A2D]'
+                      : 'bg-[#F3F1EC] text-[#1C1917] border-[#E7E5E4] hover:border-[#272A2D]'
                   }`}
                 >
                   {spot}
@@ -224,14 +234,14 @@ export const BookingFormPage: React.FC = () => {
         {/* Ghi chú yêu cầu bắt buộc (FR 4.1, UC.12) */}
         <Textarea
           label="Ghi chú yêu cầu & Lịch trình mong muốn * (Bắt buộc - FR 4.1, UC.12)"
-          placeholder="Ví dụ: Muốn đi Chùa Linh Ứng Sơn Trà, ăn hải sản Bé Mặn và nhờ HDV chụp ảnh gia đình..."
+          placeholder="Ví dụ: Cả đoàn muốn đi Chùa Linh Ứng Sơn Trà, ăn hải sản Bé Mặn và nhờ Thổ địa chụp ảnh gia đình..."
           value={specialRequests}
           onChange={(e) => setSpecialRequests(e.target.value)}
-          rows={4}
-          hint="Thông tin này giúp Hướng dẫn viên chuẩn bị lộ trình phù hợp nhất cho bạn"
+          rows={3}
+          hint="Thông tin này giúp Thổ địa chuẩn bị lộ trình tốt nhất cho bạn"
         />
 
-        {/* Tóm tắt thanh toán (Mode tourist: Tuyệt đối ẩn phí sàn) */}
+        {/* Tóm tắt thanh toán minh bạch (Mode tourist: Tuyệt đối ẩn phí sàn) */}
         <PaymentSummary
           hourlyRate={profile.hourlyRate}
           hours={hours}
@@ -241,35 +251,41 @@ export const BookingFormPage: React.FC = () => {
           mode="tourist"
         />
 
-        <div className="p-4 rounded-[12px] bg-[#E5F8F9] border border-[#1EC1CB] text-[13px] text-[#1C1C28] space-y-1">
+        {/* Hộp thông tin cam kết giữ lịch */}
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-[13px] text-amber-950 space-y-1">
           <p className="font-bold">
-            ℹ️ Cơ chế giữ lịch nguyên tử của LocalBuddy (BR-03, BR-04, BR-05):
+            ℹ️ Cam kết an tâm từ LocalBuddy (BR-03, BR-04, BR-05):
           </p>
           <p>
-            1. Khi bạn bấm <strong>Gửi yêu cầu đặt lịch</strong>, đơn sẽ ở trạng thái <strong>Chờ HDV phản hồi (PENDING)</strong>. Bạn chưa phải thanh toán ngay.
+            1. Khi gửi yêu cầu, đơn ở trạng thái <strong>Chờ Thổ địa phản hồi (PENDING)</strong>. <strong>Bạn hoàn toàn chưa bị tính phí.</strong>
           </p>
           <p>
-            2. Ngay khi HDV <strong>{user.fullName}</strong> bấm Chấp nhận (trong vòng 24 giờ), hệ thống sẽ khóa nguyên tử khung giờ (<strong>HOLD</strong>) trong <strong>15 phút</strong> để bạn thanh toán cọc 30%.
+            2. Thổ địa <strong>{user.fullName}</strong> có 24 giờ để chấp nhận. Khi chấp nhận, khung giờ được khóa giữ chỗ (HOLD) trong 15 phút để bạn tiến hành đặt cọc 30%.
           </p>
         </div>
 
         {errorMsg && (
-          <div className="p-3.5 bg-[#FCE8EB] border border-[#F5B2BA] text-[#A61B2B] rounded-[12px] text-[13px] font-semibold">
+          <div className="p-3.5 bg-red-50 border border-red-200 text-red-800 rounded-2xl text-[13px] font-semibold">
             ⚠️ {errorMsg}
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-4 border-t border-[#E4C3CC] flex-wrap gap-3">
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-[#E7E5E4] gap-4">
           <Button
             type="button"
             variant="secondary"
             onClick={() => navigate(`/guides/${user.id}`)}
           >
-            ← Quay lại hồ sơ HDV
+            ← Quay lại hồ sơ Thổ địa
           </Button>
-          <Button type="submit" variant="primary" size="lg">
-            Gửi yêu cầu đặt lịch ngay →
-          </Button>
+
+          {/* Nút hành động chính theo Mục [9]: "Gửi yêu cầu đặt lịch (chưa tính phí cho đến khi Guide chấp nhận)" */}
+          <button
+            type="submit"
+            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-[#EB5B38] hover:bg-[#d64f2e] text-white font-bold text-[14px] shadow-md transition-colors cursor-pointer text-center"
+          >
+            Gửi yêu cầu đặt lịch (chưa tính phí cho đến khi Guide chấp nhận) →
+          </button>
         </div>
       </form>
     </div>
