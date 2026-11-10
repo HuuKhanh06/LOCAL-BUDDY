@@ -246,7 +246,7 @@ const EXPERIENCES: ExperienceItem[] = [
 const FAQ_ITEMS = [
   {
     q: 'Vì sao tôi chỉ cần đặt cọc 30% khi đặt lịch Thổ địa?',
-    a: 'LocalBuddy áp dụng cơ chế thanh toán hai chặng minh bạch theo chuẩn Withlocals (BR-03, BR-05): Du khách chỉ cần thanh toán 30% tiền cọc sau khi Hướng dẫn viên chấp nhận yêu cầu để khóa lịch nguyên tử trong 15 phút. 70% còn lại bạn chỉ phải thanh toán sau khi chuyến đi thực tế đã hoàn thành.',
+    a: 'LocalBuddy áp dụng cơ chế thanh toán hai chặng minh bạch theo chuẩn Local Buddy (BR-03, BR-05): Du khách chỉ cần thanh toán 30% tiền cọc sau khi Hướng dẫn viên chấp nhận yêu cầu để khóa lịch nguyên tử trong 15 phút. 70% còn lại bạn chỉ phải thanh toán sau khi chuyến đi thực tế đã hoàn thành.',
   },
   {
     q: 'Chính sách hoàn tiền cọc khi hủy lịch được quy định như thế nào?',
@@ -297,7 +297,7 @@ export const HomePage: React.FC = () => {
                 className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#EAD7C2] text-[#D12B79] text-xs font-bold shadow-xs hover:bg-white/80 transition-all"
               >
                 <Logo variant="icon" size="sm" />
-                <span>Nền tảng đặt Thổ địa theo giờ chuẩn Withlocals →</span>
+                <span>Nền tảng đặt Thổ địa theo giờ chuẩn Local Buddy →</span>
               </Link>
 
               <h1 className="text-[38px] sm:text-[54px] lg:text-[62px] font-black tracking-tight leading-[1.08] text-[#1C1917]">
@@ -659,7 +659,7 @@ export const HomePage: React.FC = () => {
         <div className="bg-white rounded-[32px] p-8 sm:p-12 border border-[#EAD7C2] shadow-xs space-y-10">
           <div className="text-center max-w-xl mx-auto space-y-2">
             <span className="inline-block px-3.5 py-1 rounded-full bg-[#FEEDDC] text-[#D12B79] border border-[#EAD7C2] text-[11px] font-bold uppercase tracking-wider">
-              Quy trình 3 bước Withlocals
+              Quy trình 3 bước Local Buddy
             </span>
             <h2 className="text-[26px] sm:text-[34px] font-black tracking-tight text-[#1C1917]">
               Cách LocalBuddy vận hành

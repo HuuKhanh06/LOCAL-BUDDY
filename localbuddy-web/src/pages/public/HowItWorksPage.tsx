@@ -17,7 +17,7 @@ export const HowItWorksPage: React.FC = () => {
   const faqs = [
     {
       q: 'Tại sao LocalBuddy chỉ thu cọc 30% thay vì thu toàn bộ 100%?',
-      a: 'Theo chuẩn bảo vệ quyền lợi du khách của Withlocals, LocalBuddy áp dụng cơ chế thanh toán hai chặng: Bạn chỉ cần đặt cọc 30% để Hướng dẫn viên khóa lịch (giữ chỗ nguyên tử trong 15 phút). 70% còn lại bạn chỉ thanh toán sau khi chuyến đi đã hoàn thành và bạn hài lòng với dịch vụ.',
+      a: 'Theo chuẩn bảo vệ quyền lợi du khách của Local Buddy, LocalBuddy áp dụng cơ chế thanh toán hai chặng: Bạn chỉ cần đặt cọc 30% để Hướng dẫn viên khóa lịch (giữ chỗ nguyên tử trong 15 phút). 70% còn lại bạn chỉ thanh toán sau khi chuyến đi đã hoàn thành và bạn hài lòng với dịch vụ.',
     },
     {
       q: 'Hướng dẫn viên trên LocalBuddy có được kiểm duyệt chất lượng không?',
@@ -45,7 +45,7 @@ export const HowItWorksPage: React.FC = () => {
           <div className="lg:col-span-7 space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#EAD7C2] text-[#D12B79] text-xs font-bold shadow-xs">
               <Logo variant="icon" size="sm" />
-              <span>Mô hình đặt Thổ địa theo giờ chuẩn Withlocals</span>
+              <span>Mô hình đặt Thổ địa theo giờ chuẩn Local Buddy</span>
             </div>
 
             <h1 className="text-[36px] sm:text-[52px] font-black tracking-tight leading-[1.1] text-[#1C1917]">

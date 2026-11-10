@@ -269,7 +269,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
               className="px-3 py-2 rounded-lg font-bold text-[#1C1917] hover:bg-white/80 flex items-center justify-between"
             >
               <span>🌟 Giới thiệu & Mô hình hoạt động</span>
-              <span className="text-xs text-[#D12B79]">Withlocals →</span>
+              <span className="text-xs text-[#D12B79]">Local Buddy →</span>
             </Link>
             <Link
               to="/guides"
