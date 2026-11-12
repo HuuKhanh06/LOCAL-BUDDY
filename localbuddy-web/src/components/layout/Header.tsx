@@ -351,14 +351,9 @@ export const DashboardSidebarContent: React.FC<{
           <Link
             to="/"
             onClick={onCloseDrawer}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 min-w-0"
           >
             <Logo size="sm" />
-            {portalTitle && (
-              <span className="text-[10px] text-[var(--lb-muted)] uppercase font-semibold px-2 py-0.5 rounded-full bg-[var(--lb-surface-2)]">
-                {portalTitle}
-              </span>
-            )}
           </Link>
           {onCloseDrawer && (
             <button
