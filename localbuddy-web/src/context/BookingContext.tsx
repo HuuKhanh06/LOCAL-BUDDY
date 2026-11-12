@@ -469,7 +469,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     })
     .filter((item): item is { user: User; profile: GuideProfile } => item !== null);
 
-  // Chỉ các HDV đã xác minh KYC (APPROVED) và không bị khóa tài khoản mới hiển thị cho Du khách (BR-01)
+  // Chỉ các HDV đã xác minh KYC  và không bị khóa tài khoản mới hiển thị cho Du khách 
   const verifiedGuides = allGuides.filter(
     (g) => g.profile.isVerified && g.profile.kycStatus === 'APPROVED' && !g.user.isLocked
   );
@@ -652,7 +652,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         ];
         nextNotifs = pushNotification(nextNotifs, {
           userId: newUserId,
-          title: 'Chào mừng HDV mới! Vui lòng nộp hồ sơ KYC (BR-01)',
+          title: 'Chào mừng HDV mới! Vui lòng nộp hồ sơ KYC ',
           content:
             'Để hồ sơ của bạn hiển thị trên danh sách tìm kiếm và mở lịch nhận khách tại Đà Nẵng, vui lòng hoàn tất nộp hồ sơ xác thực KYC.',
           type: 'KYC',
@@ -852,7 +852,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const total = Math.round(hourlyRate * params.hours);
     const deposit = Math.round(total * 0.3);
     const remaining = total - deposit;
-    const currentFeeRate = state.feeRate; // Snapshot tỷ lệ phí sàn tại thời điểm tạo đơn (BR-13)
+    const currentFeeRate = state.feeRate; // Snapshot tỷ lệ phí sàn tại thời điểm tạo đơn 
 
     const nextIdNumber = 1000 + state.bookings.length + 1;
     const newId = `BK-${nextIdNumber}`;
@@ -889,7 +889,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       depositAmount: deposit,
       remainingAmount: remaining,
       createdAt: new Date().toISOString(),
-      pendingExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Hạn 24h HDV phản hồi (BR-03)
+      pendingExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Hạn 24h HDV phản hồi 
     };
 
     const adminUser = state.users.find((u) => u.role === 'admin') || { id: 'u-admin-1' };
@@ -901,7 +901,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       {
         userId: params.guideId,
         title: `Yêu cầu đặt lịch mới ${newId} từ ${touristName}`,
-        content: `Khung giờ ${params.date} (${params.startTime} – ${params.endTime}) • ${params.guestCount} khách • Điểm hẹn: ${params.meetingLocation}. Vui lòng phản hồi trong 24 giờ (BR-03).`,
+        content: `Khung giờ ${params.date} (${params.startTime} – ${params.endTime}) • ${params.guestCount} khách • Điểm hẹn: ${params.meetingLocation}. Vui lòng phản hồi trong 24 giờ .`,
         type: 'BOOKING',
         bookingId: newId,
         actionUrl: '/guide/don-den',
@@ -999,7 +999,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         {
           userId: target.touristId,
           title: `HDV ${guideName} đã chấp nhận đơn ${bookingId}!`,
-          content: `Khung giờ đang được giữ nguyên tử (HOLD) trong 15 phút. Vui lòng đặt cọc 30% (${formatMoney(
+          content: `Khung giờ đang được giữ chỗ trong 15 phút. Vui lòng đặt cọc 30% (${formatMoney(
             target.depositAmount
           )}) để xác nhận lịch.`,
           type: 'BOOKING',
@@ -1028,7 +1028,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     return {
       ok: true,
-      message: `Đã chấp nhận đơn ${bookingId}! Hệ thống đang khóa giữ chỗ (HOLD) 15 phút chờ khách đặt cọc 30%.`,
+      message: `Đã chấp nhận đơn ${bookingId}! Hệ thống đang khóa giữ chỗ trong 15 phút chờ khách đặt cọc 30%.`,
     };
   };
 
@@ -1135,7 +1135,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           bookingId,
           cancelledByUserId: target.touristId,
           cancellationType: 'SYSTEM_TIMEOUT',
-          reason: 'Giao dịch thanh toán tiền cọc 30% bị từ chối/thất bại trên cổng thanh toán (UC.14 Ngoại lệ 1).',
+          reason: 'Giao dịch thanh toán tiền cọc 30% bị từ chối/thất bại trên cổng thanh toán .',
           cancelledAt: new Date().toISOString(),
           deltaHours: calcDeltaHours(target.date, target.startTime),
           penaltyRate: 0,
@@ -1172,7 +1172,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             userId: target.touristId,
             title: `Giao dịch đặt cọc đơn ${bookingId} thất bại — Đơn đã hủy`,
             content:
-              'Theo quy định UC.14, giao dịch bị từ chối nên hệ thống đã hủy đơn và giải phóng khung giờ về trạng thái Trống (AVAILABLE).',
+              'giao dịch bị từ chối nên hệ thống đã hủy đơn và giải phóng khung giờ về trạng thái Trống.',
             type: 'PAYMENT',
             bookingId,
             actionUrl: `/don/${bookingId}`,
@@ -1182,7 +1182,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return {
           ok: false,
           message:
-            'Giao dịch thanh toán cọc bị từ chối! Đơn đặt lịch đã chuyển sang Đã hủy (CANCELLED) và nhả khung giờ về AVAILABLE theo đúng UC.14.',
+            'Giao dịch thanh toán cọc bị từ chối! Đơn đặt lịch đã chuyển sang Đã hủy và nhả khung giờ về AVAILABLE .',
         };
       }
 
@@ -1193,7 +1193,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return {
         ok: false,
         message:
-          'Kết nối cổng thanh toán gián đoạn tạm thời. Khung giờ vẫn đang được giữ (HOLD) — bạn có thể bấm thử thanh toán lại!',
+          'Kết nối cổng thanh toán gián đoạn tạm thời. Khung giờ vẫn đang được giữ chỗ — bạn có thể bấm thử thanh toán lại!',
       };
     }
 
@@ -1222,7 +1222,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         {
           userId: target.guideId,
           title: `Du khách đã đặt cọc 30% cho đơn ${bookingId}!`,
-          content: `Đơn ${bookingId} (${target.date} • ${target.startTime} – ${target.endTime}) đã chính thức xác nhận (CONFIRMED). Lịch của bạn đã chuyển sang BUSY.`,
+          content: `Đơn ${bookingId} (${target.date} • ${target.startTime} – ${target.endTime}) đã chính thức xác nhận . Lịch của bạn đã chuyển sang BUSY.`,
           type: 'PAYMENT',
           bookingId,
           actionUrl: '/guide/don-va-ca',
@@ -1266,14 +1266,14 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   /**
    * Automation 2 (BR-05, UC.14 Ngoại lệ 2):
-   * Quá hạn 15 phút giữ chỗ (HOLD) mà khách chưa đặt cọc -> Tự động hủy đơn, trả slot về AVAILABLE
+   * Quá hạn 15 phút giữ chỗ mà khách chưa đặt cọc -> Tự động hủy đơn, trả slot về AVAILABLE
    */
   const expireDeposit = (bookingId: string) => {
     const target = state.bookings.find((b) => b.id === bookingId);
     if (!target || target.bookingStatus !== 'WAITING_PAYMENT') return;
 
     const reason =
-      'Quá thời hạn 15 phút giữ chỗ (HOLD) nhưng Du khách chưa hoàn tất thanh toán đặt cọc 30% (Tự động hủy theo BR-05).';
+      'Quá thời hạn 15 phút giữ chỗ nhưng Du khách chưa hoàn tất thanh toán đặt cọc 30% (Tự động hủy do hết hạn giữ chỗ).';
     const cancelRec: CancellationRecord = {
       id: `CAN-${Date.now()}`,
       bookingId,
@@ -1322,7 +1322,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         {
           userId: target.guideId,
           title: `Đơn ${bookingId} đã tự động hủy (khách không cọc 15p)`,
-          content: `Khung giờ ${target.date} (${target.startTime} – ${target.endTime}) đã tự động giải phóng về trạng thái Trống (AVAILABLE).`,
+          content: `Khung giờ ${target.date} (${target.startTime} – ${target.endTime}) đã tự động giải phóng về trạng thái Trống.`,
           type: 'BOOKING',
           bookingId,
           actionUrl: '/guide/lich-ranh',
@@ -1355,14 +1355,14 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   /**
-   * Automation 1 (BR-03): Quá 24 giờ HDV không phản hồi đơn PENDING -> Tự động chuyển CANCELLED
+   * Automation 1 : Quá 24 giờ HDV không phản hồi đơn PENDING -> Tự động chuyển CANCELLED
    */
   const expirePendingBooking = (bookingId: string) => {
     const target = state.bookings.find((b) => b.id === bookingId);
     if (!target || target.bookingStatus !== 'PENDING') return;
 
     const reason =
-      'Quá thời hạn 24 giờ nhưng Hướng dẫn viên không phản hồi yêu cầu đặt lịch (Tự động hủy theo BR-03).';
+      'Quá thời hạn 24 giờ nhưng Hướng dẫn viên không phản hồi yêu cầu đặt lịch (Tự động hủy do quá thời hạn).';
     setState((prev) => {
       const nextBookings = prev.bookings.map((b) =>
         b.id === bookingId
@@ -1388,7 +1388,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         {
           userId: target.guideId,
           title: `Đơn ${bookingId} tự động hủy do quá 24h không phản hồi`,
-          content: `Bạn chưa phản hồi đơn ${bookingId} trong thời hạn 24 giờ quy định (BR-03). Đơn đã tự động hủy.`,
+          content: `Bạn chưa phản hồi đơn ${bookingId} trong thời hạn 24 giờ quy định. Đơn đã tự động hủy.`,
           type: 'BOOKING',
           bookingId,
           actionUrl: '/guide/don-den',
@@ -1675,7 +1675,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         },
         {
           userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
-          title: `HDV đã hủy đơn ${bookingId} (Vi phạm BR-06)`,
+          title: `HDV đã hủy đơn ${bookingId} `,
           content: `HDV hủy đơn đã CONFIRMED. Hoàn 100% cọc cho khách. HDV bị tính +1 vi phạm.`,
           type: 'BOOKING',
           bookingId,
@@ -1707,7 +1707,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ok: true,
       message: `Đã hủy đơn ${bookingId}. Khách được hoàn 100% cọc (${formatMoney(
         b.depositAmount
-      )}) và hệ thống đã ghi nhận +1 lần vi phạm vào hồ sơ HDV (BR-06).`,
+      )}) và hệ thống đã ghi nhận +1 lần vi phạm vào hồ sơ HDV .`,
     };
   };
 
@@ -1716,7 +1716,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
    * UC.17 & BR-08 (Chốt Câu hỏi 1):
    * Khi HDV bấm "Yêu cầu xác nhận hoàn thành", đơn VẪN GIỮ bookingStatus = 'CONFIRMED',
    * đặt guideRequestedCompletion = true và mở đồng hồ đếm ngược 24 giờ (completionAutoConfirmAt).
-   * Trong 24 giờ này, Du khách có thể bấm "Xác nhận hoàn thành" (UC.18) HOẶC một trong hai bên gửi "Khiếu nại" (UC.19).
+   * Trong 24 giờ này, Du khách có thể bấm "Xác nhận hoàn thành"  HOẶC một trong hai bên gửi "Khiếu nại" .
    */
   const requestCompletion = (bookingId: string): ActionResult => {
     const target = state.bookings.find((b) => b.id === bookingId);
@@ -1741,7 +1741,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           userId: target.touristId,
           title: `HDV yêu cầu xác nhận hoàn thành tour ${bookingId}`,
           content:
-            'Bạn có 24 giờ để bấm "Xác nhận hoàn thành" (UC.18) hoặc "Gửi khiếu nại" (UC.19) nếu có sự cố. Sau 24 giờ không có khiếu nại, hệ thống sẽ tự động hoàn tất.',
+            'Bạn có 24 giờ để bấm "Xác nhận hoàn thành"  hoặc "Gửi khiếu nại"  nếu có sự cố. Sau 24 giờ không có khiếu nại, hệ thống sẽ tự động hoàn tất.',
           type: 'BOOKING',
           bookingId,
           actionUrl: `/don/${bookingId}`,
@@ -1768,7 +1768,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return {
       ok: true,
       message:
-        'Đã gửi yêu cầu xác nhận hoàn thành! Hệ thống đã mở cửa sổ 24 giờ để Du khách xác nhận (UC.18) hoặc phản hồi khiếu nại (UC.19).',
+        'Đã gửi yêu cầu xác nhận hoàn thành! Hệ thống đã mở cửa sổ 24 giờ để Du khách xác nhận  hoặc phản hồi khiếu nại .',
     };
   };
 
@@ -1822,7 +1822,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         {
           userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
           title: `Tour ${bookingId} đã hoàn tất, chờ tất toán 70%`,
-          content: `Đơn ${bookingId} đã chuyển sang COMPLETED (WAITING_FINAL).`,
+          content: `Đơn ${bookingId} đã chuyển sang COMPLETED .`,
           type: 'BOOKING',
           bookingId,
           actionUrl: '/admin/giam-sat',
@@ -1962,7 +1962,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         ok: true,
         message: `Đã ghi nhận phương thức trả Tiền mặt 70% (${formatMoney(
           target.remainingAmount
-        )}). Trạng thái thanh toán chuyển sang Chờ HDV xác nhận tiền mặt (WAITING_RECONCILE).`,
+        )}). Trạng thái thanh toán chuyển sang Chờ HDV xác nhận tiền mặt .`,
       };
     }
 
@@ -2088,7 +2088,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!target) return { ok: false, message: 'Không tìm thấy đơn.' };
 
     const platformFee = Math.round(target.totalAmount * target.feeRate);
-    const addition = target.depositAmount - platformFee; // D - F (BR-13)
+    const addition = target.depositAmount - platformFee; // D - F 
 
     const cashPayment: Payment = {
       id: `pay-${Date.now()}`,
@@ -2149,7 +2149,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           userId: target.touristId,
           title: `HDV đã xác nhận thu đủ 70% tiền mặt đơn ${bookingId}`,
           content:
-            'Đơn đặt lịch của bạn đã hoàn tất thanh toán 100% (PAID). Hãy để lại đánh giá cho chuyến đi nhé!',
+            'Đơn đặt lịch của bạn đã hoàn tất thanh toán 100%. Hãy để lại đánh giá cho chuyến đi nhé!',
           type: 'PAYMENT',
           bookingId,
           actionUrl: `/don/${bookingId}`,
@@ -2195,7 +2195,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         platformFee
       )} vào khoản cọc 30% (${formatMoney(
         target.depositAmount
-      )}), ví khả dụng của bạn được cộng thêm +${formatMoney(addition)} (BR-13).`,
+      )}), ví khả dụng của bạn được cộng thêm +${formatMoney(addition)} .`,
     };
   };
 
@@ -2218,7 +2218,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return {
         ok: false,
         message:
-          'Theo quy tắc BR-12, đơn đã xác nhận hoàn thành (COMPLETED) không thể gửi khiếu nại mới.',
+          'đơn đã xác nhận hoàn thành  không thể gửi khiếu nại mới.',
       };
     }
 
@@ -2251,7 +2251,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         {
           userId: prev.users.find((u) => u.role === 'admin')?.id || 'u-admin-1',
           title: `Khiếu nại mới ${newDispute.id} cho đơn ${bookingId}`,
-          content: `Lý do: ${reasonCategory}. Vui lòng kiểm tra bằng chứng và đưa ra phán quyết (UC.27).`,
+          content: `Lý do: ${reasonCategory}. Vui lòng kiểm tra bằng chứng và đưa ra phán quyết .`,
           type: 'DISPUTE',
           bookingId,
           actionUrl: '/admin/tranh-chap',
@@ -2282,7 +2282,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     return {
       ok: true,
-      message: `Đã gửi hồ sơ khiếu nại ${newDispute.id}. Đơn ${bookingId} đã chuyển sang trạng thái Đang khiếu nại (DISPUTED) để Admin thẩm định.`,
+      message: `Đã gửi hồ sơ khiếu nại ${newDispute.id}. Đơn ${bookingId} đã chuyển sang trạng thái Đang khiếu nại để Admin thẩm định.`,
     };
   };
 
@@ -2469,14 +2469,14 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (b.bookingStatus !== 'COMPLETED' || b.paymentStatus !== 'PAID') {
       return {
         ok: false,
-        message: 'Chỉ đơn đã hoàn thành (COMPLETED) và thanh toán đủ (PAID) mới được đánh giá (BR-09).',
+        message: 'Chỉ đơn đã hoàn thành  và thanh toán đủ mới được đánh giá .',
       };
     }
     const alreadyReviewed = state.reviews.some((r) => r.bookingId === bookingId);
     if (alreadyReviewed) {
       return {
         ok: false,
-        message: 'Mỗi đơn đặt lịch chỉ được gửi đánh giá tối đa 1 lần (BR-09).',
+        message: 'Mỗi đơn đặt lịch chỉ được gửi đánh giá tối đa 1 lần .',
       };
     }
 
@@ -2648,7 +2648,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return {
         ok: false,
         message:
-          'Theo quy tắc BR-01, tài khoản Hướng dẫn viên phải được Admin duyệt KYC (APPROVED) trước khi mở lịch nhận khách.',
+          'Theo quy tắc BR-01, tài khoản Hướng dẫn viên phải được Admin duyệt KYC  trước khi mở lịch nhận khách.',
       };
     }
     if (params.startTime >= params.endTime) {
@@ -2756,7 +2756,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (target.status !== 'AVAILABLE' || target.bookingId) {
       return {
         ok: false,
-        message: 'Chỉ có thể xóa các khung giờ đang Trống (AVAILABLE) và chưa gắn với đơn đặt lịch.',
+        message: 'Chỉ có thể xóa các khung giờ đang Trống và chưa gắn với đơn đặt lịch.',
       };
     }
     setState((prev) => {
@@ -2789,7 +2789,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return {
         ok: false,
         message:
-          'Theo quy tắc BR-02, đơn giá thuê theo giờ của HDV phải nằm trong dải từ 80.000 ₫ đến 500.000 ₫ / giờ.',
+          'đơn giá thuê theo giờ của HDV phải nằm trong dải từ 80.000 ₫ đến 500.000 ₫ / giờ.',
       };
     }
 
@@ -2881,7 +2881,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const nextNotifs = pushNotification(prev.notifications, {
         userId: adminUser?.id || 'u-admin-1',
         title: `Hồ sơ KYC mới từ HDV cần thẩm định`,
-        content: `HDV đã gửi hồ sơ CCCD số ${params.idNumber}. Vui lòng kiểm tra và phê duyệt (UC.10).`,
+        content: `HDV đã gửi hồ sơ CCCD số ${params.idNumber}. Vui lòng kiểm tra và phê duyệt .`,
         type: 'KYC',
         actionUrl: '/admin/kyc',
       });
@@ -3157,7 +3157,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       );
       const nextNotifs = pushNotification(prev.notifications, {
         userId: guideId,
-        title: 'Chúc mừng! Hồ sơ KYC của bạn đã được phê duyệt (APPROVED)',
+        title: 'Chúc mừng! Hồ sơ KYC của bạn đã được phê duyệt ',
         content:
           'Tài khoản Hướng dẫn viên của bạn đã có huy hiệu Đã xác minh và hiển thị công khai cho Du khách. Bạn có thể mở lịch rảnh ngay!',
         type: 'KYC',

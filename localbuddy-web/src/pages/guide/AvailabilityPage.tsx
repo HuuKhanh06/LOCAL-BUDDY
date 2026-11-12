@@ -131,7 +131,7 @@ export const AvailabilityPage: React.FC = () => {
               ⚠️ Tài khoản của bạn chưa hoàn tất xác minh KYC 
             </h3>
             <p className="text-[13px] text-[#1C1C28]">
-              Chỉ Hướng dẫn viên đã được Admin phê duyệt KYC (<strong>APPROVED</strong>) mới được mở lịch nhận khách và hiển thị trên trang tìm kiếm.
+              Chỉ Hướng dẫn viên đã được Admin phê duyệt KYC mới được mở lịch nhận khách và hiển thị trên trang tìm kiếm.
             </p>
           </div>
           <Button variant="primary" onClick={() => navigate('/guide/kyc')}>

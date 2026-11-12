@@ -38,7 +38,6 @@ export const IncomingRequestsPage: React.FC = () => {
   } = useBookingContext();
   const { showToast } = useToast();
 
-  const [viewStatus, setViewStatus] = useState<'ready' | 'loading' | 'error'>('ready');
   const [rejectModalBookingId, setRejectModalBookingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState<string>(REJECT_PRESETS[0]);
 
@@ -80,36 +79,12 @@ export const IncomingRequestsPage: React.FC = () => {
             Yêu cầu đặt lịch mới gửi đến ({incomingBookings.length})
           </h1>
           <p className="text-[14px] text-[#F6E6EA]/85 mt-1">
-            Khi bạn bấm <strong>Chấp nhận</strong>, hệ thống sẽ khóa khung giờ sang <strong>HOLD (15 phút)</strong> để Du khách thanh toán cọc 30%
+            Khi bạn bấm <strong>Chấp nhận</strong>, hệ thống sẽ khóa giữ chỗ khung giờ trong 15 phút để Du khách thanh toán cọc 30%
           </p>
-        </div>
-
-        <div className="flex items-center gap-1.5 bg-white/10 p-1.5 rounded-[12px] text-[12px] self-start">
-          {(['ready', 'loading', 'error'] as const).map((st) => (
-            <button
-              key={st}
-              type="button"
-              onClick={() => setViewStatus(st)}
-              className={`px-2.5 py-1 rounded-[8px] font-bold cursor-pointer ${
-                viewStatus === st
-                  ? 'bg-[#1EC1CB] text-[#1C1C28]'
-                  : 'text-white hover:bg-white/10'
-              }`}
-            >
-              {st === 'ready' ? 'Thành công' : st === 'loading' ? 'Đang tải' : 'Lỗi'}
-            </button>
-          ))}
         </div>
       </div>
 
-      {viewStatus === 'error' ? (
-        <ErrorState
-          message="Không thể đồng bộ danh sách yêu cầu đặt lịch mới."
-          onRetry={() => setViewStatus('ready')}
-        />
-      ) : viewStatus === 'loading' ? (
-        <LoadingState message="Đang tải các yêu cầu đặt lịch từ Du khách..." />
-      ) : incomingBookings.length === 0 ? (
+      {incomingBookings.length === 0 ? (
         <EmptyState
           title="Hiện không có yêu cầu đặt lịch nào đang chờ duyệt"
           description="Tất cả các yêu cầu đặt lịch gửi đến bạn đã được xử lý. Bạn có thể mở thêm khung giờ rảnh hoặc kiểm tra các ca sắp diễn ra."

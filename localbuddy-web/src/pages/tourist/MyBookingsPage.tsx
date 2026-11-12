@@ -13,7 +13,6 @@ export const MyBookingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { bookings, currentUser, getGuideById } = useBookingContext();
   const [activeTab, setActiveTab] = useState<string>('all');
-  const [viewStatus, setViewStatus] = useState<'ready' | 'loading' | 'error'>('ready');
 
   // Phân quyền dữ liệu: Du khách chỉ thấy các đơn do chính mình đặt (b.touristId === currentUser.id)
   const userBookings = useMemo(() => {
@@ -96,36 +95,11 @@ export const MyBookingsPage: React.FC = () => {
             Theo dõi thời hạn giữ chỗ 15 phút, thanh toán cọc 30%, xác nhận hoàn thành và tất toán 70%
           </p>
         </div>
-
-        <div className="flex items-center gap-1.5 bg-white/10 p-1.5 rounded-[12px] text-[12px] self-start">
-          <span className="px-2 text-[#F6E6EA]/80 font-semibold">Trạng thái UI:</span>
-          {(['ready', 'loading', 'error'] as const).map((st) => (
-            <button
-              key={st}
-              type="button"
-              onClick={() => setViewStatus(st)}
-              className={`px-2.5 py-1 rounded-[8px] font-bold cursor-pointer ${
-                viewStatus === st
-                  ? 'bg-[#1EC1CB] text-[#1C1C28]'
-                  : 'text-white hover:bg-white/10'
-              }`}
-            >
-              {st === 'ready' ? 'Thành công' : st === 'loading' ? 'Đang tải' : 'Lỗi'}
-            </button>
-          ))}
-        </div>
       </div>
 
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-      {viewStatus === 'error' ? (
-        <ErrorState
-          message="Không thể tải danh sách đơn đặt lịch từ máy chủ."
-          onRetry={() => setViewStatus('ready')}
-        />
-      ) : viewStatus === 'loading' ? (
-        <LoadingState message="Đang đồng bộ danh sách đơn đặt lịch của bạn..." />
-      ) : filteredBookings.length === 0 ? (
+      {filteredBookings.length === 0 ? (
         <EmptyState
           title="Chưa có đơn đặt lịch nào trong mục này"
           description="Hãy khám phá các Hướng dẫn viên bản địa tại Đà Nẵng và chọn một khung giờ phù hợp với lịch trình của bạn!"
