@@ -261,8 +261,8 @@ export const AppRoutes: React.FC = () => {
           <Route path="/admin/tai-khoan" element={<AccountsPage />} />
           <Route path="/admin/rut-tien" element={<PayoutsPage />} />
           <Route path="/admin/bao-cao" element={<ReportsPage />} />
-          <Route path="/admin/doi-soat" element={<ReportsPage />} />
-          <Route path="/admin/giam-sat" element={<ReportsPage />} />
+          <Route path="/admin/doi-soat" element={<Navigate to="/admin/bao-cao?tab=reconcile" replace />} />
+          <Route path="/admin/giam-sat" element={<Navigate to="/admin/bao-cao?tab=monitoring" replace />} />
           <Route path="/admin/phi-san" element={<FeeConfigPage />} />
           <Route path="/admin/thong-bao" element={<NotificationsPage />} />
         </Route>

@@ -20,7 +20,6 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
     currentUser,
     notifications,
     logout,
-    switchRoleQuickly,
   } = useBookingContext();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -41,13 +40,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
     (n) => !n.isRead && isMatchUser(n)
   ).length;
 
-  const handleQuickRoleSwitch = (targetRole: UserRole, userId?: string) => {
-    const switchedUser = switchRoleQuickly(targetRole, userId);
-    showToast(`Đã chuyển: ${switchedUser.fullName}`, 'info');
-    if (targetRole === 'tourist') navigate('/');
-    if (targetRole === 'guide') navigate('/guide/don-den');
-    if (targetRole === 'admin') navigate('/admin/kyc');
-  };
+
 
   const handleLogout = () => {
     logout();
@@ -153,33 +146,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
             <span>{i18n.language.toUpperCase()}</span>
           </button>
 
-          {/* Chuyển nhanh 2 tài khoản hệ thống */}
-          <div className="hidden sm:flex items-center bg-white p-0.5 rounded-full border border-[#EAD7C2] shadow-xs">
-            <button
-              type="button"
-              onClick={() => handleQuickRoleSwitch('guide', 'u-guide-1')}
-              className={clsx(
-                'px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer',
-                activeRole === 'guide'
-                  ? 'bg-[#D12B79] text-white shadow-xs'
-                  : 'text-[#6E6259] hover:text-[#1C1917]'
-              )}
-            >
-              HDV
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickRoleSwitch('admin', 'u-admin-1')}
-              className={clsx(
-                'px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer',
-                activeRole === 'admin'
-                  ? 'bg-[#D12B79] text-white shadow-xs'
-                  : 'text-[#6E6259] hover:text-[#1C1917]'
-              )}
-            >
-              Admin
-            </button>
-          </div>
+
 
           <Link
             to={
@@ -286,28 +253,7 @@ export const Header: React.FC<{ role?: UserRole; userName?: string }> = ({ role:
               📋 Lịch đặt của tôi
             </Link>
           </div>
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => {
-                handleQuickRoleSwitch('guide', 'u-guide-1');
-                setMobileMenuOpen(false);
-              }}
-              className="flex-1 py-1.5 rounded-full bg-white border border-[#EAD7C2] text-[12px] font-bold text-[#1C1917] shadow-xs"
-            >
-              HDV Khanh
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                handleQuickRoleSwitch('admin', 'u-admin-1');
-                setMobileMenuOpen(false);
-              }}
-              className="flex-1 py-1.5 rounded-full bg-white border border-[#EAD7C2] text-[12px] font-bold text-[#1C1917] shadow-xs"
-            >
-              Admin Hoàng
-            </button>
-          </div>
+
           {!currentUser && (
             <div className="flex items-center gap-2 pt-2 border-t border-[#EAD7C2]">
               <Link
