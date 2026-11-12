@@ -286,7 +286,7 @@ export const BookingDetailPage: React.FC = () => {
                 ⏳ Đang chờ Thổ địa phản hồi trong 24 giờ 
               </strong>
               <span className="text-[13px] text-amber-800">
-                Khung giờ trên lịch vẫn mở (AVAILABLE) cho đến khi Thổ địa chấp nhận.
+                Khung giờ trên lịch vẫn mở  cho đến khi Thổ địa chấp nhận.
               </span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
@@ -313,7 +313,7 @@ export const BookingDetailPage: React.FC = () => {
           <div className="p-4 rounded-2xl bg-orange-50 border-2 border-[#EB5B38] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
             <div className="space-y-0.5">
               <strong className="text-[14px] text-[#EB5B38] block">
-                ⏱ Khung giờ đang được giữ chỗ nguyên tử (HOLD) trong 15 phút!
+                ⏱ Khung giờ đang được giữ chỗ nguyên tử  trong 15 phút!
               </strong>
               <span className="text-[13px] text-[#1C1917]">
                 Thổ địa đã chấp nhận. Vui lòng thanh toán cọc 30% ({formatMoney(booking.depositAmount)}) trước khi hết hạn.
@@ -349,7 +349,7 @@ export const BookingDetailPage: React.FC = () => {
                   Thổ địa {guideItem?.user.fullName} đã gửi yêu cầu xác nhận hoàn thành tour!
                 </h3>
                 <p className="text-[13px] text-[#57534E]">
-                  Bạn có <strong>24 giờ</strong> để bấm <strong>Xác nhận hoàn thành</strong> (chuyển sang tất toán 70%) hoặc <strong>Gửi khiếu nại</strong> nếu có sự cố. Khi đã hoàn thành (COMPLETED), quyền khiếu nại sẽ khóa lại.
+                  Bạn có <strong>24 giờ</strong> để bấm <strong>Xác nhận hoàn thành</strong> (chuyển sang tất toán 70%) hoặc <strong>Gửi khiếu nại</strong> nếu có sự cố. Khi đã hoàn thành , quyền khiếu nại sẽ khóa lại.
                 </p>
               </div>
               <div className="flex flex-col items-end gap-1.5 shrink-0">
@@ -380,7 +380,7 @@ export const BookingDetailPage: React.FC = () => {
         {booking.bookingStatus === 'COMPLETED' &&
           booking.paymentStatus === 'WAITING_RECONCILE' && (
             <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-[13px] text-amber-900">
-              💵 <strong>Đang chờ Thổ địa xác nhận thu 70% tiền mặt ({formatMoney(booking.remainingAmount)}):</strong> Bạn đã chọn thanh toán trực tiếp. Khi Thổ địa bấm xác nhận, đơn sẽ chuyển sang <strong>Đã thanh toán 100% (PAID)</strong>.
+              💵 <strong>Đang chờ Thổ địa xác nhận thu 70% tiền mặt ({formatMoney(booking.remainingAmount)}):</strong> Bạn đã chọn thanh toán trực tiếp. Khi Thổ địa bấm xác nhận, đơn sẽ chuyển sang <strong>Đã thanh toán 100% </strong>.
             </div>
           )}
 
@@ -464,7 +464,7 @@ export const BookingDetailPage: React.FC = () => {
               </div>
               {booking.deltaHours !== undefined && (
                 <div className="flex justify-between">
-                  <span className="text-[#78716C]">Khoảng cách trước giờ hẹn (ΔT):</span>
+                  <span className="text-[#78716C]">Khoảng cách trước giờ hẹn :</span>
                   <strong className="text-[#1C1917] tabular-nums">{booking.deltaHours} giờ</strong>
                 </div>
               )}
@@ -578,7 +578,7 @@ export const BookingDetailPage: React.FC = () => {
             <li className="ml-5">
               <div className="absolute w-3 h-3 bg-[#EB5B38] rounded-full -left-[7px] mt-1 ring-4 ring-orange-100" />
               <div className="font-bold text-[#1C1917]">
-                Khởi tạo yêu cầu đặt lịch (PENDING)
+                Khởi tạo yêu cầu đặt lịch 
               </div>
               <div className="text-[12px] text-[#78716C]">
                 {formatDateTime(booking.createdAt)} • Chờ Thổ địa phản hồi trong 24 giờ
@@ -589,7 +589,7 @@ export const BookingDetailPage: React.FC = () => {
               <li className="ml-5">
                 <div className="absolute w-3 h-3 bg-[#347CCB] rounded-full -left-[7px] mt-1 ring-4 ring-sky-100" />
                 <div className="font-bold text-[#1C1917]">
-                  Thổ địa chấp nhận & Giữ chỗ nguyên tử (WAITING_PAYMENT)
+                  Thổ địa chấp nhận & Giữ chỗ nguyên tử 
                 </div>
                 <div className="text-[12px] text-[#78716C]">
                   {formatDateTime(booking.acceptedAt)} • Khóa lịch HOLD 15 phút để cọc 30%
@@ -601,7 +601,7 @@ export const BookingDetailPage: React.FC = () => {
               <li className="ml-5">
                 <div className="absolute w-3 h-3 bg-emerald-600 rounded-full -left-[7px] mt-1 ring-4 ring-emerald-100" />
                 <div className="font-bold text-emerald-800">
-                  Đặt cọc 30% thành công ({formatMoney(booking.depositAmount)}) (CONFIRMED)
+                  Đặt cọc 30% thành công ({formatMoney(booking.depositAmount)}) 
                 </div>
                 <div className="text-[12px] text-[#78716C]">
                   {formatDateTime(booking.confirmedAt)} • Khởi tạo SERVICE_AGREEMENT điện tử
@@ -625,7 +625,7 @@ export const BookingDetailPage: React.FC = () => {
               <li className="ml-5">
                 <div className="absolute w-3 h-3 bg-emerald-600 rounded-full -left-[7px] mt-1 ring-4 ring-emerald-100" />
                 <div className="font-bold text-emerald-800">
-                  Hoàn thành chuyến đi & Tất toán 70% (COMPLETED)
+                  Hoàn thành chuyến đi & Tất toán 70% 
                 </div>
                 <div className="text-[12px] text-[#78716C]">
                   {formatDateTime(booking.completedAt)} • Trạng thái thanh toán: {booking.paymentStatus}
@@ -637,7 +637,7 @@ export const BookingDetailPage: React.FC = () => {
               <li className="ml-5">
                 <div className="absolute w-3 h-3 bg-red-600 rounded-full -left-[7px] mt-1 ring-4 ring-red-100" />
                 <div className="font-bold text-red-800">
-                  Đơn đặt lịch đã hủy (CANCELLED)
+                  Đơn đặt lịch đã hủy 
                 </div>
                 <div className="text-[12px] text-[#78716C]">
                   {formatDateTime(booking.cancelledAt)} • Lý do: {booking.cancelReason}
@@ -714,9 +714,9 @@ export const BookingDetailPage: React.FC = () => {
                   </span>
                   <div className="flex gap-1.5">
                     {[
-                      { label: 'ΔT = 72h (>48h: 0%)', val: 72 },
-                      { label: 'ΔT = 36h (24–48h: 50%)', val: 36 },
-                      { label: 'ΔT = 12h (<24h: 100%)', val: 12 },
+                      { label: 'Thời gian hủy = 72h (>48h: 0%)', val: 72 },
+                      { label: 'Thời gian hủy = 36h (24–48h: 50%)', val: 36 },
+                      { label: 'Thời gian hủy = 12h (<24h: 100%)', val: 12 },
                     ].map((opt) => (
                       <button
                         key={opt.val}
@@ -737,7 +737,7 @@ export const BookingDetailPage: React.FC = () => {
 
               <div className="bg-orange-50/60 border border-orange-200 rounded-2xl p-4 text-[13px] space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-[#78716C]">Khoảng cách đến giờ hẹn (ΔT):</span>
+                  <span className="text-[#78716C]">Khoảng cách đến giờ hẹn :</span>
                   <strong className="text-[#1C1917] tabular-nums">{simulatedDelta} giờ</strong>
                 </div>
                 <div className="flex justify-between">
@@ -818,7 +818,7 @@ export const BookingDetailPage: React.FC = () => {
       >
         <div className="space-y-4">
           <p className="text-[13px] text-[#78716C]">
-            Khi gửi khiếu nại, đơn sẽ chuyển sang trạng thái <strong>Đang khiếu nại (DISPUTED)</strong> và tạm dừng thu 70% còn lại cho đến khi Quản trị viên đưa ra phán quyết .
+            Khi gửi khiếu nại, đơn sẽ chuyển sang trạng thái <strong>Đang khiếu nại </strong> và tạm dừng thu 70% còn lại cho đến khi Quản trị viên đưa ra phán quyết .
           </p>
 
           <div>

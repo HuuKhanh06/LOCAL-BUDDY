@@ -158,7 +158,7 @@ export const KycSubmissionPage: React.FC = () => {
             Hồ sơ định danh KYC & Tài khoản nhận tiền
           </h1>
           <p className="text-sm text-[#525266] mt-0.5">
-            Chỉ Hướng dẫn viên đã được Admin phê duyệt KYC (`APPROVED`) mới hiển thị công khai và được mở lịch rảnh nhận khách.
+            Chỉ Hướng dẫn viên đã được Admin phê duyệt KYC  mới hiển thị công khai và được mở lịch rảnh nhận khách.
           </p>
         </div>
       </div>
@@ -169,7 +169,7 @@ export const KycSubmissionPage: React.FC = () => {
           <CheckCircle2 className="w-6 h-6 text-[#1B8A5A] shrink-0 mt-0.5" />
           <div className="space-y-1">
             <h2 className="text-base font-extrabold text-[#146C43]">
-              Hồ sơ KYC đã được phê duyệt (APPROVED)
+              Hồ sơ KYC đã được phê duyệt 
             </h2>
             <p className="text-xs text-[#146C43]/90">
               Tài khoản của bạn đã gắn huy hiệu <strong>Đã xác minh KYC Đà Nẵng</strong>. Hồ sơ đang hiển thị công khai trên trang tìm kiếm Du khách và bạn có toàn quyền thiết lập lịch rảnh .
@@ -189,7 +189,7 @@ export const KycSubmissionPage: React.FC = () => {
           <Clock className="w-6 h-6 text-[#D9820B] shrink-0 mt-0.5" />
           <div className="space-y-1">
             <h2 className="text-base font-extrabold text-[#9A5B06]">
-              Hồ sơ KYC đang chờ Admin thẩm định (PENDING)
+              Hồ sơ KYC đang chờ Admin thẩm định 
             </h2>
             <p className="text-xs text-[#9A5B06]/90">
               Hồ sơ định danh của bạn đã được gửi lúc{' '}
@@ -204,7 +204,7 @@ export const KycSubmissionPage: React.FC = () => {
           <XCircle className="w-6 h-6 text-[#C93B3B] shrink-0 mt-0.5" />
           <div className="space-y-1">
             <h2 className="text-base font-extrabold text-[#A62626]">
-              Hồ sơ KYC bị từ chối — Cần bổ sung lại (REJECTED)
+              Hồ sơ KYC bị từ chối — Cần bổ sung lại 
             </h2>
             <p className="text-xs text-[#A62626]">
               Lý do từ Admin:{' '}

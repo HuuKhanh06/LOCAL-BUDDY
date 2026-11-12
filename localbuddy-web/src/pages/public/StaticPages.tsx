@@ -40,33 +40,33 @@ export const CancellationPolicyPage: React.FC = () => (
       <span className="px-3 py-1 rounded-full bg-[var(--lb-surface-2)] text-[var(--lb-accent-text)] text-xs font-bold uppercase tracking-wider">
         Chính sách minh bạch
       </span>
-      <h1 className="text-3xl font-black text-[var(--lb-text)]">Chính sách hủy đơn & Hoàn cọc (ΔT)</h1>
+      <h1 className="text-3xl font-black text-[var(--lb-text)]">Chính sách hủy đơn & Hoàn cọc</h1>
       <p className="text-[var(--lb-muted)] text-sm">
-        Quy định hoàn tiền cọc 30% được tính toán tự động dựa trên khoảng thời gian chênh lệch (ΔT) từ thời điểm hủy đến giờ bắt đầu chuyến đi:
+        Quy định hoàn tiền cọc 30% được tính toán tự động dựa trên khoảng thời gian từ thời điểm hủy đến giờ bắt đầu chuyến đi:
       </p>
     </div>
 
     <div className="bg-[var(--lb-surface)] border border-[var(--lb-border)] rounded-[20px] divide-y divide-[var(--lb-border)] text-sm">
       <div className="p-5 space-y-1">
-        <div className="font-bold text-[var(--lb-success)]">ΔT &gt; 48 giờ trước giờ bắt đầu</div>
+        <div className="font-bold text-[var(--lb-success)]">Trước hơn 48 giờ so với giờ hẹn</div>
         <p className="text-xs text-[var(--lb-muted)]">
           Phạt 0% tiền cọc. Du khách được hoàn lại <strong>100% số tiền cọc</strong> đã thanh toán.
         </p>
       </div>
       <div className="p-5 space-y-1">
-        <div className="font-bold text-[var(--lb-warning)]">24 giờ ≤ ΔT ≤ 48 giờ trước giờ bắt đầu</div>
+        <div className="font-bold text-[var(--lb-warning)]">Từ 24 giờ đến 48 giờ trước giờ bắt đầu</div>
         <p className="text-xs text-[var(--lb-muted)]">
           Phạt 50% tiền cọc. Du khách nhận lại 50% tiền cọc, 50% còn lại bồi thường cho Hướng dẫn viên (sau khi trừ phí sàn).
         </p>
       </div>
       <div className="p-5 space-y-1">
-        <div className="font-bold text-[var(--lb-error)]">ΔT &lt; 24 giờ trước giờ bắt đầu</div>
+        <div className="font-bold text-[var(--lb-error)]">Dưới 24 giờ so với giờ hẹn</div>
         <p className="text-xs text-[var(--lb-muted)]">
           Phạt 100% tiền cọc. Không hoàn lại cọc cho du khách, toàn bộ tiền cọc chuyển bồi thường cho Guide (sau khi trừ phí sàn).
         </p>
       </div>
       <div className="p-5 space-y-1">
-        <div className="font-bold text-[var(--lb-blue-text)]">Guide hủy đơn đã chốt (CONFIRMED)</div>
+        <div className="font-bold text-[var(--lb-blue-text)]">Guide hủy đơn đã chốt </div>
         <p className="text-xs text-[var(--lb-muted)]">
           Du khách nhận lại <strong>100% tiền cọc</strong> ngay lập tức. Guide bị ghi nhận 1 lần vi phạm hủy tour.
         </p>

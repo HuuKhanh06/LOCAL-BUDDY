@@ -250,7 +250,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Chính sách hoàn tiền cọc khi hủy lịch được quy định như thế nào?',
-    a: 'Chính sách hủy đơn minh bạch theo mốc thời gian ΔT trước giờ hẹn: Nếu bạn hủy trước trên 48 giờ, hệ thống hoàn trả 100% tiền cọc; hủy từ 24 đến 48 giờ, hoàn 50% tiền cọc; hủy dưới 24 giờ phạt 100% cọc để bồi hoàn cho Hướng dẫn viên. Trường hợp Hướng dẫn viên hủy đơn, bạn luôn được hoàn 100% tiền cọc ngay lập tức.',
+    a: 'Chính sách hủy đơn minh bạch theo thời gian hủy trước giờ hẹn: Nếu bạn hủy trước trên 48 giờ, hệ thống hoàn trả 100% tiền cọc; hủy từ 24 đến 48 giờ, hoàn 50% tiền cọc; hủy dưới 24 giờ phạt 100% cọc để bồi hoàn cho Hướng dẫn viên. Trường hợp Hướng dẫn viên hủy đơn, bạn luôn được hoàn 100% tiền cọc ngay lập tức.',
   },
   {
     q: 'Giá thuê trên website tính theo đầu người hay tính theo giờ?',

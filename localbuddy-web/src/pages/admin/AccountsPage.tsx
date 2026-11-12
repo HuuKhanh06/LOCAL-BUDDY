@@ -84,7 +84,7 @@ export const AccountsPage: React.FC = () => {
             Quản lý Tài khoản & Theo dõi Vi phạm
           </h1>
           <p className="text-sm text-[#78716C] mt-0.5">
-            Giám sát số lần vi phạm (`soLanViPham`), khóa/mở khóa tài khoản và thu hồi huy hiệu xác minh HDV.
+            Giám sát số lần vi phạm , khóa/mở khóa tài khoản và thu hồi huy hiệu xác minh HDV.
           </p>
         </div>
 
@@ -144,7 +144,7 @@ export const AccountsPage: React.FC = () => {
                 <th className="py-3.5 px-4">Người dùng</th>
                 <th className="py-3.5 px-4">Vai trò</th>
                 <th className="py-3.5 px-4">Trạng thái KYC (Nếu là HDV)</th>
-                <th className="py-3.5 px-4">Chỉ số Vi phạm (`soLanViPham`)</th>
+                <th className="py-3.5 px-4">Chỉ số Vi phạm </th>
                 <th className="py-3.5 px-4">Trạng thái TK</th>
                 <th className="py-3.5 px-4 text-right">Thao tác quản trị</th>
               </tr>

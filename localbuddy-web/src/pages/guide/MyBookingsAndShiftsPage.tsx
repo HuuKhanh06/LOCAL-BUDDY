@@ -2,7 +2,7 @@
 // Quản lý toàn bộ Đơn & Ca dẫn khách của Hướng dẫn viên:
 // - Bấm "Yêu cầu xác nhận hoàn thành"  -> mở cửa sổ 24 giờ cho khách xác nhận  hoặc khiếu nại 
 // - Trong cửa sổ 24 giờ, HDV cũng có quyền gửi khiếu nại nếu khách vi phạm 
-// - Bấm "Xác nhận đã thu đủ 70% tiền mặt"  khi đơn ở COMPLETED + WAITING_RECONCILE -> cộng +(D - F) vào ví
+// - Bấm "Xác nhận đã thu đủ 70% tiền mặt"  khi đơn ở COMPLETED + WAITING_RECONCILE -> cộng  vào ví
 // - Bấm "Hủy nhận dẫn khách"  -> hoàn 100% cọc cho khách và cộng +1 vào soLanViPham của HDV
 
 import React, { useState, useMemo } from 'react';
@@ -237,7 +237,7 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
 
                   <div className="sm:text-right">
                     <span className="text-[12px] text-[#52526B] block">
-                      Thu nhập thực nhận của bạn (G − F):
+                      Thu nhập thực nhận của bạn:
                     </span>
                     <span className="text-[22px] font-black text-[#0F6E4B] tabular-nums">
                       {formatMoney(guideReceives)}
@@ -253,7 +253,7 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
                         ⏳ Đã gửi yêu cầu xác nhận hoàn thành  — Đang chờ khách xác nhận trong 24 giờ
                       </strong>
                       <span>
-                        Nếu sau 24 giờ khách không phản hồi và không có khiếu nại, hệ thống sẽ tự động chuyển đơn sang Đã hoàn thành (COMPLETED).
+                        Nếu sau 24 giờ khách không phản hồi và không có khiếu nại, hệ thống sẽ tự động chuyển đơn sang Đã hoàn thành .
                       </span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">

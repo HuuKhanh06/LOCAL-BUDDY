@@ -220,10 +220,10 @@ export const DisputesPage: React.FC = () => {
                     {booking ? (
                       <>
                         <div className="mt-0.5 text-[#1C1917]">
-                          Tổng giá trị đơn (G): <strong>{formatMoney(booking.totalAmount)}</strong>
+                          Tổng giá trị đơn: <strong>{formatMoney(booking.totalAmount)}</strong>
                         </div>
                         <div className="text-sm font-extrabold text-[#347CCB] mt-0.5">
-                          Cọc 30% (D): {formatMoney(booking.depositAmount)} (Phí sàn{' '}
+                          Cọc 30%: {formatMoney(booking.depositAmount)} (Phí sàn{' '}
                           {Math.round(booking.feeRate * 100)}%)
                         </div>
                       </>
@@ -356,7 +356,7 @@ export const DisputesPage: React.FC = () => {
                         </li>
                         <li>Phí nền tảng giữ lại: <strong>0 ₫</strong></li>
                         <li>
-                          Cộng <strong>+1 lần vi phạm</strong> (`soLanViPham`) vào hồ sơ HDV
+                          Cộng <strong>+1 lần vi phạm</strong>  vào hồ sơ HDV
                         </li>
                       </ul>
                     </button>

@@ -67,7 +67,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
 
       <div className="flex justify-between text-[14px] bg-white p-2.5 rounded-[10px] border border-[#1EC1CB]/60">
         <div>
-          <span className="font-bold text-[#1C1C28]">1. Đặt cọc giữ lịch 30% (D):</span>
+          <span className="font-bold text-[#1C1C28]">1. Đặt cọc giữ lịch 30%:</span>
           <p className="text-[11px] text-[#52526B]">
             Thanh toán Online trong 15 phút sau khi HDV chấp nhận
           </p>
@@ -79,7 +79,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
 
       <div className="flex justify-between text-[14px] bg-white p-2.5 rounded-[10px] border border-[#E4C3CC]">
         <div>
-          <span className="font-bold text-[#1C1C28]">2. Tất toán 70% còn lại (B):</span>
+          <span className="font-bold text-[#1C1C28]">2. Tất toán 70% còn lại:</span>
           <p className="text-[11px] text-[#52526B]">
             Thanh toán sau khi kết thúc tour (Online hoặc Tiền mặt)
           </p>
@@ -106,7 +106,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
 
           {computedGuideOnline !== undefined && (
             <div className="flex justify-between text-[13px] font-bold text-[#0F6E4B]">
-              <span>Tổng thu nhập thực nhận của HDV (G − F):</span>
+              <span>Tổng thu nhập thực nhận của HDV:</span>
               <span className="tabular-nums">{formatMoney(computedGuideOnline)}</span>
             </div>
           )}
@@ -120,7 +120,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
               <div>
                 • <strong>Nếu khách trả 70% Tiền mặt ({formatMoney(remaining)}):</strong> HDV đã cầm trực tiếp 70%, sàn khấu trừ phí vào cọc 30% và cộng phần dư{' '}
                 <strong className="text-[#0F6E4B]">
-                  (D − F) = +{formatMoney(computedGuideCashDelta)}
+                  +{formatMoney(computedGuideCashDelta)}
                 </strong>{' '}
                 vào ví HDV.
               </div>

@@ -35,7 +35,7 @@ export const ForbiddenPage: React.FC = () => {
 
         <div className="space-y-2">
           <span className="inline-block px-3.5 py-1 rounded-full bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] text-xs font-bold uppercase tracking-wider">
-            Mã lỗi 403 • Từ chối truy cập (RBAC)
+            Mã lỗi 403 • Từ chối truy cập
           </span>
           <h1 className="text-2xl sm:text-3xl font-black text-[#1C1917]">
             Bạn không có quyền truy cập trang này

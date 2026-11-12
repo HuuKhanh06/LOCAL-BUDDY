@@ -231,7 +231,7 @@ export const BalancePaymentPage: React.FC = () => {
                   💳 Thanh toán Online qua Cổng
                 </span>
                 <span className="text-[12px] opacity-85">
-                  Đơn chuyển sang Đã thanh toán đủ (PAID) ngay lập tức
+                  Đơn chuyển sang Đã thanh toán đủ  ngay lập tức
                 </span>
               </button>
 
@@ -325,7 +325,7 @@ export const BalancePaymentPage: React.FC = () => {
               <p className="text-[14px] text-[#1C1C28] leading-relaxed">
                 Bạn sẽ trao trực tiếp số tiền <strong>{formatMoney(booking.remainingAmount)}</strong> cho Hướng dẫn viên{' '}
                 <strong>{guideItem?.user.fullName}</strong>. Sau khi bạn bấm nút xác nhận bên dưới, trạng thái thanh toán sẽ chuyển sang{' '}
-                <strong>Chờ HDV xác nhận tiền mặt (WAITING_RECONCILE)</strong> cho đến khi HDV bấm xác nhận đã nhận đủ tiền.
+                <strong>Chờ HDV xác nhận tiền mặt </strong> cho đến khi HDV bấm xác nhận đã nhận đủ tiền.
               </p>
               <Button
                 type="button"

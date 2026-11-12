@@ -1,7 +1,7 @@
 // pages/guide/IncomingRequestsPage.tsx
 // Tuân thủ BR-04 & NB-01:
 // - Khi bấm "Chấp nhận", hệ thống kiểm tra nguyên tử (Atomic Check) xem khung giờ có đang bị HOLD/BUSY bởi đơn khác không.
-// - Nếu trống (AVAILABLE), khóa slot sang HOLD trong 15 phút và chuyển đơn sang WAITING_PAYMENT + WAITING_DEPOSIT.
+// - Nếu trống , khóa slot sang HOLD trong 15 phút và chuyển đơn sang WAITING_PAYMENT + WAITING_DEPOSIT.
 // - Nếu bấm "Từ chối", bắt buộc nhập/chọn lý do từ chối và chuyển đơn sang CANCELLED + UNPAID.
 
 import React, { useState } from 'react';
@@ -269,7 +269,7 @@ export const IncomingRequestsPage: React.FC = () => {
       >
         <div className="space-y-4">
           <p className="text-[14px] text-[#52526B]">
-            Khi từ chối đơn đang chờ phản hồi (<strong>PENDING</strong>), bạn <strong>không bị tính lỗi vi phạm</strong> và khung giờ vẫn giữ trạng thái Đang trống (AVAILABLE).
+            Khi từ chối đơn đang chờ phản hồi (<strong>PENDING</strong>), bạn <strong>không bị tính lỗi vi phạm</strong> và khung giờ vẫn giữ trạng thái Đang trống .
           </p>
           <div className="space-y-2">
             <label className="text-[13px] font-bold text-[#1A0A0F] block">

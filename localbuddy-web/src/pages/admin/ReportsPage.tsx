@@ -93,9 +93,9 @@ export const ReportsPage: React.FC = () => {
       'Hướng Dẫn Viên',
       'Số Giờ',
       'Đơn Giá/Giờ (VND)',
-      'Tổng Tiền G (VND)',
-      'Đặt Cọc 30% D (VND)',
-      'Còn Lại 70% B (VND)',
+      'Tổng Tiền (VND)',
+      'Đặt Cọc 30% (VND)',
+      'Còn Lại 70% (VND)',
       'Phí Sàn Snapshot (%)',
       'Trạng Thái Đơn',
       'Trạng Thái Thanh Toán',
@@ -365,7 +365,7 @@ export const ReportsPage: React.FC = () => {
 
             <div className="bg-white rounded-2xl border border-[#E7E5E4] p-5 shadow-xs">
               <div className="flex items-center justify-between text-xs text-[#78716C] font-bold uppercase">
-                <span>Doanh thu Phí sàn (F)</span>
+                <span>Doanh thu Phí sàn</span>
                 <Award className="w-4 h-4 text-emerald-600" />
               </div>
               <div className="text-2xl font-black text-emerald-700 mt-2">
@@ -413,12 +413,12 @@ export const ReportsPage: React.FC = () => {
               <div className="space-y-3 text-xs">
                 {[
                   {
-                    label: 'Hoàn thành & Tất toán (COMPLETED)',
+                    label: 'Hoàn thành & Tất toán ',
                     count: completedPaidBookings.length,
                     color: 'bg-emerald-600',
                   },
                   {
-                    label: 'Đã xác nhận / Đang tour (CONFIRMED)',
+                    label: 'Đã xác nhận / Đang tour ',
                     count: bookings.filter((b) => b.bookingStatus === 'CONFIRMED').length,
                     color: 'bg-[#347CCB]',
                   },
@@ -430,12 +430,12 @@ export const ReportsPage: React.FC = () => {
                     color: 'bg-amber-500',
                   },
                   {
-                    label: 'Đang tranh chấp (DISPUTED)',
+                    label: 'Đang tranh chấp ',
                     count: disputedBookings.length,
                     color: 'bg-red-600',
                   },
                   {
-                    label: 'Đã hủy (CANCELLED)',
+                    label: 'Đã hủy ',
                     count: cancelledBookings.length,
                     color: 'bg-[#78716C]',
                   },
@@ -536,7 +536,7 @@ export const ReportsPage: React.FC = () => {
           <div className="bg-white rounded-2xl border border-[#E7E5E4] p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-base font-bold text-[#1C1917] flex items-center gap-2">
-                <XCircle className="w-5 h-5 text-red-600" /> Nhật ký đối soát Hủy đơn & Phạt cọc theo ΔT (`CANCELLATION_RECORD`)
+                <XCircle className="w-5 h-5 text-red-600" /> Nhật ký đối soát Hủy đơn & Phạt cọc theo thời gian hủy 
               </h2>
               <span className="text-xs font-bold text-[#78716C]">{effectiveCancellations.length} bản ghi</span>
             </div>
@@ -550,7 +550,7 @@ export const ReportsPage: React.FC = () => {
                     <tr className="bg-[#F3F1EC] border-b border-[#E7E5E4] text-[11px] font-bold uppercase tracking-wider text-[#78716C]">
                       <th className="py-3 px-3">Mã Hủy / Đơn</th>
                       <th className="py-3 px-3">Phân loại</th>
-                      <th className="py-3 px-3">ΔT & Mức phạt</th>
+                      <th className="py-3 px-3">Thời gian hủy & Mức phạt</th>
                       <th className="py-3 px-3 text-right">Hoàn khách</th>
                       <th className="py-3 px-3 text-right">Phí sàn giữ</th>
                       <th className="py-3 px-3 text-right">Bồi thường HDV</th>
@@ -567,7 +567,7 @@ export const ReportsPage: React.FC = () => {
                           <div className="text-[#78716C] line-clamp-1">{c.reason}</div>
                         </td>
                         <td className="py-3 px-3 font-semibold">
-                          ΔT = {c.deltaHours}h • Phạt {Math.round(c.penaltyRate * 100)}% cọc
+                          Thời gian hủy = {c.deltaHours}h • Phạt {Math.round(c.penaltyRate * 100)}% cọc
                         </td>
                         <td className="py-3 px-3 text-right font-bold text-[#347CCB]">
                           {formatMoney(c.refundToTourist)}
@@ -596,7 +596,7 @@ export const ReportsPage: React.FC = () => {
               ⚖️ Quy tắc vận hành: Hàng đợi đối soát & Chưa trả 70%
             </strong>
             <p>
-              Đặc tả không có hạn chót trả 70%: Hệ thống nhắc thông báo sau 24h và 72h. Quản trị viên sử dụng hàng đợi này để tra soát lại giao dịch qua cổng (`provider.queryTransaction`) hoặc xác nhận đối soát thủ công kèm ghi chú kiểm toán. Tuyệt đối không tự động hủy hoặc phạt cọc của du khách.
+              Đặc tả không có hạn chót trả 70%: Hệ thống nhắc thông báo sau 24h và 72h. Quản trị viên sử dụng hàng đợi này để tra soát lại giao dịch qua cổng cổng thanh toán hoặc xác nhận đối soát thủ công kèm ghi chú kiểm toán. Tuyệt đối không tự động hủy hoặc phạt cọc của du khách.
             </p>
           </div>
 
@@ -795,7 +795,7 @@ export const ReportsPage: React.FC = () => {
               Xác nhận đối soát đơn {reconcileModalBookingId} 
             </h3>
             <p className="text-xs text-[#78716C]">
-              Thao tác này xác nhận khoản tất toán 70% đã hoàn tất, chuyển trạng thái thanh toán sang <strong>PAID</strong> và tự động cộng doanh thu (G − F) vào Ví Thổ địa.
+              Thao tác này xác nhận khoản tất toán 70% đã hoàn tất, chuyển trạng thái thanh toán sang <strong>Đã thanh toán đủ</strong> và tự động cộng doanh thu (G − F) vào Ví Thổ địa.
             </p>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-[#1C1917]">

@@ -25,7 +25,7 @@ export const HowItWorksPage: React.FC = () => {
     },
     {
       q: 'Chính sách hoàn cọc khi tôi có việc bận cần hủy chuyến đi ra sao?',
-      a: 'Chính sách minh bạch theo mốc thời gian ΔT: Hủy trước trên 48 giờ so với giờ hẹn: hoàn 100% tiền cọc; Hủy từ 24 đến 48 giờ: hoàn 50% tiền cọc; Hủy dưới 24 giờ: phạt 100% cọc để bồi hoàn công chuẩn bị của HDV. Nếu HDV hủy, bạn luôn nhận lại 100% cọc ngay lập tức.',
+      a: 'Chính sách minh bạch theo thời gian hủy: Hủy trước trên 48 giờ so với giờ hẹn: hoàn 100% tiền cọc; Hủy từ 24 đến 48 giờ: hoàn 50% tiền cọc; Hủy dưới 24 giờ: phạt 100% cọc để bồi hoàn công chuẩn bị của HDV. Nếu HDV hủy, bạn luôn nhận lại 100% cọc ngay lập tức.',
     },
     {
       q: 'Giá thuê trên website áp dụng cho cả nhóm hay tính theo từng người?',
@@ -215,7 +215,7 @@ export const HowItWorksPage: React.FC = () => {
             </div>
             <h3 className="font-extrabold text-base text-[#1C1917]">Bảo vệ quyền lợi</h3>
             <p className="text-xs text-[#78716C] leading-relaxed">
-              Cọc 30% được giữ an toàn trên hệ thống. Chính sách hủy minh bạch theo ΔT: hoàn đến 100% khi hủy trước 48 giờ.
+              Cọc 30% được giữ an toàn trên hệ thống. Chính sách hủy minh bạch theo thời gian hủy: hoàn đến 100% khi hủy trước 48 giờ.
             </p>
           </div>
 

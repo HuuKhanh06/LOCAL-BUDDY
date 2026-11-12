@@ -70,7 +70,7 @@ export const FeeConfigPage: React.FC = () => {
             Cấu hình Tỷ lệ Phí dịch vụ Nền tảng (10% – 15%)
           </h1>
           <p className="text-sm text-[#78716C] mt-0.5">
-            Thiết lập mức phí hoa hồng nền tảng (`Fee_Rate`). Mức phí mới chỉ áp dụng cho đơn tạo mới, các đơn cũ giữ nguyên `feeRate` đã snapshot khi đặt lịch.
+            Thiết lập mức phí hoa hồng nền tảng. Mức phí mới chỉ áp dụng cho đơn tạo mới, các đơn cũ giữ nguyên tỷ lệ phí đã lưu khi đặt lịch.
           </p>
         </div>
       </div>
@@ -84,7 +84,7 @@ export const FeeConfigPage: React.FC = () => {
           <div className="flex items-center justify-between bg-[#FEEDDC] text-[#1C1917] border border-[#F1DEC9] p-5 rounded-2xl">
             <div>
               <div className="text-xs uppercase tracking-wider text-[#6E6259] font-bold">
-                Tỷ lệ phí dịch vụ hiện hành (`Fee_Rate`)
+                Tỷ lệ phí dịch vụ hiện hành 
               </div>
               <div className="text-3xl font-black text-[#D12B79] mt-1">
                 {Math.round(feeRate * 100)}% / đơn hoàn thành
@@ -147,7 +147,7 @@ export const FeeConfigPage: React.FC = () => {
           <div className="bg-[#F3F1EC] border border-[#E7E5E4] rounded-xl p-4 text-xs text-[#78716C] flex items-start gap-2.5">
             <Info className="w-4 h-4 text-[#347CCB] shrink-0 mt-0.5" />
             <span>
-              <strong>Bảo toàn dữ liệu lịch sử (`tyLePhiSanSnapshot`):</strong> Mọi đơn đặt lịch đã khởi tạo trước thời điểm cập nhật sẽ tiếp tục được quyết toán theo tỷ lệ phí đã lưu cứng trên đơn đó.
+              <strong>Bảo toàn dữ liệu lịch sử :</strong> Mọi đơn đặt lịch đã khởi tạo trước thời điểm cập nhật sẽ tiếp tục được quyết toán theo tỷ lệ phí đã lưu cứng trên đơn đó.
             </span>
           </div>
 
@@ -178,7 +178,7 @@ export const FeeConfigPage: React.FC = () => {
 
           <div className="space-y-3 text-xs">
             <div className="p-3.5 rounded-xl bg-[#F3F1EC] space-y-1.5">
-              <div className="font-bold text-[#1C1917]">Phí nền tảng thu về (F):</div>
+              <div className="font-bold text-[#1C1917]">Phí nền tảng thu về:</div>
               <div className="text-lg font-extrabold text-[#347CCB]">
                 {formatMoney(sampleF)} ({percentValue}% × G)
               </div>
@@ -189,7 +189,7 @@ export const FeeConfigPage: React.FC = () => {
                 Nếu khách trả 70% cuối ONLINE :
               </div>
               <div className="text-[#1C1917]">
-                Cộng vào Ví HDV <strong>+(G - F)</strong>:{' '}
+                Cộng vào Ví HDV {' '}
                 <strong className="text-sm">{formatMoney(sampleG - sampleF)}</strong>
               </div>
             </div>
@@ -199,7 +199,7 @@ export const FeeConfigPage: React.FC = () => {
                 Nếu khách trả 70% cuối TIỀN MẶT :
               </div>
               <div className="text-[#1C1917]">
-                HDV cầm 700.000 ₫ tiền mặt + Cộng thêm vào Ví HDV <strong>+(D - F)</strong>:{' '}
+                HDV cầm 700.000 ₫ tiền mặt + Cộng thêm vào Ví HDV {' '}
                 <strong className="text-sm">{formatMoney(sampleD - sampleF)}</strong>
               </div>
             </div>
@@ -210,7 +210,7 @@ export const FeeConfigPage: React.FC = () => {
       {/* History Table */}
       <div className="bg-white rounded-2xl border border-[#E7E5E4] p-6 shadow-xs space-y-4">
         <h2 className="text-base font-extrabold text-[#1C1917] flex items-center gap-2">
-          <History className="w-5 h-5 text-[#1C1917]" /> Lịch sử điều chỉnh Tỷ lệ Phí dịch vụ (`PLATFORM_FEE_CONFIG`)
+          <History className="w-5 h-5 text-[#1C1917]" /> Lịch sử điều chỉnh Tỷ lệ Phí dịch vụ 
         </h2>
 
         <div className="overflow-x-auto">
@@ -250,10 +250,10 @@ export const FeeConfigPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Bảng Quy tắc Đặt cọc & Chính sách Hủy/Hoàn cọc theo ΔT */}
+      {/* Bảng Quy tắc Đặt cọc & Chính sách Hủy/Hoàn cọc theo thời gian hủy */}
       <div className="bg-white rounded-2xl border border-[#E7E5E4] p-6 shadow-xs space-y-4">
         <h2 className="text-base font-extrabold text-[#1C1917]">
-          Chính sách Đặt cọc, Giữ khung giờ & Bậc Phạt/Hoàn theo ΔT
+          Chính sách Đặt cọc, Giữ khung giờ & Bậc Phạt/Hoàn theo thời gian hủy
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
           <div className="p-4 rounded-xl bg-[#F3F1EC] border border-[#E7E5E4] space-y-1">
@@ -261,25 +261,25 @@ export const FeeConfigPage: React.FC = () => {
               Tỷ lệ Đặt cọc & Tất toán
             </span>
             <strong className="text-base text-[#1C1917] block">30% Cọc • 70% Sau tour</strong>
-            <p className="text-[#78716C]">Giữ khung giờ nguyên tử (HOLD) đúng 15 phút khi thanh toán cọc.</p>
+            <p className="text-[#78716C]">Giữ khung giờ nguyên tử  đúng 15 phút khi thanh toán cọc.</p>
           </div>
           <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1">
             <span className="font-bold uppercase tracking-wider text-emerald-700 block">
-              Bậc 1: ΔT &gt; 48 giờ
+              Bậc 1: Hủy trước 48 giờ
             </span>
             <strong className="text-base text-emerald-700 block">Phạt 0% • Hoàn 100% cọc</strong>
             <p className="text-[#1C1917]">Hủy sớm trước hơn 48 giờ so với giờ hẹn khởi hành.</p>
           </div>
           <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 space-y-1">
             <span className="font-bold uppercase tracking-wider text-amber-700 block">
-              Bậc 2: 24h ≤ ΔT ≤ 48h
+              Từ 24h đến 48h
             </span>
             <strong className="text-base text-amber-700 block">Phạt 50% • Hoàn 50% cọc</strong>
             <p className="text-[#1C1917]">Phần phạt 50% khấu trừ phí sàn rồi cộng bồi thường ví HDV.</p>
           </div>
           <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 space-y-1">
             <span className="font-bold uppercase tracking-wider text-rose-700 block">
-              Bậc 3: ΔT &lt; 24 giờ
+              Bậc 3: Hủy dưới 24 giờ
             </span>
             <strong className="text-base text-rose-700 block">Phạt 100% • Hoàn 0% cọc</strong>
             <p className="text-[#1C1917]">Nếu lỗi hủy từ phía HDV: Khách luôn được hoàn 100% cọc + HDV bị +1 vi phạm.</p>
@@ -349,7 +349,7 @@ export const FeeConfigPage: React.FC = () => {
                   time: c.cancelledAt,
                   category: 'HỦY & HOÀN CỌC',
                   ref: c.bookingId,
-                  detail: `${c.cancellationType} (ΔT=${c.deltaHours}h, phạt ${Math.round(c.penaltyRate * 100)}%, hoàn khách ${formatMoney(c.refundToTourist)})`,
+                  detail: `${c.cancellationType} (${c.deltaHours} giờ trước hẹn, phạt ${Math.round(c.penaltyRate * 100)}%, hoàn khách ${formatMoney(c.refundToTourist)})`,
                 })),
               ]
                 .sort((a, b) => b.time.localeCompare(a.time))

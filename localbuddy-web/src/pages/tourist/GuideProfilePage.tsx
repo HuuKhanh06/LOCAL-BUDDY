@@ -397,13 +397,13 @@ export const GuideProfilePage: React.FC = () => {
             {/* Tạm tính G & Cọc D (30%) với nhãn "Chỉ thanh toán sau khi Guide chấp nhận" */}
             <div className="bg-[#F3F1EC] border border-[#E7E5E4] rounded-2xl p-4 space-y-2 text-[13px]">
               <div className="flex justify-between items-center">
-                <span className="text-[#57534E]">Tạm tính tổng dịch vụ (G):</span>
+                <span className="text-[#57534E]">Tạm tính tổng dịch vụ:</span>
                 <strong className="text-[#1C1917] text-[15px] tabular-nums">
                   {formatMoney(estimatedTotal)}
                 </strong>
               </div>
               <div className="flex justify-between items-center text-[#EB5B38] font-bold pt-1 border-t border-[#E7E5E4]">
-                <span>Tiền cọc giữ chỗ 30% (D):</span>
+                <span>Tiền cọc giữ chỗ 30%:</span>
                 <span className="text-[16px] tabular-nums">
                   {formatMoney(estimatedDeposit)}
                 </span>

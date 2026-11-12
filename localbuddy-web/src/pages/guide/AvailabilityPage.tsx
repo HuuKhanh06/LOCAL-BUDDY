@@ -1,5 +1,5 @@
 // pages/guide/AvailabilityPage.tsx
-// Kiểm tra BR-01: Nếu HDV chưa được duyệt KYC (APPROVED), khóa tính năng mở lịch và hiển thị banner dẫn tới trang nộp KYC (/guide/kyc).
+// Kiểm tra BR-01: Nếu HDV chưa được duyệt KYC , khóa tính năng mở lịch và hiển thị banner dẫn tới trang nộp KYC (/guide/kyc).
 // Cho phép mở/đóng slot AVAILABLE <-> BUSY và thêm khung giờ rảnh mới. Khóa chỉnh sửa với các slot đang HOLD hoặc BUSY có đơn.
 
 import React, { useState, useMemo } from 'react';
@@ -118,7 +118,7 @@ export const AvailabilityPage: React.FC = () => {
             Quản lý Lịch rảnh nhận khách
           </h1>
           <p className="text-[14px] text-[#F6E6EA]/85 mt-1">
-            Thiết lập các khung giờ Đang trống (AVAILABLE) tại Đà Nẵng để Du khách đặt lịch
+            Thiết lập các khung giờ Đang trống  tại Đà Nẵng để Du khách đặt lịch
           </p>
         </div>
       </div>
@@ -244,9 +244,9 @@ export const AvailabilityPage: React.FC = () => {
             <strong className="text-[#1A0A0F] block">
               Quy tắc khóa lịch nguyên tử :
             </strong>
-            <p>• <strong>AVAILABLE (Đang trống):</strong> Cho phép Du khách gửi yêu cầu đặt lịch (PENDING).</p>
+            <p>• <strong>AVAILABLE (Đang trống):</strong> Cho phép Du khách gửi yêu cầu đặt lịch .</p>
             <p>• <strong>HOLD (Tạm giữ 15 phút):</strong> Tự động kích hoạt ngay khi bạn bấm Chấp nhận đơn . Khung giờ bị khóa với mọi đơn khác trong 15 phút chờ khách đặt cọc 30%.</p>
-            <p>• <strong>BUSY (Đã kín lịch):</strong> Đơn đã đặt cọc 30% thành công (CONFIRMED).</p>
+            <p>• <strong>BUSY (Đã kín lịch):</strong> Đơn đã đặt cọc 30% thành công .</p>
           </div>
         </div>
 
@@ -311,7 +311,7 @@ export const AvailabilityPage: React.FC = () => {
       >
         <div className="space-y-4">
           <p className="text-[13px] text-[#52526B]">
-            Chỉ các khung giờ đang Trống (AVAILABLE) và chưa có khách giữ chỗ mới được phép thay đổi thời gian.
+            Chỉ các khung giờ đang Trống  và chưa có khách giữ chỗ mới được phép thay đổi thời gian.
           </p>
           <Input
             label="Ngày làm việc *"

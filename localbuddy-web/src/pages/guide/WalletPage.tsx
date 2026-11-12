@@ -117,12 +117,12 @@ export const WalletPage: React.FC = () => {
     switch (type) {
       case 'SETTLEMENT_ONLINE':
         return {
-          label: 'Quyết toán Online 70%: +(G - F)',
+          label: 'Quyết toán Online 70%',
           cls: 'bg-[#E6F7F0] text-[#146C43] border-[#B2E5D0]',
         };
       case 'SETTLEMENT_CASH':
         return {
-          label: 'Quyết toán Tiền mặt 70%: +(D - F)',
+          label: 'Quyết toán Tiền mặt 70%: ',
           cls: 'bg-[#E6F9FA] text-[#118B93] border-[#1EC1CB]/40',
         };
       case 'CANCEL_COMPENSATION':
@@ -148,7 +148,7 @@ export const WalletPage: React.FC = () => {
   const simBalance70 = simTotalAmount - simDeposit;
   const simFee = Math.round(simTotalAmount * feeRate);
   const simOnlineWalletCredit = simTotalAmount - simFee; // +(G - F)
-  const simCashWalletCredit = simDeposit - simFee; // +(D - F)
+  const simCashWalletCredit = simDeposit - simFee; // 
 
   if (isLoading) {
     return (
@@ -260,8 +260,8 @@ export const WalletPage: React.FC = () => {
                   1. Khách trả 70% cuối qua cổng ONLINE 
                 </div>
                 <div className="mt-1">
-                  Sàn thu đủ 100% (G) → Khấu trừ phí sàn F →{' '}
-                  <strong>Cộng vào ví HDV: +(G - F)</strong>.
+                  Khách thanh toán 100% trực tuyến → Hệ thống khấu trừ phí sàn →{' '}
+                  <strong>Cộng doanh thu vào ví HDV</strong>.
                 </div>
               </div>
               <div className="bg-white p-3 rounded-lg border border-[#E8CED5]">
@@ -270,7 +270,7 @@ export const WalletPage: React.FC = () => {
                 </div>
                 <div className="mt-1">
                   HDV đã cầm trực tiếp 70% tiền mặt → Sàn lấy cọc 30% (D) trừ phí sàn F →{' '}
-                  <strong>Cộng phần dư vào ví HDV: +(D - F)</strong>. Tổng thực nhận vẫn đúng bằng{' '}
+                  <strong>Cộng phần dư vào ví HDV: </strong>. Tổng thực nhận vẫn đúng bằng{' '}
                   <strong>G - F</strong>!
                 </div>
               </div>
@@ -492,7 +492,7 @@ export const WalletPage: React.FC = () => {
                 Mô phỏng đối soát doanh thu chuyến đi 
               </h3>
               <p className="text-xs text-[#525266]">
-                Nhập tổng giá trị đơn đặt lịch (G) để so sánh dòng tiền giữa Thanh toán Online và Tiền mặt.
+                Nhập tổng giá trị đơn đặt lịch để so sánh dòng tiền giữa Thanh toán Online và Tiền mặt.
               </p>
             </div>
             <div className="w-full sm:w-64">
@@ -520,7 +520,7 @@ export const WalletPage: React.FC = () => {
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-[#525266]">1. Khách đặt cọc 30% (D) cho Sàn:</span>
+                  <span className="text-[#525266]">1. Khách đặt cọc 30%:</span>
                   <span className="font-bold text-[#1C1C28]">{formatMoney(simDeposit)}</span>
                 </div>
                 <div className="flex justify-between">
@@ -532,7 +532,7 @@ export const WalletPage: React.FC = () => {
                   <span className="font-bold">-{formatMoney(simFee)}</span>
                 </div>
                 <div className="pt-2 border-t border-[#B2E5D0] flex justify-between items-center">
-                  <span className="font-bold text-[#146C43]">Cộng vào Ví HDV +(G - F):</span>
+                  <span className="font-bold text-[#146C43]">Cộng vào Ví HDV:</span>
                   <span className="text-lg font-extrabold text-[#146C43]">
                     +{formatMoney(simOnlineWalletCredit)}
                   </span>
@@ -552,7 +552,7 @@ export const WalletPage: React.FC = () => {
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-[#525266]">1. Khách đặt cọc 30% (D) cho Sàn:</span>
+                  <span className="text-[#525266]">1. Khách đặt cọc 30%:</span>
                   <span className="font-bold text-[#1C1C28]">{formatMoney(simDeposit)}</span>
                 </div>
                 <div className="flex justify-between">
@@ -564,7 +564,7 @@ export const WalletPage: React.FC = () => {
                   <span className="font-bold">-{formatMoney(simFee)}</span>
                 </div>
                 <div className="pt-2 border-t border-[#1EC1CB]/40 flex justify-between items-center">
-                  <span className="font-bold text-[#118B93]">Cộng phần dư vào Ví HDV +(D - F):</span>
+                  <span className="font-bold text-[#118B93]">Cộng phần dư vào Ví HDV :</span>
                   <span className="text-lg font-extrabold text-[#118B93]">
                     +{formatMoney(simCashWalletCredit)}
                   </span>

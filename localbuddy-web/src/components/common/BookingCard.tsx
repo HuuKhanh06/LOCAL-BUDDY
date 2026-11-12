@@ -66,7 +66,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
       {/* Banner cảnh báo nếu đang chờ cọc 15p hoặc chờ xác nhận hoàn thành 24h */}
       {booking.bookingStatus === 'WAITING_PAYMENT' && (
         <div className="bg-[#FEF1DC] border border-[#F8CA84] text-[#8C4A08] px-3.5 py-2 rounded-[10px] text-[13px] font-semibold flex items-center justify-between">
-          <span>⏱ Đang giữ chỗ nguyên tử (HOLD) 15 phút — Chờ đặt cọc 30% ({formatMoney(booking.depositAmount)})</span>
+          <span>⏱ Đang giữ chỗ nguyên tử  15 phút — Chờ đặt cọc 30% ({formatMoney(booking.depositAmount)})</span>
         </div>
       )}
 
@@ -100,7 +100,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
       <div className="flex items-center justify-between border-t border-[#E4C3CC] pt-3.5 flex-wrap gap-3">
         <div className="flex items-center gap-4 flex-wrap">
           <div>
-            <span className="text-[12px] text-[#52526B]">Tổng dịch vụ (G): </span>
+            <span className="text-[12px] text-[#52526B]">Tổng dịch vụ: </span>
             <span className="text-[16px] font-extrabold text-[#1A0A0F] tabular-nums">
               {formatMoney(booking.totalAmount)}
             </span>

@@ -221,7 +221,7 @@ export const DepositPaymentPage: React.FC = () => {
           </h2>
           <p className="text-[14px] text-[#1C1C28] max-w-md mx-auto">
             {booking.cancelReason ||
-              'Đã quá hạn 15 phút giữ chỗ hoặc giao dịch bị từ chối. Khung giờ của Hướng dẫn viên đã được giải phóng về trạng thái Đang trống (AVAILABLE).'}
+              'Đã quá hạn 15 phút giữ chỗ hoặc giao dịch bị từ chối. Khung giờ của Hướng dẫn viên đã được giải phóng về trạng thái Đang trống .'}
           </p>
           <div className="flex justify-center gap-3 pt-2">
             <Button variant="secondary" onClick={() => navigate(`/don/${booking.id}`)}>

@@ -255,10 +255,10 @@ export const BookingFormPage: React.FC = () => {
             ℹ️ Cam kết an tâm từ LocalBuddy:
           </p>
           <p>
-            1. Khi gửi yêu cầu, đơn ở trạng thái <strong>Chờ Thổ địa phản hồi (PENDING)</strong>. <strong>Bạn hoàn toàn chưa bị tính phí.</strong>
+            1. Khi gửi yêu cầu, đơn ở trạng thái <strong>Chờ Thổ địa phản hồi </strong>. <strong>Bạn hoàn toàn chưa bị tính phí.</strong>
           </p>
           <p>
-            2. Thổ địa <strong>{user.fullName}</strong> có 24 giờ để chấp nhận. Khi chấp nhận, khung giờ được khóa giữ chỗ (HOLD) trong 15 phút để bạn tiến hành đặt cọc 30%.
+            2. Thổ địa <strong>{user.fullName}</strong> có 24 giờ để chấp nhận. Khi chấp nhận, khung giờ được khóa giữ chỗ  trong 15 phút để bạn tiến hành đặt cọc 30%.
           </p>
         </div>
 
