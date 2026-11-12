@@ -1,4 +1,4 @@
-// pages/tourist/DepositPaymentPage.tsx (UC.14: Thanh toán tiền đặt cọc 30% trong 15 phút giữ chỗ HOLD)
+// pages/tourist/DepositPaymentPage.tsx
 // Tích hợp lớp PaymentProvider (Chế độ SANDBOX có thể thay thế bằng VNPay / MoMo thật):
 // - Thành công -> CONFIRMED + DEPOSITED, Slot HOLD -> BUSY
 // - Lỗi mạng tạm thời / Hủy giữa chừng / Đóng tab giữa lúc thanh toán -> Khôi phục phiên & cho thử lại trong 15 phút
@@ -111,7 +111,7 @@ export const DepositPaymentPage: React.FC = () => {
     });
     expireDeposit(booking.id);
     showToast(
-      `Đã hết thời hạn 15 phút giữ chỗ (BR-05)! Đơn ${booking.id} đã tự động hủy và nhả lịch về AVAILABLE.`,
+      `Đã hết thời hạn 15 phút giữ chỗ ! Đơn ${booking.id} đã tự động hủy và nhả lịch về AVAILABLE.`,
       'error'
     );
   };
@@ -173,7 +173,7 @@ export const DepositPaymentPage: React.FC = () => {
       <div className="bg-[#1C1C28] text-white rounded-[16px] p-6 flex items-center justify-between flex-wrap gap-4">
         <div>
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#1EC1CB]">
-            UC.14 • Khóa lịch nguyên tử HOLD 15 phút (BR-05) • {paymentProvider.mode}
+            Khóa lịch nguyên tử HOLD 15 phút  • {paymentProvider.mode}
           </span>
           <h1 className="text-[24px] font-extrabold text-white mt-1">
             Thanh toán đặt cọc 30% • Đơn {booking.id}

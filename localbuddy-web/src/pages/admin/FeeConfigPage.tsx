@@ -1,4 +1,4 @@
-// pages/admin/FeeConfigPage.tsx (UC.29: Cấu hình Phí sàn & BR-13)
+// pages/admin/FeeConfigPage.tsx
 // Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState } from 'react';
@@ -40,7 +40,7 @@ export const FeeConfigPage: React.FC = () => {
     setError('');
 
     if (percentValue < 10 || percentValue > 15) {
-      setError('Theo quy tắc nghiệp vụ BR-13, tỷ lệ phí sàn bắt buộc nằm trong khoảng từ 10% đến 15%.');
+      setError('Tỷ lệ phí sàn bắt buộc nằm trong khoảng từ 10% đến 15%.');
       return;
     }
 
@@ -64,7 +64,7 @@ export const FeeConfigPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#347CCB] bg-sky-50 border border-sky-200 px-3 py-1 rounded-full mb-2">
-            <Percent className="w-3.5 h-3.5" /> Cấu hình Tham số Tài chính • UC.29 & BR-13
+            <Percent className="w-3.5 h-3.5" /> Cấu hình Tham số Tài chính 
           </span>
           <h1 className="text-2xl font-extrabold text-[#1C1917]">
             Cấu hình Tỷ lệ Phí dịch vụ Nền tảng (10% – 15%)
@@ -92,7 +92,7 @@ export const FeeConfigPage: React.FC = () => {
             </div>
             <div className="text-right">
               <span className="px-3 py-1 rounded-full bg-white text-[#D12B79] border border-[#F1DEC9] text-xs font-bold shadow-xs">
-                Khung chuẩn BR-13: 10% – 15%
+                Khung chuẩn 10% – 15%
               </span>
             </div>
           </div>
@@ -186,7 +186,7 @@ export const FeeConfigPage: React.FC = () => {
 
             <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1">
               <div className="font-bold text-emerald-700">
-                Nếu khách trả 70% cuối ONLINE (UC.20):
+                Nếu khách trả 70% cuối ONLINE :
               </div>
               <div className="text-[#1C1917]">
                 Cộng vào Ví HDV <strong>+(G - F)</strong>:{' '}
@@ -196,7 +196,7 @@ export const FeeConfigPage: React.FC = () => {
 
             <div className="p-3.5 rounded-xl bg-sky-50 border border-sky-200 space-y-1">
               <div className="font-bold text-[#347CCB]">
-                Nếu khách trả 70% cuối TIỀN MẶT (UC.21):
+                Nếu khách trả 70% cuối TIỀN MẶT :
               </div>
               <div className="text-[#1C1917]">
                 HDV cầm 700.000 ₫ tiền mặt + Cộng thêm vào Ví HDV <strong>+(D - F)</strong>:{' '}
@@ -250,10 +250,10 @@ export const FeeConfigPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Bảng Quy tắc Đặt cọc & Chính sách Hủy/Hoàn cọc theo ΔT (BR-05, BR-06, BR-09) */}
+      {/* Bảng Quy tắc Đặt cọc & Chính sách Hủy/Hoàn cọc theo ΔT */}
       <div className="bg-white rounded-2xl border border-[#E7E5E4] p-6 shadow-xs space-y-4">
         <h2 className="text-base font-extrabold text-[#1C1917]">
-          Chính sách Đặt cọc, Giữ khung giờ & Bậc Phạt/Hoàn theo ΔT (BR-05, BR-06)
+          Chính sách Đặt cọc, Giữ khung giờ & Bậc Phạt/Hoàn theo ΔT
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
           <div className="p-4 rounded-xl bg-[#F3F1EC] border border-[#E7E5E4] space-y-1">

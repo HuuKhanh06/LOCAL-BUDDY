@@ -1,10 +1,10 @@
-// pages/tourist/BookingFormPage.tsx (UC.12: Đặt lịch Hướng dẫn viên theo giờ)
+// pages/tourist/BookingFormPage.tsx
 // Thiết kế theo Mục [9] THAM KHẢO UI:
 // Gửi yêu cầu: chọn ngày → lưới giờ rảnh → số giờ → địa điểm hẹn → số khách → ghi chú → tóm tắt tiền →
 // "Gửi yêu cầu đặt lịch (chưa tính phí cho đến khi Guide chấp nhận)"
 // Tuân thủ:
 // - Bắt buộc nhập cả Địa điểm hẹn và Ghi chú yêu cầu + chip gợi ý điểm đón Đà Nẵng
-// - Khung giờ VẪN GIỮ LÀ AVAILABLE (BR-04) khi PENDING, chỉ HOLD 15 phút khi HDV Chấp nhận (UC.13)
+// - Khung giờ VẪN GIỮ LÀ AVAILABLE khi PENDING, chỉ HOLD 15 phút khi HDV Chấp nhận 
 // - Tourist mode: Tuyệt đối không bao giờ hiển thị phí sàn
 
 import React, { useState } from 'react';
@@ -80,14 +80,14 @@ export const BookingFormPage: React.FC = () => {
 
     if (!meetingLocation.trim()) {
       setErrorMsg(
-        'Theo quy định FR 4.1 (UC.12), vui lòng nhập hoặc chọn Địa điểm hẹn đón khách tại Đà Nẵng.'
+        'Vui lòng nhập hoặc chọn Địa điểm hẹn đón khách tại Đà Nẵng.'
       );
       return;
     }
 
     if (!specialRequests.trim()) {
       setErrorMsg(
-        'Theo quy định FR 4.1 (UC.12), vui lòng nhập Ghi chú yêu cầu / Lịch trình mong muốn để Thổ địa chuẩn bị.'
+        'Vui lòng nhập Ghi chú yêu cầu / Lịch trình mong muốn để Thổ địa chuẩn bị.'
       );
       return;
     }
@@ -122,7 +122,7 @@ export const BookingFormPage: React.FC = () => {
     });
 
     showToast(
-      `Đã tạo yêu cầu đặt lịch ${newBooking.id}! Thổ địa có 24 giờ để phản hồi (BR-03).`,
+      `Đã tạo yêu cầu đặt lịch ${newBooking.id}! Thổ địa có 24 giờ để phản hồi .`,
       'success'
     );
     navigate(`/don/${newBooking.id}`);
@@ -134,7 +134,7 @@ export const BookingFormPage: React.FC = () => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <span className="text-[12px] font-bold uppercase tracking-wider text-[#EB5B38] bg-orange-50 border border-orange-200 px-3 py-1 rounded-full">
-            Bước xác nhận chuyến đi • UC.12
+            Bước xác nhận chuyến đi
           </span>
           <h1 className="text-[24px] sm:text-[28px] font-black text-[#1C1917] mt-2">
             Gửi yêu cầu đặt Thổ địa Đà Nẵng
@@ -201,7 +201,7 @@ export const BookingFormPage: React.FC = () => {
         {/* Địa điểm hẹn bắt buộc + Chip gợi ý điểm đón Đà Nẵng */}
         <div className="space-y-2">
           <Input
-            label="Địa điểm hẹn đón khách tại Đà Nẵng * (Bắt buộc - FR 4.1)"
+            label="Địa điểm hẹn đón khách tại Đà Nẵng * (Bắt buộc)"
             placeholder="Nhập địa chỉ khách sạn hoặc điểm hẹn tại Đà Nẵng..."
             value={meetingLocation}
             onChange={(e) => setMeetingLocation(e.target.value)}
@@ -229,9 +229,9 @@ export const BookingFormPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Ghi chú yêu cầu bắt buộc (FR 4.1, UC.12) */}
+        {/* Ghi chú yêu cầu bắt buộc */}
         <Textarea
-          label="Ghi chú yêu cầu & Lịch trình mong muốn * (Bắt buộc - FR 4.1, UC.12)"
+          label="Ghi chú yêu cầu & Lịch trình mong muốn * (Bắt buộc)"
           placeholder="Ví dụ: Cả đoàn muốn đi Chùa Linh Ứng Sơn Trà, ăn hải sản Bé Mặn và nhờ Thổ địa chụp ảnh gia đình..."
           value={specialRequests}
           onChange={(e) => setSpecialRequests(e.target.value)}
@@ -252,7 +252,7 @@ export const BookingFormPage: React.FC = () => {
         {/* Hộp thông tin cam kết giữ lịch */}
         <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-[13px] text-amber-950 space-y-1">
           <p className="font-bold">
-            ℹ️ Cam kết an tâm từ LocalBuddy (BR-03, BR-04, BR-05):
+            ℹ️ Cam kết an tâm từ LocalBuddy:
           </p>
           <p>
             1. Khi gửi yêu cầu, đơn ở trạng thái <strong>Chờ Thổ địa phản hồi (PENDING)</strong>. <strong>Bạn hoàn toàn chưa bị tính phí.</strong>

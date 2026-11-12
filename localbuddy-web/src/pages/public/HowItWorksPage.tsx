@@ -21,7 +21,7 @@ export const HowItWorksPage: React.FC = () => {
     },
     {
       q: 'Hướng dẫn viên trên LocalBuddy có được kiểm duyệt chất lượng không?',
-      a: '100% Thổ địa (Local Guide) bắt buộc nộp Căn cước công dân gắn chip hoặc Thẻ HDV/Chứng chỉ ngoại ngữ để Ban Quản trị thẩm định định danh KYC (UC.05) trước khi được duyệt hiển thị và nhận khách.',
+      a: '100% Thổ địa (Local Guide) bắt buộc nộp Căn cước công dân gắn chip hoặc Thẻ HDV/Chứng chỉ ngoại ngữ để Ban Quản trị thẩm định định danh KYC trước khi được duyệt hiển thị và nhận khách.',
     },
     {
       q: 'Chính sách hoàn cọc khi tôi có việc bận cần hủy chuyến đi ra sao?',

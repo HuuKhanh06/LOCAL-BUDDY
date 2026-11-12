@@ -246,7 +246,7 @@ const EXPERIENCES: ExperienceItem[] = [
 const FAQ_ITEMS = [
   {
     q: 'Vì sao tôi chỉ cần đặt cọc 30% khi đặt lịch Thổ địa?',
-    a: 'LocalBuddy áp dụng cơ chế thanh toán hai chặng minh bạch theo chuẩn Local Buddy (BR-03, BR-05): Du khách chỉ cần thanh toán 30% tiền cọc sau khi Hướng dẫn viên chấp nhận yêu cầu để khóa lịch nguyên tử trong 15 phút. 70% còn lại bạn chỉ phải thanh toán sau khi chuyến đi thực tế đã hoàn thành.',
+    a: 'LocalBuddy áp dụng cơ chế thanh toán hai chặng minh bạch theo chuẩn Local Buddy: Du khách chỉ cần thanh toán 30% tiền cọc sau khi Hướng dẫn viên chấp nhận yêu cầu để khóa lịch nguyên tử trong 15 phút. 70% còn lại bạn chỉ phải thanh toán sau khi chuyến đi thực tế đã hoàn thành.',
   },
   {
     q: 'Chính sách hoàn tiền cọc khi hủy lịch được quy định như thế nào?',

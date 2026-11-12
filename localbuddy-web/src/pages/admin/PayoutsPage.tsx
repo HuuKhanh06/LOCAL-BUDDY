@@ -1,4 +1,4 @@
-// pages/admin/PayoutsPage.tsx (UC.23: Duyệt Rút tiền HDV & BR-09)
+// pages/admin/PayoutsPage.tsx
 // Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState, useEffect } from 'react';
@@ -104,7 +104,7 @@ export const PayoutsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#347CCB] bg-sky-50 border border-sky-200 px-3 py-1 rounded-full mb-2">
-            <Building2 className="w-3.5 h-3.5" /> Đối soát & Giải ngân Ví HDV • UC.23 & BR-09
+            <Building2 className="w-3.5 h-3.5" /> Đối soát & Giải ngân Ví HDV 
           </span>
           <h1 className="text-2xl font-extrabold text-[#1C1917]">
             Duyệt yêu cầu rút tiền Hướng dẫn viên
@@ -274,7 +274,7 @@ export const PayoutsPage: React.FC = () => {
           onClose={() => setSelectedRequest(null)}
           title={
             actionMode === 'APPROVE'
-              ? `Xác nhận giải ngân lệnh ${selectedRequest.id} (UC.23)`
+              ? `Xác nhận giải ngân lệnh ${selectedRequest.id} `
               : `Từ chối lệnh rút tiền ${selectedRequest.id} & Hoàn ví`
           }
         >

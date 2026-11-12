@@ -1,4 +1,4 @@
-// pages/guide/IncomingRequestsPage.tsx (UC.13: HDV phản hồi yêu cầu đặt lịch trong 24 giờ)
+// pages/guide/IncomingRequestsPage.tsx
 // Tuân thủ BR-04 & NB-01:
 // - Khi bấm "Chấp nhận", hệ thống kiểm tra nguyên tử (Atomic Check) xem khung giờ có đang bị HOLD/BUSY bởi đơn khác không.
 // - Nếu trống (AVAILABLE), khóa slot sang HOLD trong 15 phút và chuyển đơn sang WAITING_PAYMENT + WAITING_DEPOSIT.
@@ -74,7 +74,7 @@ export const IncomingRequestsPage: React.FC = () => {
       <div className="bg-[#1C1C28] text-white rounded-[16px] p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#1EC1CB]">
-            UC.13 • Phản hồi trong 24 giờ & Khóa lịch nguyên tử (BR-03, BR-04)
+            Phản hồi trong 24 giờ & Khóa lịch nguyên tử 
           </span>
           <h1 className="text-[26px] sm:text-[30px] font-extrabold text-white mt-1">
             Yêu cầu đặt lịch mới gửi đến ({incomingBookings.length})
@@ -163,7 +163,7 @@ export const IncomingRequestsPage: React.FC = () => {
                       onClick={() => {
                         expirePendingBooking(b.id);
                         showToast(
-                          `Đã giả lập quá hạn 24h cho đơn ${b.id} -> Tự động chuyển CANCELLED (BR-03)!`,
+                          `Đã giả lập quá hạn 24h cho đơn ${b.id} -> Tự động chuyển CANCELLED !`,
                           'warning'
                         );
                       }}
@@ -205,7 +205,7 @@ export const IncomingRequestsPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Bảng tài chính: HDV nhìn thấy rõ Phí sàn và Thu nhập thực nhận (BR-13) */}
+                {/* Bảng tài chính: HDV nhìn thấy rõ Phí sàn và Thu nhập thực nhận  */}
                 <PaymentSummary
                   hourlyRate={b.hourlyRateSnapshot}
                   hours={b.hours}
@@ -251,11 +251,11 @@ export const IncomingRequestsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Modal xác nhận từ chối đơn (UC.13) */}
+      {/* Modal xác nhận từ chối đơn  */}
       <Modal
         isOpen={Boolean(rejectModalBookingId)}
         onClose={() => setRejectModalBookingId(null)}
-        title={`Từ chối yêu cầu đặt lịch ${rejectModalBookingId} (UC.13)`}
+        title={`Từ chối yêu cầu đặt lịch ${rejectModalBookingId} `}
         footer={
           <>
             <Button variant="ghost" onClick={() => setRejectModalBookingId(null)}>

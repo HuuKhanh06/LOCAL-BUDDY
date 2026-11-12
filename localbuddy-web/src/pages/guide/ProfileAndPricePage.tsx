@@ -1,4 +1,4 @@
-// pages/guide/ProfileAndPricePage.tsx (UC.10: Cập nhật Hồ sơ chuyên môn & Đơn giá theo giờ của HDV)
+// pages/guide/ProfileAndPricePage.tsx
 // Kiểm tra nghiêm ngặt BR-02: Đơn giá từ 80.000 ₫ đến 500.000 ₫ / giờ.
 // Cho phép chọn Khu vực hoạt động tại Đà Nẵng, Ngôn ngữ, Kỹ năng và tài khoản ngân hàng nhận tiền.
 
@@ -103,7 +103,7 @@ export const ProfileAndPricePage: React.FC = () => {
           />
           <div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#1EC1CB]">
-              UC.10 • Hồ sơ chuyên môn & Đơn giá theo giờ (BR-02)
+              Hồ sơ chuyên môn & Đơn giá theo giờ 
             </span>
             <h1 className="text-[24px] font-extrabold text-white mt-0.5">
               {guideItem.user.fullName}
@@ -143,7 +143,7 @@ export const ProfileAndPricePage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Input
-              label="Đơn giá thuê theo giờ (VNĐ / giờ) * (BR-02)"
+              label="Đơn giá thuê theo giờ (VNĐ / giờ) * "
               type="number"
               min={80000}
               max={500000}
@@ -262,10 +262,10 @@ export const ProfileAndPricePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Thông tin ngân hàng nhận rút tiền (UC.22) */}
+        {/* Thông tin ngân hàng nhận rút tiền  */}
         <div className="border-t border-[#E4C3CC] pt-5 space-y-4">
           <h3 className="text-[16px] font-extrabold text-[#1A0A0F]">
-            🏦 Tài khoản Ngân hàng nhận tiền rút từ Ví (UC.22)
+            🏦 Tài khoản Ngân hàng nhận tiền rút từ Ví 
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Input

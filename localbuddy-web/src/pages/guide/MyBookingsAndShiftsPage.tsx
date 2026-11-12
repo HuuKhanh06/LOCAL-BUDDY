@@ -1,9 +1,9 @@
 // pages/guide/MyBookingsAndShiftsPage.tsx
 // Quản lý toàn bộ Đơn & Ca dẫn khách của Hướng dẫn viên:
-// - Bấm "Yêu cầu xác nhận hoàn thành" (UC.17) -> mở cửa sổ 24 giờ cho khách xác nhận (UC.18) hoặc khiếu nại (UC.19)
-// - Trong cửa sổ 24 giờ, HDV cũng có quyền gửi khiếu nại nếu khách vi phạm (UC.19)
-// - Bấm "Xác nhận đã thu đủ 70% tiền mặt" (UC.21) khi đơn ở COMPLETED + WAITING_RECONCILE -> cộng +(D - F) vào ví
-// - Bấm "Hủy nhận dẫn khách" (UC.25, BR-06) -> hoàn 100% cọc cho khách và cộng +1 vào soLanViPham của HDV
+// - Bấm "Yêu cầu xác nhận hoàn thành"  -> mở cửa sổ 24 giờ cho khách xác nhận  hoặc khiếu nại 
+// - Trong cửa sổ 24 giờ, HDV cũng có quyền gửi khiếu nại nếu khách vi phạm 
+// - Bấm "Xác nhận đã thu đủ 70% tiền mặt"  khi đơn ở COMPLETED + WAITING_RECONCILE -> cộng +(D - F) vào ví
+// - Bấm "Hủy nhận dẫn khách"  -> hoàn 100% cọc cho khách và cộng +1 vào soLanViPham của HDV
 
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -45,7 +45,7 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
     'Hướng dẫn viên gặp sự cố sức khỏe đột xuất không thể dẫn đoàn.'
   );
 
-  // Modal khiếu nại / No-show từ phía HDV (UC.19)
+  // Modal khiếu nại / No-show từ phía HDV 
   const [disputeBookingId, setDisputeBookingId] = useState<string | null>(null);
   const [disputeReason, setDisputeReason] = useState<string>(
     'Du khách tự ý hủy ngang giữa chừng và có hành vi không đúng mực trong chuyến đi.'
@@ -175,13 +175,13 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
       <div className="bg-[#1C1C28] text-white rounded-[16px] p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#1EC1CB]">
-            UC.17, UC.21, UC.25 • Quản lý ca dẫn khách & Đối soát
+            Quản lý ca dẫn khách & Đối soát
           </span>
           <h1 className="text-[26px] sm:text-[30px] font-extrabold text-white mt-1">
             Đơn & Ca dẫn khách của tôi
           </h1>
           <p className="text-[14px] text-[#F6E6EA]/85 mt-1">
-            Gửi yêu cầu xác nhận hoàn thành tour (UC.17), xác nhận thu 70% tiền mặt (UC.21) và đối soát doanh thu
+            Gửi yêu cầu xác nhận hoàn thành tour , xác nhận thu 70% tiền mặt  và đối soát doanh thu
           </p>
         </div>
 
@@ -245,12 +245,12 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Banner trạng thái cửa sổ 24h chờ khách xác nhận hoàn thành (UC.17 → UC.18) */}
+                {/* Banner trạng thái cửa sổ 24h chờ khách xác nhận hoàn thành  */}
                 {b.bookingStatus === 'CONFIRMED' && b.guideRequestedCompletion && (
                   <div className="p-4 rounded-[12px] bg-[#E5F8F9] border border-[#1EC1CB] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="text-[13px] text-[#1C1C28]">
                       <strong className="block text-[14px] text-[#1A0A0F]">
-                        ⏳ Đã gửi yêu cầu xác nhận hoàn thành (UC.17) — Đang chờ khách xác nhận trong 24 giờ
+                        ⏳ Đã gửi yêu cầu xác nhận hoàn thành  — Đang chờ khách xác nhận trong 24 giờ
                       </strong>
                       <span>
                         Nếu sau 24 giờ khách không phản hồi và không có khiếu nại, hệ thống sẽ tự động chuyển đơn sang Đã hoàn thành (COMPLETED).
@@ -279,15 +279,15 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
                   </div>
                 )}
 
-                {/* Banner đối soát tiền mặt 70% (UC.21, BR-13) */}
+                {/* Banner đối soát tiền mặt 70% */}
                 {b.bookingStatus === 'COMPLETED' &&
                   b.paymentStatus === 'WAITING_RECONCILE' && (
                     <div className="p-4 rounded-[12px] bg-[#FEF1DC] border-2 border-[#F8CA84] space-y-2 text-[13px] text-[#8C4A08]">
                       <strong className="text-[14px] block">
-                        💵 Khách đã chọn trả Tiền mặt 70% ({formatMoney(b.remainingAmount)}) trực tiếp cho bạn (UC.21)
+                        💵 Khách đã chọn trả Tiền mặt 70% ({formatMoney(b.remainingAmount)}) trực tiếp cho bạn 
                       </strong>
                       <p className="text-[#1C1C28]">
-                        Sau khi nhận đủ <strong>{formatMoney(b.remainingAmount)}</strong> tiền mặt từ khách, hãy bấm nút <strong>“Xác nhận đã thu đủ 70% tiền mặt”</strong> bên dưới. Hệ thống sẽ khấu trừ phí sàn ({formatMoney(platformFee)}) vào khoản cọc 30% ({formatMoney(b.depositAmount)}) đang giữ và cộng thêm phần dư <strong>+{formatMoney(cashReconcileDelta)}</strong> vào ví khả dụng của bạn (BR-13).
+                        Sau khi nhận đủ <strong>{formatMoney(b.remainingAmount)}</strong> tiền mặt từ khách, hãy bấm nút <strong>“Xác nhận đã thu đủ 70% tiền mặt”</strong> bên dưới. Hệ thống sẽ khấu trừ phí sàn ({formatMoney(platformFee)}) vào khoản cọc 30% ({formatMoney(b.depositAmount)}) đang giữ và cộng thêm phần dư <strong>+{formatMoney(cashReconcileDelta)}</strong> vào ví khả dụng của bạn .
                       </p>
                     </div>
                   )}
@@ -353,7 +353,7 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
                         size="sm"
                         onClick={() => navigate('/guide/don-den')}
                       >
-                        Đi tới duyệt yêu cầu (UC.13) →
+                        Đi tới duyệt yêu cầu  →
                       </Button>
                     )}
 
@@ -376,13 +376,13 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
                           size="sm"
                           onClick={() => setCancelBookingId(b.id)}
                         >
-                          ✕ Hủy nhận dẫn khách (UC.25)
+                          ✕ Hủy nhận dẫn khách 
                         </Button>
                         <Button
                           variant="primary"
                           onClick={() => handleRequestComplete(b.id)}
                         >
-                          ✓ Yêu cầu xác nhận hoàn thành tour (UC.17)
+                          ✓ Yêu cầu xác nhận hoàn thành tour 
                         </Button>
                       </>
                     )}
@@ -393,7 +393,7 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
                         size="sm"
                         onClick={() => setDisputeBookingId(b.id)}
                       >
-                        ⚠️ Gửi khiếu nại sự cố (UC.19)
+                        ⚠️ Gửi khiếu nại sự cố 
                       </Button>
                     )}
 
@@ -404,7 +404,7 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
                           size="lg"
                           onClick={() => handleConfirmCash(b.id)}
                         >
-                          💵 Xác nhận đã thu đủ {formatMoney(b.remainingAmount)} tiền mặt (UC.21)
+                          💵 Xác nhận đã thu đủ {formatMoney(b.remainingAmount)} tiền mặt 
                         </Button>
                       )}
 
@@ -445,11 +445,11 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Modal HDV hủy đơn đã CONFIRMED (UC.25, BR-06) */}
+      {/* Modal HDV hủy đơn đã CONFIRMED  */}
       <Modal
         isOpen={Boolean(cancelBookingId)}
         onClose={() => setCancelBookingId(null)}
-        title={`Cảnh báo Hủy đơn đã xác nhận ${cancelBookingId} (UC.25, BR-06)`}
+        title={`Cảnh báo Hủy đơn đã xác nhận ${cancelBookingId} `}
         footer={
           <>
             <Button variant="ghost" onClick={() => setCancelBookingId(null)}>
@@ -464,7 +464,7 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
         <div className="space-y-4">
           <div className="p-4 bg-[#FCE8EB] border border-[#F5B2BA] rounded-[12px] text-[13px] text-[#A61B2B] space-y-1.5">
             <strong className="block text-[14px]">
-              ⚠️ Quy tắc chế tài khi HDV hủy đơn đã xác nhận (BR-06):
+              ⚠️ Quy tắc chế tài khi HDV hủy đơn đã xác nhận :
             </strong>
             <ul className="list-disc pl-5 space-y-1">
               <li>
@@ -474,7 +474,7 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
                 Hướng dẫn viên nhận <strong>0 ₫</strong> và bị hệ thống tự động cộng <strong>+1 lần vi phạm (soLanViPham)</strong>.
               </li>
               <li>
-                Lịch sử vi phạm sẽ hiển thị cảnh báo đỏ trên trang Quản lý người dùng của Admin (UC.06).
+                Lịch sử vi phạm sẽ hiển thị cảnh báo đỏ trên trang Quản lý người dùng của Admin .
               </li>
             </ul>
           </div>
@@ -488,11 +488,11 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
         </div>
       </Modal>
 
-      {/* Modal HDV gửi khiếu nại trong cửa sổ 24h (UC.19) */}
+      {/* Modal HDV gửi khiếu nại trong cửa sổ 24h  */}
       <Modal
         isOpen={Boolean(disputeBookingId)}
         onClose={() => setDisputeBookingId(null)}
-        title={`Gửi khiếu nại từ phía HDV cho đơn ${disputeBookingId} (UC.19)`}
+        title={`Gửi khiếu nại từ phía HDV cho đơn ${disputeBookingId} `}
         footer={
           <>
             <Button variant="ghost" onClick={() => setDisputeBookingId(null)}>
@@ -506,7 +506,7 @@ export const MyBookingsAndShiftsPage: React.FC = () => {
       >
         <div className="space-y-4">
           <p className="text-[13px] text-[#52526B]">
-            Trong cửa sổ 24 giờ sau khi yêu cầu hoàn thành, nếu Du khách vi phạm thỏa thuận, bạn có thể gửi khiếu nại để Admin thẩm định và bảo vệ quyền lợi cho bạn (UC.19, UC.27).
+            Trong cửa sổ 24 giờ sau khi yêu cầu hoàn thành, nếu Du khách vi phạm thỏa thuận, bạn có thể gửi khiếu nại để Admin thẩm định và bảo vệ quyền lợi cho bạn.
           </p>
           <Textarea
             label="Nội dung sự cố / khiếu nại *"

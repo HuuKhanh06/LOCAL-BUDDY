@@ -1,4 +1,4 @@
-// pages/admin/KycReviewPage.tsx (UC.05: Thẩm định KYC Hướng dẫn viên & BR-01)
+// pages/admin/KycReviewPage.tsx
 // Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState, useEffect } from 'react';
@@ -54,7 +54,7 @@ export const KycReviewPage: React.FC = () => {
   const handleApprove = (guideId: string) => {
     const note = reviewNote.trim() || 'Đã đối chiếu CCCD gắn chip và Thẻ HDV/Chứng chỉ hợp lệ tại Đà Nẵng.';
     approveKyc(guideId, note);
-    showToast('Đã phê duyệt hồ sơ KYC! Hướng dẫn viên đã được mở khóa hiển thị công khai (BR-01).', 'success');
+    showToast('Đã phê duyệt hồ sơ KYC! Hướng dẫn viên đã được mở khóa hiển thị công khai .', 'success');
     setSelectedRecord(null);
   };
 
@@ -83,13 +83,13 @@ export const KycReviewPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#347CCB] bg-sky-50 border border-sky-200 px-3 py-1 rounded-full mb-2">
-            <ShieldCheck className="w-3.5 h-3.5" /> Thẩm định Định danh HDV • UC.05 & BR-01
+            <ShieldCheck className="w-3.5 h-3.5" /> Thẩm định Định danh HDV 
           </span>
           <h1 className="text-2xl font-extrabold text-[#1C1917]">
             Duyệt hồ sơ KYC Hướng dẫn viên
           </h1>
           <p className="text-sm text-[#78716C] mt-0.5">
-            Kiểm tra CCCD, Thẻ HDV/Chứng chỉ ngoại ngữ và tài khoản ngân hàng trước khi cấp quyền nhận khách (BR-01).
+            Kiểm tra CCCD, Thẻ HDV/Chứng chỉ ngoại ngữ và tài khoản ngân hàng trước khi cấp quyền nhận khách .
           </p>
         </div>
 
@@ -382,7 +382,7 @@ export const KycReviewPage: React.FC = () => {
                 onClick={() => handleApprove(selectedRecord.guideId)}
                 icon={<CheckCircle2 className="w-4 h-4" />}
               >
-                Phê duyệt KYC & Cấp quyền nhận khách (BR-01)
+                Phê duyệt KYC & Cấp quyền nhận khách 
               </Button>
             </div>
           </div>

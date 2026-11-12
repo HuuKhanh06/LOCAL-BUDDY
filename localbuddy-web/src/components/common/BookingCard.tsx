@@ -72,7 +72,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
 
       {booking.bookingStatus === 'CONFIRMED' && booking.guideRequestedCompletion && (
         <div className="bg-[#E5F8F9] border border-[#1EC1CB] text-[#1C1C28] px-3.5 py-2 rounded-[10px] text-[13px] font-semibold">
-          🔔 HDV đã yêu cầu xác nhận hoàn thành tour — Cửa sổ 24 giờ để xác nhận (UC.18) hoặc khiếu nại (UC.19)
+          🔔 HDV đã yêu cầu xác nhận hoàn thành tour — Cửa sổ 24 giờ để xác nhận  hoặc khiếu nại 
         </div>
       )}
 

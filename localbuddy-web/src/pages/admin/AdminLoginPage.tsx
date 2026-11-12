@@ -1,4 +1,4 @@
-// pages/admin/AdminLoginPage.tsx (UC.04: Đăng nhập Quản trị viên)
+// pages/admin/AdminLoginPage.tsx
 // Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState } from 'react';
@@ -47,7 +47,7 @@ export const AdminLoginPage: React.FC = () => {
               <Logo size="sm" />
             </Link>
             <span className="px-2.5 py-1 rounded-full bg-[var(--lb-surface)] border border-[var(--lb-border)] text-[var(--lb-accent-text)] text-[11px] font-bold uppercase tracking-wider">
-              Admin Portal (UC.04)
+              Admin Portal
             </span>
           </div>
           <h1 className="text-lg font-bold text-[var(--lb-text)]">

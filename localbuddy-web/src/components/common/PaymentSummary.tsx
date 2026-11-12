@@ -1,5 +1,5 @@
 // components/common/PaymentSummary.tsx
-// Bảng chi tiết tài chính minh bạch theo từng vai trò (BR-03, BR-13)
+// Bảng chi tiết tài chính minh bạch theo từng vai trò
 // Quy tắc bất biến: Du khách KHÔNG BAO GIỜ nhìn thấy Phí hoa hồng nền tảng (Fee_Rate).
 
 import React from 'react';
@@ -49,7 +49,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
     <div className="bg-[#FBF4F6] border border-[#E4C3CC] rounded-[12px] p-5 space-y-3">
       <div className="flex items-center justify-between border-b border-[#E4C3CC] pb-2.5">
         <h4 className="text-[15px] font-bold text-[#1A0A0F]">
-          Chi tiết thanh toán & Đặt cọc (BR-03)
+          Chi tiết thanh toán & Đặt cọc 
         </h4>
         {hourlyRate && hours && (
           <span className="text-[12px] font-semibold text-[#52526B]">
@@ -89,11 +89,11 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
         </span>
       </div>
 
-      {/* Chỉ HDV và Admin mới nhìn thấy Phí hoa hồng nền tảng và Công thức quyết toán Ví (BR-13) */}
+      {/* Chỉ HDV và Admin mới nhìn thấy Phí hoa hồng nền tảng và Công thức quyết toán Ví  */}
       {mode !== 'tourist' && computedFee !== undefined && (
         <div className="border-t border-[#E4C3CC] pt-3 mt-2 space-y-2">
           <p className="text-[12px] font-bold uppercase tracking-wider text-[#1A0A0F]">
-            Đối soát doanh thu Hướng dẫn viên (BR-13)
+            Đối soát doanh thu Hướng dẫn viên 
           </p>
           <div className="flex justify-between text-[13px]">
             <span className="text-[#52526B]">

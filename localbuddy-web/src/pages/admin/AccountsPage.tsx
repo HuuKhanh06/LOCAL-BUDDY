@@ -1,4 +1,4 @@
-// pages/admin/AccountsPage.tsx (UC.06: Quản lý Tài khoản & Xử lý Vi phạm BR-06)
+// pages/admin/AccountsPage.tsx
 // Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState, useEffect } from 'react';
@@ -56,8 +56,8 @@ export const AccountsPage: React.FC = () => {
     toggleUserLock(confirmUser.id);
     showToast(
       confirmUser.isLocked
-        ? `Đã mở khóa tài khoản ${confirmUser.fullName} (UC.06).`
-        : `Đã khóa tài khoản ${confirmUser.fullName} do vi phạm quy chuẩn nền tảng (UC.06).`,
+        ? `Đã mở khóa tài khoản ${confirmUser.fullName} .`
+        : `Đã khóa tài khoản ${confirmUser.fullName} do vi phạm quy chuẩn nền tảng .`,
       confirmUser.isLocked ? 'success' : 'info'
     );
     setConfirmUser(null);
@@ -78,7 +78,7 @@ export const AccountsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#347CCB] bg-sky-50 border border-sky-200 px-3 py-1 rounded-full mb-2">
-            <Users className="w-3.5 h-3.5" /> Quản trị Người dùng & Kỷ luật • UC.06 & BR-06
+            <Users className="w-3.5 h-3.5" /> Quản trị Người dùng & Kỷ luật 
           </span>
           <h1 className="text-2xl font-extrabold text-[#1C1917]">
             Quản lý Tài khoản & Theo dõi Vi phạm
@@ -255,7 +255,7 @@ export const AccountsPage: React.FC = () => {
                           </span>
                           {user.violationCount >= 2 && (
                             <div className="text-[11px] font-bold text-red-600">
-                              Đề xuất khóa tài khoản (BR-06)
+                              Đề xuất khóa tài khoản 
                             </div>
                           )}
                         </div>
@@ -308,7 +308,7 @@ export const AccountsPage: React.FC = () => {
           title={
             confirmUser.isLocked
               ? `Mở khóa tài khoản: ${confirmUser.fullName}`
-              : `Xác nhận khóa tài khoản: ${confirmUser.fullName} (UC.06)`
+              : `Xác nhận khóa tài khoản: ${confirmUser.fullName} `
           }
         >
           <div className="space-y-4">

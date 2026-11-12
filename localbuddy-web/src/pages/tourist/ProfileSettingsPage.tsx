@@ -1,4 +1,4 @@
-// pages/tourist/ProfileSettingsPage.tsx (UC.04: Quản lý thông tin cá nhân Du khách)
+// pages/tourist/ProfileSettingsPage.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBookingContext } from '../../context/BookingContext';
@@ -124,7 +124,7 @@ export const ProfileSettingsPage: React.FC = () => {
           />
           <div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#1EC1CB]">
-              UC.04 • Hồ sơ tài khoản
+              Hồ sơ tài khoản
             </span>
             <h1 className="text-[24px] font-extrabold text-white mt-0.5">
               {activeUser.fullName}

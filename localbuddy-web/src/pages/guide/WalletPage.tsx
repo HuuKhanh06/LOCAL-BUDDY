@@ -83,7 +83,7 @@ export const WalletPage: React.FC = () => {
     const numAmount = Number(amountInput);
 
     if (!Number.isFinite(numAmount) || numAmount < 200000) {
-      setWithdrawError('Số tiền rút tối thiểu là 200.000 ₫ theo quy định BR-09.');
+      setWithdrawError('Số tiền rút tối thiểu là 200.000 ₫.');
       return;
     }
     if (numAmount > wallet.availableBalance) {
@@ -165,7 +165,7 @@ export const WalletPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#118B93] bg-[#E6F9FA] px-3 py-1 rounded-full mb-2">
-            <WalletIcon className="w-3.5 h-3.5" /> Quản lý Ví & Đối soát • UC.22, BR-09, BR-13
+            <WalletIcon className="w-3.5 h-3.5" /> Quản lý Ví & Đối soát 
           </span>
           <h1 className="text-2xl font-extrabold text-[#1A0A0F]">
             Ví Hướng dẫn viên & Lịch sử quyết toán
@@ -241,14 +241,13 @@ export const WalletPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Transparent Formula Explanation Banner (BR-13) */}
+      {/* Transparent Formula Explanation Banner  */}
       <div className="bg-[#FDF7F9] border border-[#E8CED5] rounded-[12px] p-5">
         <div className="flex items-start gap-3">
           <Info className="w-5 h-5 text-[#1A0A0F] shrink-0 mt-0.5" />
           <div className="text-xs text-[#1C1C28] space-y-1.5 leading-relaxed">
             <div className="font-bold text-sm text-[#1A0A0F]">
-              Quy tắc quyết toán Ví HDV minh bạch (BR-13 — Tỷ lệ phí sàn hiện hành:{' '}
-              {Math.round(feeRate * 100)}%)
+              Quy tắc quyết toán Ví HDV minh bạch (Tỷ lệ phí sàn hiện hành: {Math.round(feeRate * 100)}%)
             </div>
             <p>
               Giả sử Tổng tiền chuyến đi là <strong>G</strong>, Tiền cọc 30% sàn đã thu hộ là{' '}
@@ -258,7 +257,7 @@ export const WalletPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
               <div className="bg-white p-3 rounded-lg border border-[#E8CED5]">
                 <div className="font-bold text-[#146C43]">
-                  1. Khách trả 70% cuối qua cổng ONLINE (UC.20)
+                  1. Khách trả 70% cuối qua cổng ONLINE 
                 </div>
                 <div className="mt-1">
                   Sàn thu đủ 100% (G) → Khấu trừ phí sàn F →{' '}
@@ -267,7 +266,7 @@ export const WalletPage: React.FC = () => {
               </div>
               <div className="bg-white p-3 rounded-lg border border-[#E8CED5]">
                 <div className="font-bold text-[#118B93]">
-                  2. Khách trả 70% cuối bằng TIỀN MẶT cho HDV (UC.21)
+                  2. Khách trả 70% cuối bằng TIỀN MẶT cho HDV 
                 </div>
                 <div className="mt-1">
                   HDV đã cầm trực tiếp 70% tiền mặt → Sàn lấy cọc 30% (D) trừ phí sàn F →{' '}
@@ -490,7 +489,7 @@ export const WalletPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E8CED5] pb-4">
             <div>
               <h3 className="text-lg font-extrabold text-[#1A0A0F]">
-                Mô phỏng đối soát doanh thu chuyến đi (BR-13)
+                Mô phỏng đối soát doanh thu chuyến đi 
               </h3>
               <p className="text-xs text-[#525266]">
                 Nhập tổng giá trị đơn đặt lịch (G) để so sánh dòng tiền giữa Thanh toán Online và Tiền mặt.
@@ -516,7 +515,7 @@ export const WalletPage: React.FC = () => {
             <div className="rounded-[12px] border-2 border-[#1B8A5A]/30 bg-[#E6F7F0]/30 p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-extrabold uppercase tracking-wider px-2.5 py-1 rounded bg-[#E6F7F0] text-[#146C43]">
-                  Phương án A: Khách trả 70% cuối ONLINE (UC.20)
+                  Phương án A: Khách trả 70% cuối ONLINE 
                 </span>
               </div>
               <div className="space-y-2 text-sm">
@@ -548,7 +547,7 @@ export const WalletPage: React.FC = () => {
             <div className="rounded-[12px] border-2 border-[#1EC1CB]/50 bg-[#E6F9FA]/30 p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-extrabold uppercase tracking-wider px-2.5 py-1 rounded bg-[#E6F9FA] text-[#118B93]">
-                  Phương án B: Khách trả 70% cuối TIỀN MẶT (UC.21)
+                  Phương án B: Khách trả 70% cuối TIỀN MẶT 
                 </span>
               </div>
               <div className="space-y-2 text-sm">
@@ -585,7 +584,7 @@ export const WalletPage: React.FC = () => {
       <Modal
         isOpen={isWithdrawModalOpen}
         onClose={() => setIsWithdrawModalOpen(false)}
-        title="Tạo yêu cầu rút tiền về ngân hàng (UC.22)"
+        title="Tạo yêu cầu rút tiền về ngân hàng "
       >
         <form onSubmit={handleConfirmWithdraw} className="space-y-4">
           <div className="bg-[#F6E6EA]/70 border border-[#E8CED5] rounded-[10px] p-3.5 flex items-center justify-between">
@@ -612,7 +611,7 @@ export const WalletPage: React.FC = () => {
             step={50000}
             value={amountInput}
             onChange={(e) => setAmountInput(e.target.value)}
-            helperText="Tối thiểu 200.000 ₫ / lần theo quy tắc nghiệp vụ BR-09."
+            helperText="Tối thiểu 200.000 ₫ / lần."
             required
           />
 
@@ -651,7 +650,7 @@ export const WalletPage: React.FC = () => {
           <div className="bg-[#FFF5E5] border border-[#F8D39A] rounded-[10px] p-3 text-xs text-[#9A5B06] flex items-start gap-2">
             <HelpCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>
-              Sau khi gửi yêu cầu, số tiền sẽ tạm khóa khỏi Số dư khả dụng để chờ Admin đối soát và chuyển khoản (UC.23). Nếu lệnh bị từ chối, tiền sẽ được hoàn lại 100% vào ví của bạn.
+              Sau khi gửi yêu cầu, số tiền sẽ tạm khóa khỏi Số dư khả dụng để chờ Admin đối soát và chuyển khoản . Nếu lệnh bị từ chối, tiền sẽ được hoàn lại 100% vào ví của bạn.
             </span>
           </div>
 

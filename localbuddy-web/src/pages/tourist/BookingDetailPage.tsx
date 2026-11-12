@@ -283,7 +283,7 @@ export const BookingDetailPage: React.FC = () => {
           <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="space-y-0.5">
               <strong className="text-[14px] text-amber-900 block">
-                ⏳ Đang chờ Thổ địa phản hồi trong 24 giờ (BR-03)
+                ⏳ Đang chờ Thổ địa phản hồi trong 24 giờ 
               </strong>
               <span className="text-[13px] text-amber-800">
                 Khung giờ trên lịch vẫn mở (AVAILABLE) cho đến khi Thổ địa chấp nhận.
@@ -343,7 +343,7 @@ export const BookingDetailPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="text-[11px] font-extrabold uppercase tracking-wider bg-[#FEEDDC] text-[#D12B79] border border-[#F1DEC9] px-2.5 py-0.5 rounded">
-                  UC.17 → UC.18 / UC.19 • Cửa sổ xác nhận 24 giờ (BR-08, BR-12)
+                  Cửa sổ xác nhận 24 giờ 
                 </span>
                 <h3 className="text-[16px] font-bold text-[#1C1917] mt-1">
                   Thổ địa {guideItem?.user.fullName} đã gửi yêu cầu xác nhận hoàn thành tour!
@@ -363,7 +363,7 @@ export const BookingDetailPage: React.FC = () => {
                   onClick={() => {
                     autoConfirmCompletionTimeout(booking.id);
                     showToast(
-                      'Đã giả lập trôi qua 24h không có khiếu nại -> Tự động chuyển COMPLETED (BR-08)!',
+                      'Đã giả lập trôi qua 24h không có khiếu nại -> Tự động chuyển COMPLETED!',
                       'success'
                     );
                   }}
@@ -423,7 +423,7 @@ export const BookingDetailPage: React.FC = () => {
                 ⚖️ Hồ sơ Khiếu nại ({disputeRecord?.id || 'Đang thẩm định'})
               </h3>
               <span className="text-[12px] font-bold px-2.5 py-0.5 rounded-full bg-white text-red-800 border border-red-200">
-                {disputeRecord?.status === 'RESOLVED' ? 'Đã có phán quyết Admin' : 'Chờ Admin xử lý (UC.27)'}
+                {disputeRecord?.status === 'RESOLVED' ? 'Đã có phán quyết Admin' : 'Chờ Admin xử lý '}
               </span>
             </div>
             {disputeRecord && (
@@ -475,7 +475,7 @@ export const BookingDetailPage: React.FC = () => {
                 </strong>
               </div>
               <div className="flex justify-between text-red-700">
-                <span>Mức phạt áp dụng (BR-06):</span>
+                <span>Mức phạt áp dụng :</span>
                 <strong className="tabular-nums">−{formatMoney(booking.penalty || 0)}</strong>
               </div>
               <div className="flex justify-between text-emerald-700 border-t border-[#E7E5E4] pt-2.5 text-[15px] font-bold">
@@ -501,7 +501,7 @@ export const BookingDetailPage: React.FC = () => {
         <div className="bg-white border border-[#E7E5E4] rounded-[22px] p-6 space-y-3 shadow-xs">
           <div className="flex items-center justify-between">
             <h3 className="text-[16px] font-bold text-[#1C1917]">
-              Đánh giá của bạn cho chuyến đi này (UC.26)
+              Đánh giá của bạn cho chuyến đi này 
             </h3>
             <span className="text-amber-500 font-bold">
               {'★'.repeat(existingReview.stars)} ({existingReview.stars}/5 sao)
@@ -526,7 +526,7 @@ export const BookingDetailPage: React.FC = () => {
           <div className="flex items-center justify-between border-b border-[#E7E5E4] pb-3">
             <div>
               <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#347CCB]">
-                SERVICE_AGREEMENT • BR-10
+                Hợp đồng dịch vụ
               </span>
               <h3 className="text-[16px] font-bold text-[#1C1917]">
                 Thỏa thuận dịch vụ điện tử
@@ -613,7 +613,7 @@ export const BookingDetailPage: React.FC = () => {
               <li className="ml-5">
                 <div className="absolute w-3 h-3 bg-[#347CCB] rounded-full -left-[7px] mt-1 ring-4 ring-sky-100" />
                 <div className="font-bold text-[#1C1917]">
-                  Thổ địa gửi yêu cầu xác nhận hoàn thành tour (UC.17)
+                  Thổ địa gửi yêu cầu xác nhận hoàn thành tour 
                 </div>
                 <div className="text-[12px] text-[#78716C]">
                   {formatDateTime(booking.completionRequestedAt)} • Mở cửa sổ 24 giờ xác nhận hoặc khiếu nại
@@ -687,11 +687,11 @@ export const BookingDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* MODAL 1: HỦY ĐƠN (UC.24, BR-06) */}
+      {/* MODAL 1: HỦY ĐƠN  */}
       <Modal
         isOpen={isCancelModalOpen}
         onClose={() => setIsCancelModalOpen(false)}
-        title={`Xác nhận hủy đơn ${booking.id} (UC.24)`}
+        title={`Xác nhận hủy đơn ${booking.id} `}
         maxWidth="lg"
         footer={
           <>
@@ -710,7 +710,7 @@ export const BookingDetailPage: React.FC = () => {
               <div className="bg-[#F3F1EC] border border-[#E7E5E4] rounded-2xl p-3.5 space-y-2">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <span className="text-[12px] font-bold text-[#1C1917]">
-                    ⚡ Chọn mốc thời gian ΔT để kiểm thử 3 bậc phạt của BR-06:
+                    ⚡ Chọn mốc thời gian để xem mức hoàn hủy:
                   </span>
                   <div className="flex gap-1.5">
                     {[
@@ -799,11 +799,11 @@ export const BookingDetailPage: React.FC = () => {
         </div>
       </Modal>
 
-      {/* MODAL 2: GỬI KHIẾU NẠI (UC.19, BR-12) */}
+      {/* MODAL 2: GỬI KHIẾU NẠI */}
       <Modal
         isOpen={isDisputeModalOpen}
         onClose={() => setIsDisputeModalOpen(false)}
-        title={`Gửi hồ sơ khiếu nại đơn ${booking.id} (UC.19)`}
+        title={`Gửi hồ sơ khiếu nại đơn ${booking.id} `}
         maxWidth="lg"
         footer={
           <>
@@ -818,7 +818,7 @@ export const BookingDetailPage: React.FC = () => {
       >
         <div className="space-y-4">
           <p className="text-[13px] text-[#78716C]">
-            Khi gửi khiếu nại, đơn sẽ chuyển sang trạng thái <strong>Đang khiếu nại (DISPUTED)</strong> và tạm dừng thu 70% còn lại cho đến khi Quản trị viên đưa ra phán quyết (UC.27).
+            Khi gửi khiếu nại, đơn sẽ chuyển sang trạng thái <strong>Đang khiếu nại (DISPUTED)</strong> và tạm dừng thu 70% còn lại cho đến khi Quản trị viên đưa ra phán quyết .
           </p>
 
           <div>
@@ -869,11 +869,11 @@ export const BookingDetailPage: React.FC = () => {
         </div>
       </Modal>
 
-      {/* MODAL 3: ĐÁNH GIÁ THỔ ĐỊA (UC.26, BR-09) */}
+      {/* MODAL 3: ĐÁNH GIÁ THỔ ĐỊA */}
       <Modal
         isOpen={isReviewModalOpen}
         onClose={() => setIsReviewModalOpen(false)}
-        title={`Đánh giá Thổ địa ${guideItem?.user.fullName || ''} (UC.26)`}
+        title={`Đánh giá Thổ địa ${guideItem?.user.fullName || ''} `}
         footer={
           <>
             <Button variant="ghost" onClick={() => setIsReviewModalOpen(false)}>

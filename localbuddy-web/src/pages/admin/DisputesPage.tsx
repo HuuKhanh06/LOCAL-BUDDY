@@ -1,4 +1,4 @@
-// pages/admin/DisputesPage.tsx (UC.27: Phân xử Tranh chấp & BR-12)
+// pages/admin/DisputesPage.tsx
 // Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState, useEffect } from 'react';
@@ -95,7 +95,7 @@ export const DisputesPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-700 bg-rose-50 border border-rose-200 px-3 py-1 rounded-full mb-2">
-            <Scale className="w-3.5 h-3.5" /> Phân xử Khiếu nại & Tranh chấp • UC.27 & BR-12
+            <Scale className="w-3.5 h-3.5" /> Phân xử Khiếu nại & Tranh chấp 
           </span>
           <h1 className="text-2xl font-extrabold text-[#1C1917]">
             Trung tâm Xử lý Khiếu nại & Bảo vệ Giao dịch
@@ -288,7 +288,7 @@ export const DisputesPage: React.FC = () => {
                   >
                     {disp.status === 'RESOLVED'
                       ? 'Xem chi tiết hồ sơ phân xử'
-                      : 'Thẩm định & Ra phán quyết (UC.27)'}
+                      : 'Thẩm định & Ra phán quyết '}
                   </Button>
                 </div>
               </div>
@@ -327,7 +327,7 @@ export const DisputesPage: React.FC = () => {
                 {/* 2 Ruling Cards */}
                 <div className="space-y-2">
                   <label className="block text-xs font-extrabold uppercase tracking-wider text-[#1C1917]">
-                    Chọn phán quyết của Admin (BR-12, UC.27) *
+                    Chọn phán quyết của Admin  *
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Option 1: GUIDE_FAULT */}

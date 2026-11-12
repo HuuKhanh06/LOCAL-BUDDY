@@ -152,13 +152,13 @@ export const KycSubmissionPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#118B93] bg-[#E6F9FA] px-3 py-1 rounded-full mb-2">
-            <ShieldCheck className="w-3.5 h-3.5" /> Xác minh danh tính KYC • UC.09 & BR-01
+            <ShieldCheck className="w-3.5 h-3.5" /> Xác minh danh tính KYC 
           </span>
           <h1 className="text-2xl font-extrabold text-[#1A0A0F]">
             Hồ sơ định danh KYC & Tài khoản nhận tiền
           </h1>
           <p className="text-sm text-[#525266] mt-0.5">
-            Theo quy tắc BR-01, chỉ Hướng dẫn viên đã được Admin phê duyệt KYC (`APPROVED`) mới hiển thị công khai và được mở lịch rảnh nhận khách.
+            Chỉ Hướng dẫn viên đã được Admin phê duyệt KYC (`APPROVED`) mới hiển thị công khai và được mở lịch rảnh nhận khách.
           </p>
         </div>
       </div>
@@ -172,7 +172,7 @@ export const KycSubmissionPage: React.FC = () => {
               Hồ sơ KYC đã được phê duyệt (APPROVED)
             </h2>
             <p className="text-xs text-[#146C43]/90">
-              Tài khoản của bạn đã gắn huy hiệu <strong>Đã xác minh KYC Đà Nẵng</strong>. Hồ sơ đang hiển thị công khai trên trang tìm kiếm Du khách và bạn có toàn quyền thiết lập lịch rảnh (UC.11).
+              Tài khoản của bạn đã gắn huy hiệu <strong>Đã xác minh KYC Đà Nẵng</strong>. Hồ sơ đang hiển thị công khai trên trang tìm kiếm Du khách và bạn có toàn quyền thiết lập lịch rảnh .
             </p>
             {existingRecord?.reviewedAt && (
               <p className="text-xs text-[#146C43]/80 font-medium pt-1">
@@ -193,7 +193,7 @@ export const KycSubmissionPage: React.FC = () => {
             </h2>
             <p className="text-xs text-[#9A5B06]/90">
               Hồ sơ định danh của bạn đã được gửi lúc{' '}
-              {existingRecord ? formatDateTimeVN(existingRecord.submittedAt) : 'vừa xong'}. Trong thời gian chờ duyệt, hồ sơ chưa hiển thị trên kết quả tìm kiếm công khai (BR-01). Bạn vẫn có thể cập nhật lại giấy tờ bên dưới nếu cần bổ sung.
+              {existingRecord ? formatDateTimeVN(existingRecord.submittedAt) : 'vừa xong'}. Trong thời gian chờ duyệt, hồ sơ chưa hiển thị trên kết quả tìm kiếm công khai . Bạn vẫn có thể cập nhật lại giấy tờ bên dưới nếu cần bổ sung.
             </p>
           </div>
         </div>
@@ -384,7 +384,7 @@ export const KycSubmissionPage: React.FC = () => {
             <div className="flex justify-end pt-2">
               <Button type="submit" variant="primary" icon={<Upload className="w-4 h-4" />}>
                 {kycStatus === 'NOT_SUBMITTED'
-                  ? 'Nộp hồ sơ xác minh KYC (UC.09)'
+                  ? 'Nộp hồ sơ xác minh KYC '
                   : 'Cập nhật & Gửi duyệt lại hồ sơ KYC'}
               </Button>
             </div>
@@ -439,7 +439,7 @@ export const KycSubmissionPage: React.FC = () => {
                 <Building2 className="w-3.5 h-3.5" /> Cam kết bảo mật dữ liệu
               </div>
               <p>
-                Giấy tờ tùy thân của bạn được mã hóa và chỉ phục vụ mục đích thẩm định định danh Hướng dẫn viên bản địa Đà Nẵng bởi bộ phận Admin LocalBuddy (UC.10).
+                Giấy tờ tùy thân của bạn được mã hóa và chỉ phục vụ mục đích thẩm định định danh Hướng dẫn viên bản địa Đà Nẵng bởi bộ phận Admin LocalBuddy .
               </p>
             </div>
           </div>

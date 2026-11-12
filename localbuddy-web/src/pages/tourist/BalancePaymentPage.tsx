@@ -1,4 +1,4 @@
-// pages/tourist/BalancePaymentPage.tsx (UC.20: Tất toán 70% còn lại sau khi hoàn thành tour)
+// pages/tourist/BalancePaymentPage.tsx
 // Tích hợp lớp PaymentProvider (SANDBOX) hỗ trợ 2 nhánh chuẩn BR-13 + Khôi phục đóng tab + Chống thanh toán trùng:
 // 1. ONLINE (VNPay / MoMo / Thẻ): Thành công -> PaymentStatus = PAID, Ví HDV cộng +(G - F).
 // 2. CASH (Tiền mặt trực tiếp): PaymentStatus = WAITING_RECONCILE (Chờ HDV bấm xác nhận đã nhận đủ 70% tiền mặt ở UC.21).
@@ -141,7 +141,7 @@ export const BalancePaymentPage: React.FC = () => {
     <div className="max-w-2xl mx-auto py-4 space-y-6">
       <div className="bg-[#1C1C28] text-white rounded-[16px] p-6">
         <span className="text-[11px] font-bold uppercase tracking-wider text-[#1EC1CB]">
-          UC.20 • Quyết toán chuyến đi đã hoàn thành (BR-13) • {paymentProvider.mode}
+          Quyết toán chuyến đi đã hoàn thành  • {paymentProvider.mode}
         </span>
         <h1 className="text-[24px] font-extrabold text-white mt-1">
           Tất toán 70% còn lại • Đơn {booking.id}
@@ -251,7 +251,7 @@ export const BalancePaymentPage: React.FC = () => {
                   💵 Trả Tiền mặt trực tiếp cho HDV
                 </span>
                 <span className="text-[12px] opacity-85">
-                  HDV sẽ bấm xác nhận đã nhận đủ 70% tiền mặt trên ứng dụng (UC.21)
+                  HDV sẽ bấm xác nhận đã nhận đủ 70% tiền mặt trên ứng dụng 
                 </span>
               </button>
             </div>
@@ -320,7 +320,7 @@ export const BalancePaymentPage: React.FC = () => {
           ) : (
             <div className="border border-[#F8CA84] rounded-[14px] p-5 bg-[#FEF1DC]/50 space-y-4">
               <h4 className="text-[15px] font-bold text-[#8C4A08]">
-                💵 Hướng dẫn thanh toán Tiền mặt trực tiếp (UC.20 → UC.21):
+                💵 Hướng dẫn thanh toán Tiền mặt trực tiếp:
               </h4>
               <p className="text-[14px] text-[#1C1C28] leading-relaxed">
                 Bạn sẽ trao trực tiếp số tiền <strong>{formatMoney(booking.remainingAmount)}</strong> cho Hướng dẫn viên{' '}

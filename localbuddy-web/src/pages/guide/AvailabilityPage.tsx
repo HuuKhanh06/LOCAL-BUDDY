@@ -1,4 +1,4 @@
-// pages/guide/AvailabilityPage.tsx (UC.11: Quản lý lịch rảnh của Hướng dẫn viên)
+// pages/guide/AvailabilityPage.tsx
 // Kiểm tra BR-01: Nếu HDV chưa được duyệt KYC (APPROVED), khóa tính năng mở lịch và hiển thị banner dẫn tới trang nộp KYC (/guide/kyc).
 // Cho phép mở/đóng slot AVAILABLE <-> BUSY và thêm khung giờ rảnh mới. Khóa chỉnh sửa với các slot đang HOLD hoặc BUSY có đơn.
 
@@ -112,7 +112,7 @@ export const AvailabilityPage: React.FC = () => {
       <div className="bg-[#1C1C28] text-white rounded-[16px] p-6 sm:p-8 flex items-center justify-between flex-wrap gap-4">
         <div>
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#1EC1CB]">
-            UC.11 • Lịch làm việc theo giờ & Cơ chế Atomic Lock (BR-01, BR-04)
+            Lịch làm việc theo giờ & Cơ chế Atomic Lock 
           </span>
           <h1 className="text-[26px] sm:text-[30px] font-extrabold text-white mt-1">
             Quản lý Lịch rảnh nhận khách
@@ -123,15 +123,15 @@ export const AvailabilityPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Cảnh báo nếu HDV chưa duyệt KYC (BR-01) */}
+      {/* Cảnh báo nếu HDV chưa duyệt KYC  */}
       {!isKycApproved && (
         <div className="p-5 rounded-[16px] bg-[#FEF1DC] border-2 border-[#F8CA84] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <h3 className="text-[16px] font-extrabold text-[#8C4A08]">
-              ⚠️ Tài khoản của bạn chưa hoàn tất xác minh KYC (BR-01)
+              ⚠️ Tài khoản của bạn chưa hoàn tất xác minh KYC 
             </h3>
             <p className="text-[13px] text-[#1C1C28]">
-              Theo quy tắc nghiệp vụ BR-01, chỉ Hướng dẫn viên đã được Admin phê duyệt KYC (<strong>APPROVED</strong>) mới được mở lịch nhận khách và hiển thị trên trang tìm kiếm.
+              Chỉ Hướng dẫn viên đã được Admin phê duyệt KYC (<strong>APPROVED</strong>) mới được mở lịch nhận khách và hiển thị trên trang tìm kiếm.
             </p>
           </div>
           <Button variant="primary" onClick={() => navigate('/guide/kyc')}>
@@ -242,10 +242,10 @@ export const AvailabilityPage: React.FC = () => {
 
           <div className="p-4 rounded-[12px] bg-[#F6E6EA]/60 border border-[#E4C3CC] text-[13px] space-y-1.5">
             <strong className="text-[#1A0A0F] block">
-              Quy tắc khóa lịch nguyên tử (BR-04, BR-05):
+              Quy tắc khóa lịch nguyên tử :
             </strong>
             <p>• <strong>AVAILABLE (Đang trống):</strong> Cho phép Du khách gửi yêu cầu đặt lịch (PENDING).</p>
-            <p>• <strong>HOLD (Tạm giữ 15 phút):</strong> Tự động kích hoạt ngay khi bạn bấm Chấp nhận đơn (UC.13). Khung giờ bị khóa với mọi đơn khác trong 15 phút chờ khách đặt cọc 30%.</p>
+            <p>• <strong>HOLD (Tạm giữ 15 phút):</strong> Tự động kích hoạt ngay khi bạn bấm Chấp nhận đơn . Khung giờ bị khóa với mọi đơn khác trong 15 phút chờ khách đặt cọc 30%.</p>
             <p>• <strong>BUSY (Đã kín lịch):</strong> Đơn đã đặt cọc 30% thành công (CONFIRMED).</p>
           </div>
         </div>

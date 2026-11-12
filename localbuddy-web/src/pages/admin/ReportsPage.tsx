@@ -1,4 +1,4 @@
-// pages/admin/ReportsPage.tsx (UC.28: Báo cáo & Thống kê; QĐ-09: Hàng đợi đối soát; Giám sát booking)
+// pages/admin/ReportsPage.tsx
 // Chuẩn thiết kế tokens: #EB5B38, #272A2D, #E6E4DC, #347CCB
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -265,9 +265,7 @@ export const ReportsPage: React.FC = () => {
       {/* Header & Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E7E5E4] pb-5">
         <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#347CCB] bg-sky-50 border border-sky-200 px-3 py-1 rounded-full">
-            Admin Portal • UC.28 & QĐ-09
-          </span>
+
           <h1 className="text-[24px] sm:text-[28px] font-black text-[#1C1917] mt-2">
             Báo cáo, Đối soát & Giám sát Nền tảng
           </h1>
@@ -284,7 +282,7 @@ export const ReportsPage: React.FC = () => {
                 : 'text-[#78716C] hover:text-[#1C1917]'
             }`}
           >
-            📊 Doanh thu (UC.28)
+            📊 Doanh thu
           </button>
           <button
             type="button"
@@ -346,7 +344,7 @@ export const ReportsPage: React.FC = () => {
               className="inline-flex items-center gap-1.5 font-bold"
             >
               <Download className="w-4 h-4" />
-              <span>Xuất Báo Cáo CSV (UC.28)</span>
+              <span>Xuất Báo Cáo CSV</span>
             </Button>
           </div>
 
@@ -590,12 +588,12 @@ export const ReportsPage: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: HÀNG ĐỢI ĐỐI SOÁT & CHƯA TRẢ 70% (QĐ-09) */}
+      {/* TAB 2: HÀNG ĐỢI ĐỐI SOÁT & CHƯA TRẢ 70%  */}
       {currentTab === 'reconcile' && (
         <div className="space-y-6">
           <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-[13px] text-amber-950 space-y-1">
             <strong className="block font-bold">
-              ⚖️ Quy tắc vận hành QĐ-09: Hàng đợi đối soát & Chưa trả 70%
+              ⚖️ Quy tắc vận hành: Hàng đợi đối soát & Chưa trả 70%
             </strong>
             <p>
               Đặc tả không có hạn chót trả 70%: Hệ thống nhắc thông báo sau 24h và 72h. Quản trị viên sử dụng hàng đợi này để tra soát lại giao dịch qua cổng (`provider.queryTransaction`) hoặc xác nhận đối soát thủ công kèm ghi chú kiểm toán. Tuyệt đối không tự động hủy hoặc phạt cọc của du khách.
@@ -627,7 +625,7 @@ export const ReportsPage: React.FC = () => {
                       <th className="py-3 px-3 text-right">Cọc D (30%)</th>
                       <th className="py-3 px-3 text-right">Còn Lại B (70%)</th>
                       <th className="py-3 px-3">Trạng thái</th>
-                      <th className="py-3 px-3 text-right">Thao tác Admin (QĐ-09)</th>
+                      <th className="py-3 px-3 text-right">Thao tác Admin</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#E7E5E4]">
@@ -789,12 +787,12 @@ export const ReportsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Modal Xác nhận Đối soát thủ công (QĐ-09) */}
+      {/* Modal Xác nhận Đối soát thủ công  */}
       {reconcileModalBookingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E7E5E4]">
             <h3 className="text-lg font-bold text-[#1C1917]">
-              Xác nhận đối soát đơn {reconcileModalBookingId} (QĐ-09)
+              Xác nhận đối soát đơn {reconcileModalBookingId} 
             </h3>
             <p className="text-xs text-[#78716C]">
               Thao tác này xác nhận khoản tất toán 70% đã hoàn tất, chuyển trạng thái thanh toán sang <strong>PAID</strong> và tự động cộng doanh thu (G − F) vào Ví Thổ địa.

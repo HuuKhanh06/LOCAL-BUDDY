@@ -430,7 +430,7 @@ export const GuideProfilePage: React.FC = () => {
             {/* Tóm tắt chính sách huỷ theo Mục [9] */}
             <div className="p-3.5 bg-white border border-[#E7E5E4] rounded-2xl space-y-1.5 text-[11px] text-[#57534E]">
               <strong className="text-[#1C1917] block font-bold text-[12px]">
-                Chính sách hủy đơn & Hoàn cọc (BR-06):
+                Chính sách hủy đơn & Hoàn cọc :
               </strong>
               <div className="flex justify-between">
                 <span>• Hủy trước &gt; 48 giờ:</span>

@@ -158,7 +158,7 @@ const RoleGuard: React.FC<{
             🔒
           </div>
           <span className="inline-block px-3 py-1 rounded-full bg-[var(--lb-surface-2)] text-[var(--lb-error)] text-xs font-bold uppercase tracking-wider">
-            Tài khoản bị tạm khóa (UC.06)
+            Tài khoản bị tạm khóa
           </span>
           <h1 className="text-xl font-bold text-[var(--lb-text)]">
             Tài khoản {currentUser.fullName} đang bị tạm khóa
